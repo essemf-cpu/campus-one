@@ -5,7 +5,7 @@ import { join } from "path";
 
 const serviceAccount = JSON.parse(
   readFileSync(
-    join(process.cwd(), "scripts", "config", "campus-one-2af72-firebase-adminsdk-fbsvc-e64de834a7.json"),
+    join(process.cwd(), "scripts", "config", "serviceAccountKey.json"),
     "utf8"
   )
 );
