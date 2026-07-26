@@ -1,0 +1,233 @@
+/* ===========================
+   RESET
+=========================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* ===========================
+   BODY
+=========================== */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f9;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ===========================
+   CONTENEUR
+=========================== */
+
+.login-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ===========================
+   CARTE
+=========================== */
+
+.login-card {
+
+    width: 100%;
+    max-width: 430px;
+
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 16px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,.12);
+}
+
+/* ===========================
+   LOGO
+=========================== */
+
+.logo {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.logo img {
+    width: 90px;
+    margin-bottom: 15px;
+}
+
+.logo h1 {
+
+    color: #003366;
+
+    font-size: 32px;
+
+    margin-bottom: 8px;
+}
+
+.logo p {
+
+    color: #666;
+
+    font-size: 15px;
+}
+
+/* ===========================
+   INPUTS
+=========================== */
+
+.input-group {
+
+    margin-bottom: 20px;
+}
+
+.input-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-weight: bold;
+
+    color: #333;
+}
+
+.input-group input {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    border: 1px solid #cfcfcf;
+
+    font-size: 15px;
+
+    transition: .25s;
+}
+
+.input-group input:focus {
+
+    outline: none;
+
+    border-color: #003366;
+
+    box-shadow: 0 0 0 3px rgba(0,51,102,.15);
+}
+
+/* ===========================
+   BOUTON
+=========================== */
+
+button {
+
+    width: 100%;
+
+    padding: 15px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #003366;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: .25s;
+}
+
+button:hover {
+
+    background: #00509e;
+}
+
+/* ===========================
+   LIEN
+=========================== */
+
+.forgot {
+
+    display: block;
+
+    text-align: center;
+
+    margin-top: 18px;
+
+    text-decoration: none;
+
+    color: #003366;
+
+    font-weight: bold;
+}
+
+.forgot:hover {
+
+    text-decoration: underline;
+}
+
+/* ===========================
+   MESSAGE
+=========================== */
+
+#message {
+
+    margin-top: 18px;
+
+    text-align: center;
+
+    color: red;
+}
+
+/* ===========================
+   MOT DE PASSE
+=========================== */
+
+.password-container {
+
+    position: relative;
+}
+
+.password-container input {
+
+    padding-right: 55px;
+}
+
+.toggle-password {
+
+    position: absolute;
+
+    right: 18px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    cursor: pointer;
+
+    font-size: 20px;
+
+    user-select: none;
+}
+
+button:disabled {
+
+    opacity: .7;
+
+    cursor: not-allowed;
+}
