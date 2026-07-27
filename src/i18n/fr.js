@@ -29,9 +29,17 @@ const fr = {
             "Identifiant ou mot de passe incorrect.",
 
         NETWORK:
-            "Erreur de connexion."
+            "Erreur de connexion.",
+        
+        USER_NOT_FOUND: 
+           "Utilisateur introuvable.",
 
-    }
+        UNKNOWN: "Une erreur est survenue."
+    },
+    
+    SUCCESS: {
+    LOGIN: "Connexion réussie."
+}
 
 };
 

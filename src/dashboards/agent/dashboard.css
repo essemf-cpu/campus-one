@@ -1,0 +1,18 @@
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f5f7fa;
+}
+
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px;
+    background:#005baa;
+    color:white;
+}
+
+main{
+    padding:30px;
+}

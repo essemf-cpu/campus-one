@@ -1,3 +1,4 @@
+import { findUserByMatricule, login } from "./authService.js";
 import t from "../i18n/index.js";
 
 const form = document.getElementById("loginForm");
@@ -12,14 +13,13 @@ form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     message.textContent = "";
+    message.style.color = "red";
 
     const matricule = identifiant.value.trim();
     const mdp = password.value.trim();
 
     if (!matricule || !mdp) {
-
         message.textContent = t.ERRORS.EMPTY_FIELDS;
-
         return;
     }
 
@@ -28,7 +28,55 @@ form.addEventListener("submit", async (e) => {
 
     try {
 
-        // Firebase arrivera ici
+        console.log("Étape 1 : Recherche de l'utilisateur");
+
+        const agent = await findUserByMatricule(matricule);
+
+        console.log("Étape 2 : Utilisateur trouvé", agent);
+
+        await login(agent.email, mdp);
+
+        sessionStorage.setItem(
+    "agent",
+    JSON.stringify(agent)
+);
+
+        console.log("Étape 3 : Authentification réussie");
+
+        message.style.color = "green";
+        message.textContent = t.SUCCESS.LOGIN;
+
+        window.location.href = "../dashboards/agent/dashboard.html";
+
+    } catch (error) {
+
+        console.error(error);
+
+        message.style.color = "red";
+
+        switch (error.message) {
+
+            case "USER_NOT_FOUND":
+                message.textContent = t.ERRORS.USER_NOT_FOUND;
+                break;
+
+            default:
+
+                switch (error.code) {
+
+                    case "auth/invalid-credential":
+                        message.textContent = t.ERRORS.INVALID_CREDENTIALS;
+                        break;
+
+                    case "auth/network-request-failed":
+                        message.textContent = t.ERRORS.NETWORK;
+                        break;
+
+                    default:
+                        message.textContent = t.ERRORS.UNKNOWN;
+                }
+
+        }
 
     } finally {
 
@@ -38,7 +86,6 @@ form.addEventListener("submit", async (e) => {
     }
 
 });
-
 
 toggle.addEventListener("click", () => {
 
@@ -51,6 +98,7 @@ toggle.addEventListener("click", () => {
 
         password.type = "password";
         toggle.classList.replace("fa-eye-slash", "fa-eye");
+
     }
 
 });

@@ -1,20 +1,64 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Campus One</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="style.css">
+    <title>Campus One</title>
+
+    <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
 
-  <h1>Campus One</h1>
-  <p>Un campus. Une plateforme. Tous les services.</p>
+    <header class="navbar">
 
-  <script type="module" src="app.js"></script>
+        <h1>Campus One</h1>
+
+        <nav>
+
+            <a href="#">Accueil</a>
+            <a href="#">À propos</a>
+            <a href="#">Services</a>
+            <a href="#">Contact</a>
+
+            <a href="src/auth/login.html" class="btn-login">
+                Se connecter
+            </a>
+
+        </nav>
+
+    </header>
+
+    <section class="hero">
+
+        <div class="overlay">
+
+            <h2>Une plateforme. Un campus. Tous les services du COUD.</h2>
+
+            <p>
+                Campus One centralise l'ensemble des services
+                destinés aux étudiants, aux agents et aux
+                administrations du COUD.
+            </p>
+
+            <a href="src/auth/login.html" class="btn-start">
+                Accéder à la plateforme
+            </a>
+
+        </div>
+
+    </section>
+
+    <footer>
+
+        © Campus One - COUD
+
+    </footer>
 
 </body>
+
 </html>
