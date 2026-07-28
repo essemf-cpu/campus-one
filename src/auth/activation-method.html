@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Choix du mode de confirmation</title>
+    <link rel="stylesheet" href="activation-method.css">
+</head>
+<body>
+
+<h1>Choisissez où recevoir votre code</h1>
+
+<label>
+
+    <input
+        type="radio"
+        name="mode"
+        value="email"
+        checked>
+
+    📧 <span id="email"></span>
+
+</label>
+
+<br><br>
+
+<label>
+
+    <input
+        type="radio"
+        name="mode"
+        value="phone">
+
+    📱 <span id="phone"></span>
+
+</label>
+
+<button id="continueBtn">
+    Continuer
+</button>
+
+</body>
+</html>
+
+<script type="module" src="activation-method.js"></script>

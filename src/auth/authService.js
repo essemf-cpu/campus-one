@@ -59,3 +59,49 @@ export async function findUserByMatricule(matricule) {
     return snapshot.docs[0].data();
 
 }
+
+export async function checkMatricule(matricule) {
+
+    const q = query(
+        collection(db, "agents"),
+        where("matricule", "==", matricule)
+    );
+
+    const snapshot = await getDocs(q);
+
+    return !snapshot.empty;
+
+}
+
+function maskEmail(email) {
+
+    const [nom, domaine] = email.split("@");
+
+    const debut = nom.substring(0, 2);
+
+    return debut + "*".repeat(Math.max(1, nom.length - 2)) + "@" + domaine;
+
+}
+
+function maskPhone(phone) {
+
+    const numero = phone.toString();
+
+    return numero.substring(0, 2)
+        + " *** ** "
+        + numero.substring(numero.length - 2);
+
+}
+
+export async function getActivationInfos(matricule) {
+
+    const agent = await findUserByMatricule(matricule);
+
+    return {
+
+        email: maskEmail(agent.email),
+        phone: maskPhone(agent.telephone),
+
+    };
+
+}
