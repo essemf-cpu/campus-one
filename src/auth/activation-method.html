@@ -2,43 +2,71 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choix du mode de confirmation</title>
     <link rel="stylesheet" href="activation-method.css">
 </head>
+
 <body>
 
-<h1>Choisissez où recevoir votre code</h1>
+<div class="card">
 
-<label>
+    <h1>Choisissez où recevoir votre code</h1>
 
-    <input
-        type="radio"
-        name="mode"
-        value="email"
-        checked>
+    <p class="subtitle">
+        Un code de vérification vous sera envoyé afin de confirmer votre identité.
+    </p>
 
-    📧 <span id="email"></span>
+    <label class="option">
 
-</label>
+        <div class="left">
 
-<br><br>
+            <input
+                type="radio"
+                name="mode"
+                value="email"
+                checked>
 
-<label>
+            <div>
 
-    <input
-        type="radio"
-        name="mode"
-        value="phone">
+                <h3>📧 E-mail</h3>
 
-    📱 <span id="phone"></span>
+                <span id="email"></span>
 
-</label>
+            </div>
 
-<button id="continueBtn">
-    Continuer
-</button>
+        </div>
+
+    </label>
+
+    <label class="option">
+
+        <div class="left">
+
+            <input
+                type="radio"
+                name="mode"
+                value="phone">
+
+            <div>
+
+                <h3>📱 Téléphone</h3>
+
+                <span id="phone"></span>
+
+            </div>
+
+        </div>
+
+    </label>
+
+    <button id="continueBtn">
+        Continuer
+    </button>
+
+</div>
+
+<script type="module" src="activation-method.js"></script>
 
 </body>
 </html>
-
-<script type="module" src="activation-method.js"></script>

@@ -7,50 +7,87 @@
 
 body{
     background:#f4f7fb;
+    min-height:100vh;
     display:flex;
     justify-content:center;
     align-items:center;
-    height:100vh;
+    padding:20px;
 }
 
 .card{
-    width:450px;
-    background:white;
+    width:100%;
+    max-width:480px;
+    background:#fff;
+    border-radius:18px;
     padding:35px;
-    border-radius:15px;
-    box-shadow:0 10px 30px rgba(0,0,0,.15);
+    box-shadow:0 12px 35px rgba(0,0,0,.08);
 }
 
 h1{
     color:#005baa;
-    margin-bottom:15px;
+    font-size:28px;
+    margin-bottom:10px;
 }
 
 .subtitle{
     color:#666;
-    margin-bottom:25px;
+    line-height:1.5;
+    margin-bottom:30px;
 }
 
 .option{
-    border:1px solid #ddd;
-    border-radius:10px;
+    display:block;
+    border:2px solid #e5e7eb;
+    border-radius:14px;
     padding:18px;
-    margin-bottom:15px;
+    margin-bottom:16px;
     cursor:pointer;
+    transition:.2s;
 }
 
 .option:hover{
     border-color:#005baa;
+    transform:translateY(-2px);
+}
+
+.left{
+    display:flex;
+    align-items:flex-start;
+    gap:15px;
+}
+
+input[type="radio"]{
+    margin-top:6px;
+    accent-color:#005baa;
+    transform:scale(1.2);
+}
+
+h3{
+    font-size:18px;
+    color:#222;
+    margin-bottom:6px;
+}
+
+.option span{
+    color:#666;
+    font-size:15px;
+    word-break:break-word;
 }
 
 button{
     width:100%;
-    margin-top:20px;
+    margin-top:15px;
     padding:15px;
     border:none;
-    border-radius:10px;
+    border-radius:12px;
     background:#005baa;
     color:white;
     font-size:16px;
+    font-weight:bold;
     cursor:pointer;
+    transition:.2s;
+}
+
+button:hover{
+    background:#00498b;
 }

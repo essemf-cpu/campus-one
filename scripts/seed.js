@@ -2,6 +2,7 @@ import departements from "./data/departements.js";
 import rattachements from "./data/rattachements.js";
 import services from "./data/services.js";
 import postes from "./data/postes.js";
+import agents from "./data/seed/agents.js";
 
 import { seedCollection } from "./utils/seedCollection.js";
 
@@ -13,6 +14,7 @@ async function seed() {
     await seedCollection("rattachements", rattachements);
     await seedCollection("services", services);
     await seedCollection("postes", postes);
+    await seedCollection("agents", agents);
 
     console.log("\n🎉 Seeder terminé avec succès !");
     process.exit(0);
