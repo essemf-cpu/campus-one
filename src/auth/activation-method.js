@@ -43,26 +43,19 @@ sessionStorage.setItem(
 
         if (mode === "phone") {
 
-            console.log(
-                "=========================="
-            );
-            console.log(
-                "MODE DÉVELOPPEMENT"
-            );
-            console.log(
-                "Code SMS :", code
-            );
-            console.log(
-                "=========================="
-            );
+    console.log("==========================");
+    console.log("MODE DÉVELOPPEMENT");
+    console.log("Code SMS :", code);
+    console.log("==========================");
 
-            alert(
-                "Mode développeur : regarde la console."
-            );
+    alert("Mode développeur : regarde la console.");
 
-            return;
+    window.location.href =
+        `activation-code.html?matricule=${matricule}`;
 
-        }
+    return;
+
+}
 
         try {
 

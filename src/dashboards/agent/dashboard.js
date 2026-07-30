@@ -1,22 +1,37 @@
-const agent = JSON.parse(
-    sessionStorage.getItem("agent")
-);
+import { requireAuth } from "../../auth/authGuard.js";
+import { getCurrentUser } from "../../auth/authService.js";
+import { auth } from "../../firebase/firebase.js";
 
-if (!agent) {
+requireAuth(async (user) => {
 
-    window.location.href =
-    "../../auth/login.html";
+    try {
 
-}
+        const currentUser = await getCurrentUser(user.uid);
 
-document.getElementById("welcome").textContent =
-`Bienvenue ${agent.prenom} ${agent.nom}`;
+        const account = currentUser.account;
+        const profile = currentUser.profile;
 
-document.getElementById("fonction").textContent =
-agent.fonction;
+        document.getElementById("welcome").textContent =
+            `Bienvenue ${profile.prenom} ${profile.nom}`;
 
-document.getElementById("service").textContent =
-agent.service;
+        document.getElementById("fonction").textContent =
+            profile.fonction;
 
-document.getElementById("affectation").textContent =
-agent.affectation;
+        document.getElementById("service").textContent =
+            profile.service;
+
+        document.getElementById("affectation").textContent =
+            profile.affectation;
+
+    } catch (error) {
+
+        console.error(error);
+
+        await auth.signOut();
+
+        window.location.href =
+            "../../auth/login.html";
+
+    }
+
+});

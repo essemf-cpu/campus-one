@@ -134,7 +134,7 @@ document
         return;
 
     }
-
+sessionStorage.setItem("activationVerified", "true");
     window.location.href =
 `create-password.html?matricule=${matricule}`;
 

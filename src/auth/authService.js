@@ -1,85 +1,154 @@
 import {
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  signOut,
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+    signOut
 } from "firebase/auth";
 
-import { auth } from "../firebase/firebase.js";
+import { auth, db } from "../firebase/firebase.js";
 
 import {
     collection,
     query,
     where,
-    getDocs
+    getDocs,
+    doc,
+    getDoc
 } from "firebase/firestore";
 
-import { db } from "../firebase/firebase.js";
+/* ===========================
+   AUTHENTIFICATION
+=========================== */
 
-/**
- * Connexion
- */
 export async function login(email, password) {
-  return await signInWithEmailAndPassword(
-    auth,
-    email,
-    password
-  );
-}
 
-/**
- * Déconnexion
- */
-export async function logout() {
-  return await signOut(auth);
-}
-
-/**
- * Mot de passe oublié
- */
-export async function forgotPassword(email) {
-  return await sendPasswordResetEmail(
-    auth,
-    email
-  );
-}
-
-export async function findUserByMatricule(matricule) {
-
-    const q = query(
-        collection(db, "agents"),
-        where("matricule", "==", matricule)
+    return signInWithEmailAndPassword(
+        auth,
+        email,
+        password
     );
 
-    const snapshot = await getDocs(q);
+}
+
+export async function logout() {
+
+    return signOut(auth);
+
+}
+
+export async function forgotPassword(email) {
+
+    return sendPasswordResetEmail(
+        auth,
+        email
+    );
+
+}
+
+/* ===========================
+   UTILISATEURS
+=========================== */
+
+/**
+ * Recherche un utilisateur par UID
+ * (agents aujourd'hui, étudiants demain)
+ */
+export async function getCurrentUser(uid) {
+
+    // Lire le compte dans users
+    const accountRef = doc(db, "users", uid);
+
+    const accountSnap = await getDoc(accountRef);
+
+    if (!accountSnap.exists()) {
+        throw new Error("ACCOUNT_NOT_FOUND");
+    }
+
+    const account = accountSnap.data();
+
+    // Lire automatiquement le profil
+    const profileRef = doc(db, account.profile);
+
+    const profileSnap = await getDoc(profileRef);
+
+    if (!profileSnap.exists()) {
+        throw new Error("PROFILE_NOT_FOUND");
+    }
+
+    return {
+        account,
+        profile: profileSnap.data()
+    };
+
+}
+
+/**
+ * Recherche un utilisateur par matricule
+ */
+export async function findUserByMatricule(
+    matricule,
+    collectionName = "agents"
+) {
+
+    const snapshot = await getDocs(
+
+        query(
+
+            collection(db, collectionName),
+
+            where("matricule", "==", matricule)
+
+        )
+
+    );
 
     if (snapshot.empty) {
+
         throw new Error("USER_NOT_FOUND");
+
     }
 
     return snapshot.docs[0].data();
 
 }
 
-export async function checkMatricule(matricule) {
+/**
+ * Vérifie si un matricule existe
+ */
+export async function checkMatricule(
+    matricule,
+    collectionName = "agents"
+) {
 
-    const q = query(
-        collection(db, "agents"),
-        where("matricule", "==", matricule)
+    const snapshot = await getDocs(
+
+        query(
+
+            collection(db, collectionName),
+
+            where("matricule", "==", matricule)
+
+        )
+
     );
-
-    const snapshot = await getDocs(q);
 
     return !snapshot.empty;
 
 }
 
+/* ===========================
+   ACTIVATION
+=========================== */
+
 function maskEmail(email) {
 
     const [nom, domaine] = email.split("@");
 
-    const debut = nom.substring(0, 2);
-
-    return debut + "*".repeat(Math.max(1, nom.length - 2)) + "@" + domaine;
+    return (
+        nom.substring(0, 2) +
+        "*".repeat(Math.max(1, nom.length - 2)) +
+        "@" +
+        domaine
+    );
 
 }
 
@@ -87,21 +156,69 @@ function maskPhone(phone) {
 
     const numero = phone.toString();
 
-    return numero.substring(0, 2)
-        + " *** ** "
-        + numero.substring(numero.length - 2);
+    return (
+        numero.substring(0, 2) +
+        " *** ** " +
+        numero.substring(numero.length - 2)
+    );
 
 }
 
-export async function getActivationInfos(matricule) {
+export async function getActivationInfos(
+    matricule,
+    collectionName = "agents"
+) {
 
-    const agent = await findUserByMatricule(matricule);
+    const user = await findUserByMatricule(
+        matricule,
+        collectionName
+    );
 
     return {
 
-        email: maskEmail(agent.email),
-        phone: maskPhone(agent.telephone),
+        email: maskEmail(user.email),
+
+        phone: maskPhone(user.telephone)
 
     };
+
+}
+
+export async function findUser(matricule) {
+
+    const collections = [
+        "agents",
+        "etudiants"
+    ];
+
+    for (const collectionName of collections) {
+
+        const snapshot = await getDocs(
+
+            query(
+
+                collection(db, collectionName),
+
+                where("matricule", "==", matricule)
+
+            )
+
+        );
+
+        if (!snapshot.empty) {
+
+            return {
+
+                ...snapshot.docs[0].data(),
+
+                collection: collectionName
+
+            };
+
+        }
+
+    }
+
+    throw new Error("USER_NOT_FOUND");
 
 }

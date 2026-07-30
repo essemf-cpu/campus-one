@@ -1,4 +1,4 @@
-import { findUserByMatricule, login } from "./authService.js";
+import { findUser, login } from "./authService.js";
 import t from "../i18n/index.js";
 
 const form = document.getElementById("loginForm");
@@ -28,25 +28,37 @@ form.addEventListener("submit", async (e) => {
 
     try {
 
-        console.log("Étape 1 : Recherche de l'utilisateur");
+        const user = await findUser(matricule);
 
-        const agent = await findUserByMatricule(matricule);
-
-        console.log("Étape 2 : Utilisateur trouvé", agent);
-
-        await login(agent.email, mdp);
+        await login(user.email, mdp);
 
         sessionStorage.setItem(
-    "agent",
-    JSON.stringify(agent)
-);
-
-        console.log("Étape 3 : Authentification réussie");
+            "user",
+            JSON.stringify(user)
+        );
 
         message.style.color = "green";
         message.textContent = t.SUCCESS.LOGIN;
 
-        window.location.href = "../dashboards/agent/dashboard.html";
+        switch (user.collection) {
+
+            case "agents":
+
+                window.location.href =
+                    "../dashboards/agent/dashboard.html";
+                break;
+
+            case "etudiants":
+
+                window.location.href =
+                    "../dashboards/etudiant/dashboard.html";
+                break;
+
+            default:
+
+                throw new Error("UNKNOWN_ROLE");
+
+        }
 
     } catch (error) {
 
@@ -60,20 +72,28 @@ form.addEventListener("submit", async (e) => {
                 message.textContent = t.ERRORS.USER_NOT_FOUND;
                 break;
 
+            case "UNKNOWN_ROLE":
+                message.textContent = "Rôle inconnu.";
+                break;
+
             default:
 
                 switch (error.code) {
 
                     case "auth/invalid-credential":
-                        message.textContent = t.ERRORS.INVALID_CREDENTIALS;
+                        message.textContent =
+                            t.ERRORS.INVALID_CREDENTIALS;
                         break;
 
                     case "auth/network-request-failed":
-                        message.textContent = t.ERRORS.NETWORK;
+                        message.textContent =
+                            t.ERRORS.NETWORK;
                         break;
 
                     default:
-                        message.textContent = t.ERRORS.UNKNOWN;
+                        message.textContent =
+                            t.ERRORS.UNKNOWN;
+
                 }
 
         }
@@ -92,12 +112,18 @@ toggle.addEventListener("click", () => {
     if (password.type === "password") {
 
         password.type = "text";
-        toggle.classList.replace("fa-eye", "fa-eye-slash");
+        toggle.classList.replace(
+            "fa-eye",
+            "fa-eye-slash"
+        );
 
     } else {
 
         password.type = "password";
-        toggle.classList.replace("fa-eye-slash", "fa-eye");
+        toggle.classList.replace(
+            "fa-eye-slash",
+            "fa-eye"
+        );
 
     }
 
