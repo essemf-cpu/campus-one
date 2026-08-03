@@ -16,3 +16,47 @@ header{
 main{
     padding:30px;
 }
+
+#modulesContainer{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+
+    gap:20px;
+
+    margin-top:25px;
+
+}
+
+.module-card{
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:25px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.12);
+
+    transition:.2s;
+
+}
+
+.module-card:hover{
+
+    transform:translateY(-5px);
+
+}
+
+.icon{
+
+    font-size:42px;
+
+    margin-bottom:10px;
+
+}

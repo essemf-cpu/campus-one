@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "seed": "node scripts/seed.js",
     "server": "node server.js",
-"server:dev": "nodemon server.js"
+    "server:dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +20,8 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "firebase": "^12.16.0",
-    "firebase-admin": "^14.2.0"
+    "firebase-admin": "^14.2.0",
+    "lucide": "^1.28.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.14",
