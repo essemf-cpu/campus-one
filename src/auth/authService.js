@@ -19,6 +19,8 @@ import {
    AUTHENTIFICATION
 =========================== */
 
+let currentUserCache = null;
+
 export async function login(email, password) {
 
     return signInWithEmailAndPassword(
@@ -54,9 +56,11 @@ export async function forgotPassword(email) {
  */
 export async function getCurrentUser(uid) {
 
-    // Lire le compte dans users
-    const accountRef = doc(db, "users", uid);
+    if (currentUserCache) {
+        return currentUserCache;
+    }
 
+    const accountRef = doc(db, "users", uid);
     const accountSnap = await getDoc(accountRef);
 
     if (!accountSnap.exists()) {
@@ -65,19 +69,27 @@ export async function getCurrentUser(uid) {
 
     const account = accountSnap.data();
 
-    // Lire automatiquement le profil
     const profileRef = doc(db, account.profile);
-
     const profileSnap = await getDoc(profileRef);
 
     if (!profileSnap.exists()) {
         throw new Error("PROFILE_NOT_FOUND");
     }
 
-    return {
+    currentUserCache = {
+
         account,
         profile: profileSnap.data()
+
     };
+
+    return currentUserCache;
+
+}
+
+export function clearCurrentUserCache() {
+
+    currentUserCache = null;
 
 }
 

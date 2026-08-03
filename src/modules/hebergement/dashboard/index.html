@@ -14,15 +14,346 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+<link rel="stylesheet" href="../components/sidebar.css">
+
 </head>
 
 <body>
 
-    <div id="sidebar-container"></div>
+    <div id="app-loader">
+
+    <img src="/src/assets/logo coud.png" alt="Campus One">
+
+    <h2>Campus One</h2>
+
+    <p>Chargement de votre espace...</p>
+
+</div>
+
+    <aside class="sidebar">
+
+    <div class="top">
+
+        <button class="menu-btn">
+            <i data-lucide="menu"></i>
+        </button>
+
+       <div class="profile">
+
+    <div class="profile-header">
+
+        <img src="/src/assets/logo coud.png" class="logo" id="sidebar-logo">
+
+        <button class="notif-btn">
+            <i data-lucide="bell"></i>
+            <span class="badge hidden" id="notif-count"></span>
+        </button>
+
+    </div>
+
+    <div class="profile-info">
+
+        <h3 id="sidebar-affectation"></h3>
+
+        <p id="sidebar-fonction"></p>
+
+    </div>
+
+    
+
+</div>
+
+    <div class="section">
+
+        <h4>VOIR AUSSI</h4>
+
+        <a href="#">
+            <i data-lucide="shirt"></i>
+            <span>Lingerie</span>
+        </a>
+
+        <a href="#">
+            <i data-lucide="users"></i>
+            <span>Résidents</span>
+        </a>
+
+        <a href="#">
+            <i data-lucide="wallet"></i>
+            <span>Recouvrement</span>
+        </a>
+
+    </div>
+
+    <div class="section">
+
+        <h4>BON DE TRAVAIL</h4>
+
+        <a class="active" href="#">
+            <i data-lucide="clipboard-list"></i>
+            <span>Demandes</span>
+        </a>
+
+        <a href="#">
+            <i data-lucide="clipboard-check"></i>
+            <span>Suivi</span>
+        </a>
+
+        <a href="#">
+            <i data-lucide="archive"></i>
+            <span>Anciens bons</span>
+        </a>
+
+        <a href="#">
+            <i data-lucide="history"></i>
+            <span>Historique des demandes</span>
+        </a>
+
+    </div>
+
+    <div class="section">
+
+        <h4>GESTION</h4>
+
+        <a href="#">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Mon tableau de bord</span>
+        </a>
+
+    </div>
+
+ </div>
+
+    <div class="bottom">
+
+        <a href="#" id="logout-btn">
+            <i data-lucide="log-out"></i>
+            <span>Déconnexion</span>
+        </a>
+
+        <div class="agent-card">
+
+    <div class="agent-avatar">
+        <i data-lucide="user"></i>
+    </div>
+
+    <div class="agent-info">
+
+        <strong class="agent-name" id="sidebar-nom"></strong>
+
+        <small class="agent-site" id="sidebar-site"></small>
+
+    </div>
+
+    <button class="agent-menu">
+        <i data-lucide="chevron-down"></i>
+    </button>
+
+</div>
+
+    </div>
+
+</aside>
 
     <main id="content">
 
-    </main>
+        <section class="page-title">
+
+    <h1>Bon de travail - <span id="page-title"></span></h1>
+
+</section>
+
+    <!-- =========================
+         DEMANDES ETUDIANTS
+    ========================== -->
+
+    <section class="card demandes-card">
+
+        <div class="card-header">
+
+            <h2>Demandes étudiants</h2>
+
+        </div>
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Nom</th>
+
+                    <th>Carte</th>
+
+                    <th>Chambre</th>
+
+                    <th>Niveau</th>
+
+                    <th>Type</th>
+
+                    <th>Description</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="demandes-body">
+
+<tr class="empty-row">
+
+<td colspan="7">
+
+Aucune demande pour le moment
+
+</td>
+
+</tr>
+
+</tbody>
+
+        </table>
+
+    </section>
+
+    <!-- =========================
+         NOUVEAU BON
+    ========================== -->
+
+    <section class="card nouveau-card">
+
+        <div class="card-header">
+
+            <h2>Nouveau bon</h2>
+
+        </div>
+
+        <form id="bonForm">
+
+            <div class="grid">
+
+                <div>
+
+                    <label>Date</label>
+
+                    <input
+                        type="date"
+                        id="date">
+
+                </div>
+
+                <div>
+
+                    <label>Type</label>
+
+                    <select id="type">
+
+                    </select>
+
+                </div>
+
+                <div class="full">
+
+                    <label>Description</label>
+
+                    <textarea
+                        id="description"
+                        rows="4">
+                    </textarea>
+
+                </div>
+
+                <div>
+
+                    <label>Chambre</label>
+
+                    <input
+                        id="chambre">
+
+                </div>
+
+                <div>
+
+                    <label>Toilette</label>
+
+                    <input
+                        id="toilette">
+
+                </div>
+
+            </div>
+
+            <button
+                class="primary-btn"
+                type="submit">
+
+                Envoyer
+
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- =========================
+         SUIVI
+    ========================== -->
+
+    <section class="card suivi-card">
+
+        <div class="card-header">
+
+            <h2>Suivi (bons du jour)</h2>
+
+        </div>
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Date</th>
+
+                    <th>Type</th>
+
+                    <th>Description</th>
+
+                    <th>Chambre</th>
+
+                    <th>Toilette</th>
+
+                    <th>Supprimer</th>
+
+                    <th>Statut</th>
+
+                    <th>Cause</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="bons-body">
+
+<tr class="empty-row">
+
+<td colspan="9">
+
+Aucun bon aujourd'hui
+
+</td>
+
+</tr>
+
+</tbody>
+
+        </table>
+
+    </section>
+
+</main>
 
     <script type="module" src="dashboard.js"></script>
 

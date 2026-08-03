@@ -4,6 +4,7 @@ import { getCurrentUser } from "./authService.js";
 
 export function requireRole(expectedRole, callback) {
 
+    console.time("AUTH");
     onAuthStateChanged(auth, async (firebaseUser) => {
 
         if (!firebaseUser) {
@@ -16,6 +17,7 @@ export function requireRole(expectedRole, callback) {
         try {
 
             const currentUser = await getCurrentUser(firebaseUser.uid);
+            console.timeEnd("AUTH");
 
             const account = currentUser.account;
             const profile = currentUser.profile;
@@ -43,6 +45,7 @@ export function requireRole(expectedRole, callback) {
             window.location.href = "../../auth/login.html";
 
         }
+        
 
     });
 
