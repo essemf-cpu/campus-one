@@ -1,52 +1,44 @@
-import { onAuthStateChanged } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase.js";
-import { getCurrentUser } from "./authService.js";
+import { getSession } from "./sessionManager.js";
 
-export function requireRole(expectedRole, callback) {
+export async function requireRole(expectedRole, callback) {
 
-    console.time("AUTH");
-    onAuthStateChanged(auth, async (firebaseUser) => {
+    try {
 
-        if (!firebaseUser) {
+        const session = await getSession();
+
+        if (!session) {
 
             window.location.href = "../../auth/login.html";
             return;
 
         }
 
-        try {
+        const { account, profile } = session;
 
-            const currentUser = await getCurrentUser(firebaseUser.uid);
-            console.timeEnd("AUTH");
+        if (account.role !== expectedRole) {
 
-            const account = currentUser.account;
-            const profile = currentUser.profile;
-
-            if (account.role !== expectedRole) {
-
-                window.location.href = "../../403.html";
-                return;
-
-            }
-
-            await callback({
-
-                account,
-                profile
-
-            });
-
-        } catch (error) {
-
-            console.error(error);
-
-            await auth.signOut();
-
-            window.location.href = "../../auth/login.html";
+            window.location.href = "../../403.html";
+            return;
 
         }
-        
 
-    });
+        await callback({
+
+            account,
+            profile
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        await signOut(auth);
+
+        window.location.href = "../../auth/login.html";
+
+    }
 
 }

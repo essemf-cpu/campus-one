@@ -15,6 +15,8 @@ import {
     getDoc
 } from "firebase/firestore";
 
+import { clearSession } from "./sessionManager.js";
+
 /* ===========================
    AUTHENTIFICATION
 =========================== */
@@ -63,18 +65,14 @@ export async function getCurrentUser(uid) {
     const accountRef = doc(db, "users", uid);
     const accountSnap = await getDoc(accountRef);
 
-    if (!accountSnap.exists()) {
-        throw new Error("ACCOUNT_NOT_FOUND");
-    }
+    console.time("PROFILE");
 
     const account = accountSnap.data();
 
     const profileRef = doc(db, account.profile);
     const profileSnap = await getDoc(profileRef);
 
-    if (!profileSnap.exists()) {
-        throw new Error("PROFILE_NOT_FOUND");
-    }
+    console.timeEnd("PROFILE");
 
     currentUserCache = {
 
@@ -90,6 +88,8 @@ export async function getCurrentUser(uid) {
 export function clearCurrentUserCache() {
 
     currentUserCache = null;
+
+    clearSession();
 
 }
 

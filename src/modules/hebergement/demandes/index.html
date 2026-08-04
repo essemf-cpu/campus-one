@@ -8,7 +8,7 @@
 
     <title>Hébergement</title>
 
-    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="demandes.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -20,7 +20,7 @@
 
 <body>
 
-    <div id="app-loader">
+<div id="app-loader">
 
     <img src="/src/assets/logo coud.png" alt="Campus One">
 
@@ -30,129 +30,7 @@
 
 </div>
 
-    <aside class="sidebar">
-
-    <div class="top">
-
-        <button class="menu-btn">
-            <i data-lucide="menu"></i>
-        </button>
-
-       <div class="profile">
-
-    <div class="profile-header">
-
-        <img src="/src/assets/logo coud.png" class="logo" id="sidebar-logo">
-
-        <button class="notif-btn">
-            <i data-lucide="bell"></i>
-            <span class="badge hidden" id="notif-count"></span>
-        </button>
-
-    </div>
-
-    <div class="profile-info">
-
-        <h3 id="sidebar-affectation"></h3>
-
-        <p id="sidebar-fonction"></p>
-
-    </div>
-
-    
-
-</div>
-
-    <div class="section">
-
-        <h4>VOIR AUSSI</h4>
-
-        <a href="#">
-            <i data-lucide="shirt"></i>
-            <span>Lingerie</span>
-        </a>
-
-        <a href="#">
-            <i data-lucide="users"></i>
-            <span>Résidents</span>
-        </a>
-
-        <a href="#">
-            <i data-lucide="wallet"></i>
-            <span>Recouvrement</span>
-        </a>
-
-    </div>
-
-    <div class="section">
-
-        <h4>BON DE TRAVAIL</h4>
-
-        <a class="active" href="#">
-            <i data-lucide="clipboard-list"></i>
-            <span>Demandes</span>
-        </a>
-
-        <a href="#">
-            <i data-lucide="clipboard-check"></i>
-            <span>Suivi</span>
-        </a>
-
-        <a href="#">
-            <i data-lucide="archive"></i>
-            <span>Anciens bons</span>
-        </a>
-
-        <a href="#">
-            <i data-lucide="history"></i>
-            <span>Historique des demandes</span>
-        </a>
-
-    </div>
-
-    <div class="section">
-
-        <h4>GESTION</h4>
-
-        <a href="#">
-            <i data-lucide="layout-dashboard"></i>
-            <span>Mon tableau de bord</span>
-        </a>
-
-    </div>
-
- </div>
-
-    <div class="bottom">
-
-        <a href="#" id="logout-btn">
-            <i data-lucide="log-out"></i>
-            <span>Déconnexion</span>
-        </a>
-
-        <div class="agent-card">
-
-    <div class="agent-avatar">
-        <i data-lucide="user"></i>
-    </div>
-
-    <div class="agent-info">
-
-        <strong class="agent-name" id="sidebar-nom"></strong>
-
-        <small class="agent-site" id="sidebar-site"></small>
-
-    </div>
-
-    <button class="agent-menu">
-        <i data-lucide="chevron-down"></i>
-    </button>
-
-</div>
-
-    </div>
-
-</aside>
+<div id="sidebar-container"></div>
 
     <main id="content">
 
@@ -299,7 +177,7 @@ Aucune demande pour le moment
          SUIVI
     ========================== -->
 
-    <section class="card suivi-card">
+    <section id="suivi" class="card suivi-card">
 
         <div class="card-header">
 
@@ -355,7 +233,7 @@ Aucun bon aujourd'hui
 
 </main>
 
-    <script type="module" src="dashboard.js"></script>
+    <script type="module" src="demandes.js"></script>
 
 </body>
 

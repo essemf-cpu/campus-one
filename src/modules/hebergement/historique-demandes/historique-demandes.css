@@ -1,0 +1,205 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    display:flex;
+
+    min-height:100vh;
+
+    background:#f5f7fb;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+#content{
+
+    flex:1;
+
+    padding:28px;
+
+    background:#f6f8fb;
+
+    overflow:auto;
+
+}
+
+/* ==========================
+   PAGE
+========================== */
+
+.page-title{
+
+    margin-bottom:20px;
+
+}
+
+.page-title h1{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    color:#0f172a;
+
+}
+
+/* ==========================
+   CARTES
+========================== */
+
+.card{
+
+    width:100%;
+
+    background:#fff;
+
+    border:1px solid #edf1f7;
+
+    border-radius:18px;
+
+    padding:20px;
+
+    box-shadow:0 4px 16px rgba(15,23,42,.05);
+
+}
+
+.card-header{
+
+    margin-bottom:20px;
+
+}
+
+.card-header h2{
+
+    font-size:22px;
+
+    font-weight:700;
+
+    color:#0f172a;
+
+}
+
+/* ==========================
+   TABLEAU
+========================== */
+
+.table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.table th{
+
+    text-align:left;
+
+    padding:12px;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    color:#334155;
+
+    border-bottom:1px solid #e8edf4;
+
+    background:#f8fafc;
+
+}
+
+.table td{
+
+    padding:14px 12px;
+
+    font-size:14px;
+
+    color:#475569;
+
+    border-bottom:1px solid #eef2f7;
+
+}
+
+.table tbody tr:hover{
+
+    background:#f8fafc;
+
+}
+
+.empty-row td{
+
+    text-align:center;
+
+    padding:30px;
+
+    color:#94a3b8;
+
+}
+
+/* ==========================
+   LOADER
+========================== */
+
+#app-loader{
+
+    position:fixed;
+
+    inset:0;
+
+    background:#fff;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:999999;
+
+}
+
+#app-loader img{
+
+    width:260px;
+
+    max-width:70%;
+
+}
+
+#app-loader h2{
+
+    margin-top:18px;
+
+    color:#2563eb;
+
+}
+
+#app-loader p{
+
+    margin-top:8px;
+
+    color:#64748b;
+
+}
+
+body:not(.loaded) #sidebar-container,
+body:not(.loaded) .sidebar,
+body:not(.loaded) #content{
+
+    visibility:hidden;
+
+}
+
+body.loaded #app-loader{
+
+    display:none;
+
+}

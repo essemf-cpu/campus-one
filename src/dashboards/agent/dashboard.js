@@ -5,7 +5,7 @@ requireRole("agent", async ({ profile }) => {
     if (profile.service === "Service de l'Hébergement") {
 
         window.location.href =
-            "../../modules/hebergement/dashboard/index.html";
+            "../../modules/hebergement/demandes/index.html";
 
     }
 

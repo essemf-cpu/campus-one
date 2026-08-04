@@ -1,4 +1,4 @@
-import { db } from "../config/firebaseAdmin.js";
+import { db } from "../../server/config/firebaseAdmin.js";
 
 export async function seedCollection(collectionName, data) {
   const collection = db.collection(collectionName);

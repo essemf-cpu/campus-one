@@ -183,3 +183,65 @@ canvas{
     background:#f8fafc;
 
 }
+
+/* ==========================
+   LOADER
+========================== */
+
+#app-loader{
+
+    position:fixed;
+
+    inset:0;
+
+    background:#fff;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:999999;
+
+}
+
+#app-loader img{
+
+    width:260px;
+
+    max-width:70%;
+
+}
+
+#app-loader h2{
+
+    margin-top:18px;
+
+    color:#1d4ed8;
+
+}
+
+#app-loader p{
+
+    margin-top:8px;
+
+    color:#64748b;
+
+}
+
+body:not(.loaded) #sidebar-container,
+body:not(.loaded) .sidebar,
+body:not(.loaded) #content{
+
+    visibility:hidden;
+
+}
+
+body.loaded #app-loader{
+
+    display:none;
+
+}
