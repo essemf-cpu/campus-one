@@ -7,11 +7,17 @@ import {
 
 requireRole("agent", async ({ profile }) => {
 
+    console.log("1 - requireRole OK");
+
     if (profile.service !== "Service de l'Hébergement") {
         return;
     }
 
+    console.log("2 - service OK");
+
     await loadSidebar(profile);
+
+    console.log("3 - sidebar chargée");
 
     document.getElementById("page-title").textContent =
         profile.affectation;
@@ -20,7 +26,11 @@ requireRole("agent", async ({ profile }) => {
 
     if (typeSelect) {
 
+        console.log("4 - select trouvé");
+
         const types = await getTypesTravaux();
+
+        console.log("5 - types récupérés", types);
 
         typeSelect.innerHTML = "";
 
@@ -35,6 +45,8 @@ requireRole("agent", async ({ profile }) => {
         });
 
     }
+
+    console.log("6 - page prête");
 
     document.body.classList.add("loaded");
 

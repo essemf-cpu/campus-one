@@ -1,47 +1,85 @@
 import { auth, db } from "../config/firebaseAdmin.js";
 
-export async function createAgentAccount(matricule, password) {
-    // Rechercher l'agent
-    const doc = await db.collection("agents").doc(matricule).get();
+export async function createUserAccount(matricule, password) {
+
+    // Recherche de l'utilisateur
+    let doc = await db.collection("agents").doc(matricule).get();
+
+    let collectionName = "agents";
+    let role = "agent";
 
     if (!doc.exists) {
-        throw new Error("Agent introuvable.");
+
+        doc = await db.collection("etudiants").doc(matricule).get();
+
+        collectionName = "etudiants";
+        role = "etudiant";
+
     }
 
-    const agent = doc.data();
+    if (!doc.exists) {
 
-    if (agent.uid) {
+        throw new Error("Utilisateur introuvable.");
+
+    }
+
+    const userData = doc.data();
+
+    if (userData.uid) {
+
         throw new Error("Ce compte est déjà activé.");
+
     }
 
     // Création du compte Firebase Authentication
     const user = await auth.createUser({
-        email: agent.email,
+
+        email: userData.email,
+
         password,
-        displayName: `${agent.prenom} ${agent.nom}`,
+
+        displayName: `${userData.prenom} ${userData.nom}`,
+
     });
 
-    // Création du compte dans la collection users
+    // Création du document users
     await db.collection("users").doc(user.uid).set({
+
         uid: user.uid,
-        matricule: agent.matricule,
-        role: "agent",
-        email: agent.email,
-        profile: `agents/${matricule}`,
+
+        matricule: userData.matricule,
+
+        role,
+
+        email: userData.email,
+
+        profile: `${collectionName}/${matricule}`,
+
         estActif: true,
+
         createdAt: new Date(),
+
     });
 
-    // Mise à jour du profil agent
+    // Mise à jour du profil (agent ou étudiant)
     await doc.ref.update({
+
         uid: user.uid,
+
         estActive: true,
+
         dateActivation: new Date(),
+
     });
 
     return {
+
         uid: user.uid,
-        nom: `${agent.prenom} ${agent.nom}`,
-        email: agent.email,
+
+        nom: `${userData.prenom} ${userData.nom}`,
+
+        email: userData.email,
+
     };
+
 }

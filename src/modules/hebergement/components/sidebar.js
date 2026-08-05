@@ -112,21 +112,63 @@ if (suiviLink && !suiviLink.dataset.binded) {
 
     }
 
-    // Menu 
-    const menuBtn = document.querySelector(".menu-btn");
+    // ==============================
+// MENU
+// ==============================
 
-    if (menuBtn && !menuBtn.dataset.binded) {
+const menuBtn = document.querySelector(".menu-btn");
 
-        menuBtn.dataset.binded = "true";
+const sidebar = document.querySelector(".sidebar");
 
-        menuBtn.onclick = () => {
+const mobileMenuBtn =
+    document.getElementById("mobile-menu-btn");
 
-            document.querySelector(".sidebar")
-                .classList.toggle("collapsed");
+if (menuBtn && !menuBtn.dataset.binded) {
 
-        };
+    menuBtn.dataset.binded = "true";
+
+    menuBtn.onclick = () => {
+
+        if (window.innerWidth <= 768) {
+
+            sidebar.classList.toggle("open");
+
+        } else {
+
+            sidebar.classList.toggle("collapsed");
+
+        }
+
+    };
+
+}
+
+if(mobileMenuBtn){
+
+    mobileMenuBtn.onclick = ()=>{
+
+        sidebar.classList.toggle("open");
+
+    };
+
+}
+
+// Fermer le menu mobile en cliquant à côté
+
+document.addEventListener("click",(e)=>{
+
+    if(window.innerWidth > 768) return;
+
+    if(
+        !sidebar.contains(e.target) &&
+        !menuBtn.contains(e.target)
+    ){
+
+        sidebar.classList.remove("open");
 
     }
+
+});
 
    const notifBtn = document.querySelector(".notif-btn");
 

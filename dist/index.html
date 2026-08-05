@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Campus One</title>
+
+
+  <link rel="stylesheet" crossorigin href="/assets/index-CEFUKhQV.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <header class="navbar">
+
+        <h1 class="logo">
+
+            Campus One
+
+        </h1>
+
+        <!-- MENU PC -->
+
+        <nav id="desktop-menu">
+
+            <a href="#">Accueil</a>
+
+            <a href="#">À propos</a>
+
+            <a href="#">Services</a>
+
+            <a href="#">Contact</a>
+
+            <a
+                href="src/auth/login.html"
+                class="btn-login">
+
+                Se connecter
+
+            </a>
+
+        </nav>
+
+        <!-- BOUTON MOBILE -->
+
+        <button id="menu-toggle">
+
+            ☰
+
+        </button>
+
+    </header>
+
+    <!-- OVERLAY -->
+
+    <div id="overlay"></div>
+
+    <!-- MENU MOBILE -->
+
+    <nav id="mobile-menu">
+
+        <button id="close-menu">
+
+            ✕
+
+        </button>
+
+        <a href="#">Accueil</a>
+
+        <a href="#">À propos</a>
+
+        <a href="#">Services</a>
+
+        <a href="#">Contact</a>
+
+        <hr>
+
+        <a
+            href="src/auth/login.html"
+            class="btn-login">
+
+            Se connecter
+
+        </a>
+
+    </nav>
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="overlay">
+
+            <h2>
+
+                Une plateforme.
+                Un campus.
+                Tous les services du COUD.
+
+            </h2>
+
+            <p>
+
+                Campus One centralise
+                l'ensemble des services
+                destinés aux étudiants,
+                aux agents
+                et aux administrations
+                du COUD.
+
+            </p>
+
+            <a
+                href="src/auth/login.html"
+                class="btn-start">
+
+                Accéder à la plateforme
+
+            </a>
+
+            <p class="activate">
+
+                Première utilisation ?
+
+                <a href="src/auth/activate-account.html">
+
+                    Activer mon compte
+
+                </a>
+
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        © Campus One - COUD
+
+    </footer>
+
+    <script>
+
+        const menu = document.getElementById("mobile-menu");
+        const overlay = document.getElementById("overlay");
+
+        const openBtn = document.getElementById("menu-toggle");
+        const closeBtn = document.getElementById("close-menu");
+
+        function openMenu(){
+
+            menu.classList.add("open");
+            overlay.classList.add("show");
+
+        }
+
+        function closeMenu(){
+
+            menu.classList.remove("open");
+            overlay.classList.remove("show");
+
+        }
+
+        openBtn.addEventListener("click",openMenu);
+
+        closeBtn.addEventListener("click",closeMenu);
+
+        overlay.addEventListener("click",closeMenu);
+
+    </script>
+
+</body>
+
+</html>

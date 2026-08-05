@@ -96,54 +96,87 @@ export function clearCurrentUserCache() {
 /**
  * Recherche un utilisateur par matricule
  */
-export async function findUserByMatricule(
-    matricule,
-    collectionName = "agents"
-) {
+export async function findUserByMatricule(matricule) {
 
-    const snapshot = await getDocs(
-
+    // Recherche chez les agents
+    let snapshot = await getDocs(
         query(
-
-            collection(db, collectionName),
-
+            collection(db, "agents"),
             where("matricule", "==", matricule)
-
         )
-
     );
 
-    if (snapshot.empty) {
+    if (!snapshot.empty) {
 
-        throw new Error("USER_NOT_FOUND");
+        return snapshot.docs[0].data();
 
     }
 
-    return snapshot.docs[0].data();
+    // Recherche chez les étudiants
+    snapshot = await getDocs(
+        query(
+            collection(db, "etudiants"),
+            where("matricule", "==", matricule)
+        )
+    );
+
+    if (!snapshot.empty) {
+
+        return snapshot.docs[0].data();
+
+    }
+
+    throw new Error("USER_NOT_FOUND");
 
 }
 
 /**
  * Vérifie si un matricule existe
+ * chez les agents ou les étudiants.
  */
-export async function checkMatricule(
-    matricule,
-    collectionName = "agents"
-) {
+export async function checkMatricule(matricule) {
 
-    const snapshot = await getDocs(
+    console.log("Recherche :", matricule);
 
-        query(
+    const collections = [
+        "agents",
+        "etudiants"
+    ];
 
-            collection(db, collectionName),
+    for (const collectionName of collections) {
 
-            where("matricule", "==", matricule)
+        const snapshot = await getDocs(
 
-        )
+            
 
-    );
 
-    return !snapshot.empty;
+            query(
+
+                collection(db, collectionName),
+
+                where("matricule", "==", matricule)
+
+            )
+
+        );
+        const all = await getDocs(collection(db, collectionName));
+        all.forEach(doc => {
+
+    console.log(doc.id, doc.data());
+
+});
+
+        console.log(collectionName, snapshot.size);
+
+        if (!snapshot.empty) {
+
+            return true;
+
+        }
+
+    }
+
+    return false;
 
 }
 
@@ -176,15 +209,9 @@ function maskPhone(phone) {
 
 }
 
-export async function getActivationInfos(
-    matricule,
-    collectionName = "agents"
-) {
+export async function getActivationInfos(matricule) {
 
-    const user = await findUserByMatricule(
-        matricule,
-        collectionName
-    );
+    const user = await findUserByMatricule(matricule);
 
     return {
 

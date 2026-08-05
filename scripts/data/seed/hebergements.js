@@ -1,0 +1,81 @@
+export default [
+
+  {
+    id: "2026ABC_2026-2027_01",
+    matricule: "2026ABC",
+    numeroEtudiant: "2026ABC",
+    anneeAcademique: "2026-2027",
+    site: "ESP",
+    pavillon: "G1",
+    chambre: "84",
+    lit: "1",
+    dateDebut: new Date("2026-01-03"),
+    statutOccupation: "actif",
+  },
+
+  {
+    id: "2026ABD_2026-2027_01",
+    matricule: "2026ABD",
+    numeroEtudiant: "2026ABD",
+    anneeAcademique: "2026-2027",
+    site: "Grand Campus",
+    pavillon: "H1",
+    chambre: "52",
+    lit: "2",
+    dateDebut: new Date("2026-01-03"),
+    statutOccupation: "actif",
+  },
+
+  {
+    id: "2026ABE_2026-2027_01",
+    matricule: "2026ABE",
+    numeroEtudiant: "2026ABE",
+    anneeAcademique: "2026-2027",
+    site: "Grand Campus",
+    pavillon: "A",
+    chambre: "17",
+    lit: "1",
+    dateDebut: new Date("2026-01-03"),
+    statutOccupation: "actif",
+  },
+
+  {
+    id: "2026ABF_2026-2027_01",
+    matricule: "2026ABF",
+    numeroEtudiant: "2026ABF",
+    anneeAcademique: "2026-2027",
+    site: "ESEA",
+    pavillon: "ESEA",
+    chambre: "09",
+    lit: "1",
+    dateDebut: new Date("2026-01-03"),
+    statutOccupation: "actif",
+  },
+
+  {
+    id: "2026ABG_2026-2027_01",
+    matricule: "2026ABG",
+    numeroEtudiant: "2026ABG",
+    anneeAcademique: "2026-2027",
+    site: "ENSETP",
+    pavillon: "ENSETP",
+    chambre: "31",
+    lit: "2",
+    dateDebut: new Date("2026-01-03"),
+    statutOccupation: "actif",
+  },
+
+  {
+    id: "2026ABH_2026-2027_01",
+    matricule: "2026ABH",
+    numeroEtudiant: "2026ABH",
+    anneeAcademique: "2026-2027",
+    site: "Claudel",
+    pavillon: "Claudel",
+    chambre: "12",
+    lit: "1",
+    dateDebut: new Date("2026-01-03"),
+    statutOccupation: "actif",
+  },
+
+];

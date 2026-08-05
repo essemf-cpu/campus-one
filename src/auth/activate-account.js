@@ -12,6 +12,8 @@ form.addEventListener("submit", async (e) => {
 
     const numero = matricule.value.trim();
 
+    console.log("Matricule saisi :", numero);
+
     const existe = await checkMatricule(numero);
 
     if (!existe) {

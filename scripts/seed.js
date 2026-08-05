@@ -11,6 +11,8 @@ import typesTravaux from "./data/seed/typesTravaux.js";
 
 // Agents
 import agents from "./data/seed/agents.js";
+import etudiants from "./data/seed/etudiants.js";
+import hebergements from "./data/seed/hebergements.js";
 
 import { seedCollection } from "./utils/seedCollection.js";
 
@@ -34,6 +36,10 @@ async function seed() {
 
         // Agents
         await seedCollection("agents", agents);
+
+        // Étudiants
+        await seedCollection("etudiants", etudiants);
+        await seedCollection("hebergements", hebergements);
 
         console.log("\n🎉 Seeder terminé avec succès !");
         process.exit(0);
