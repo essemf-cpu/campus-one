@@ -1,0 +1,1 @@
+import{d as e,f as t,l as n,p as r,u as i}from"./authService-D2997x6y.js";async function a(){return(await i(t(r(n,`bons`),e(`date`,`desc`)))).docs.map(e=>({id:e.id,...e.data()}))}export{a as t};

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mon tableau de bord</title>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script type="module" crossorigin src="/assets/tableauDeBord-DWWQsQVb.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/authService-D2997x6y.js">
+  <link rel="modulepreload" crossorigin href="/assets/sidebar-CN3sq0y-.js">
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="/assets/authGuard-DMjBNp27.js">
+  <link rel="stylesheet" crossorigin href="/assets/sidebar-CkPSazEI.css">
+  <link rel="stylesheet" crossorigin href="/assets/tableauDeBord-UDepQ24H.css">
+</head>
+
+<body>
+
+    <div id="app-loader">
+
+    <img src="/assets/logo%20coud-BWhvgonx.png" alt="Campus One">
+
+    <h2>Campus One</h2>
+
+    <p>Chargement de votre espace...</p>
+
+</div>
+
+    <div id="sidebar-container"></div>
+
+    <main id="content">
+
+        <section class="page-header">
+
+    <h1>Mon tableau de bord</h1>
+
+    <p>Vue d'ensemble de votre activité</p>
+
+</section>
+
+<section class="stats-grid">
+
+    <div class="stat-card">
+        <h3>Total des bons</h3>
+        <span id="total-bons">0</span>
+    </div>
+
+    <div class="stat-card">
+        <h3>En attente</h3>
+        <span id="bons-attente">0</span>
+    </div>
+
+    <div class="stat-card">
+        <h3>En cours</h3>
+        <span id="bons-encours">0</span>
+    </div>
+
+    <div class="stat-card">
+        <h3>Terminés</h3>
+        <span id="bons-termines">0</span>
+    </div>
+
+</section>
+
+<section class="charts-grid">
+
+    <div class="card">
+
+        <h2>Répartition par statut</h2>
+
+        <canvas id="chartStatut"></canvas>
+
+    </div>
+
+    <div class="card">
+
+        <h2>Répartition par type</h2>
+
+        <canvas id="chartType"></canvas>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <h2>Derniers bons</h2>
+
+    <table class="table">
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Statut</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="dashboard-body">
+
+        </tbody>
+
+    </table>
+
+</section>
+
+    </main>
+
+
+</body>
+
+</html>

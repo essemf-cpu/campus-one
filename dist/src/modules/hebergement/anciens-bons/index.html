@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Anciens bons</title>
+
+
+  <script type="module" crossorigin src="/assets/anciensBons-CgNysIEJ.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/authService-D2997x6y.js">
+  <link rel="modulepreload" crossorigin href="/assets/sidebar-CN3sq0y-.js">
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="/assets/authGuard-DMjBNp27.js">
+  <link rel="modulepreload" crossorigin href="/assets/referentielService-gb5zYWnA.js">
+  <link rel="modulepreload" crossorigin href="/assets/bonsService-DNxlooij.js">
+  <link rel="stylesheet" crossorigin href="/assets/sidebar-CkPSazEI.css">
+  <link rel="stylesheet" crossorigin href="/assets/anciensBons-C1p9cTP8.css">
+</head>
+
+<body>
+
+    <div id="app-loader">
+
+        <img src="/assets/logo%20coud-BWhvgonx.png" alt="Campus One">
+
+        <h2>Campus One</h2>
+
+        <p>Chargement de votre espace...</p>
+
+    </div>
+
+    <div id="sidebar-container"></div>
+
+    <main id="content">
+
+        <section class="page-title">
+
+    <h1>Anciens bons - <span id="page-title"></span></h1>
+
+</section>
+
+<section class="card">
+
+    <div class="card-header">
+
+        <h2>Recherche et filtres</h2>
+
+    </div>
+
+    <div class="grid">
+
+        <div>
+
+            <label>Recherche par date</label>
+
+            <input
+                type="text"
+                id="recherche"
+                placeholder="jj/mm/aaaa">
+
+        </div>
+
+        <div>
+
+            <label>Type de travail</label>
+
+            <select id="typeFiltre">
+
+                <option value="">Tous les types</option>
+
+            </select>
+
+        </div>
+
+        <div>
+
+            <label>Période</label>
+
+            <select id="periode">
+
+                <option value="">Toutes les périodes</option>
+
+                <option value="semaine">Semaine passée</option>
+
+                <option value="mois">Mois passé</option>
+
+                <option value="annee">Année passée</option>
+
+            </select>
+
+        </div>
+
+        <div>
+
+            <label>Année</label>
+
+            <select id="anneeFiltre">
+
+                <option value="">Toutes les années</option>
+
+            </select>
+
+        </div>
+
+        <div>
+
+            <label>Mois</label>
+
+            <select id="moisFiltre">
+
+                <option value="">Tous les mois</option>
+
+                <option value="01">Janvier</option>
+                <option value="02">Février</option>
+                <option value="03">Mars</option>
+                <option value="04">Avril</option>
+                <option value="05">Mai</option>
+                <option value="06">Juin</option>
+                <option value="07">Juillet</option>
+                <option value="08">Août</option>
+                <option value="09">Septembre</option>
+                <option value="10">Octobre</option>
+                <option value="11">Novembre</option>
+                <option value="12">Décembre</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="card">
+
+    <div class="card-header">
+
+        <h2>Historique des bons</h2>
+
+    </div>
+
+    <table class="table">
+
+        <thead>
+
+            <tr>
+
+                <th>ID</th>
+
+                <th>Date</th>
+
+                <th>Type</th>
+
+                <th>Description</th>
+
+                <th>Pavillon</th>
+
+                <th>Statut</th>
+
+                <th>Cause</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="anciens-body">
+
+            <tr class="empty-row">
+
+                <td colspan="7">
+
+                    Aucun ancien bon trouvé.
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</section>
+
+    </main>
+
+
+</body>
+
+</html>

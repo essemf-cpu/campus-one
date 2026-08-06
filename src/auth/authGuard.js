@@ -10,7 +10,7 @@ export async function requireRole(expectedRole, callback) {
 
         if (!session) {
 
-            window.location.href = "../../auth/login.html";
+            window.location.href = "/src/auth/login.html";
             return;
 
         }
@@ -19,16 +19,14 @@ export async function requireRole(expectedRole, callback) {
 
         if (account.role !== expectedRole) {
 
-            window.location.href = "../../403.html";
+            window.location.href = "/src/403.html";
             return;
 
         }
 
         await callback({
-
             account,
             profile
-
         });
 
     } catch (error) {
@@ -37,7 +35,7 @@ export async function requireRole(expectedRole, callback) {
 
         await signOut(auth);
 
-        window.location.href = "../../auth/login.html";
+        window.location.href = "/src/auth/login.html";
 
     }
 
