@@ -31,12 +31,10 @@ export async function requireRole(expectedRole, callback) {
 
     } catch (error) {
 
-        console.error(error);
+    console.error("AUTHGUARD", error);
+    debugger;
+    throw error;
 
-        await signOut(auth);
-
-        window.location.href = "/src/auth/login.html";
-
-    }
+}
 
 }

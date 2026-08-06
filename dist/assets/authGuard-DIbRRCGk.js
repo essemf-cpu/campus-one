@@ -1,0 +1,1 @@
+import{s as e}from"./authService-n_DqcOyb.js";async function t(t,n){try{let r=await e();if(!r){window.location.href=`/src/auth/login.html`;return}let{account:i,profile:a}=r;if(i.role!==t){window.location.href=`/src/403.html`;return}await n({account:i,profile:a})}catch(e){throw console.error(`AUTHGUARD`,e),e}}export{t};

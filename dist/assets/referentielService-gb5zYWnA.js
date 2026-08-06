@@ -1,1 +1,0 @@
-import{l as e,p as t,u as n}from"./authService-D2997x6y.js";async function r(){return(await n(t(e,`typesTravaux`))).docs.map(e=>({id:e.id,...e.data()}))}export{r as t};

@@ -1,4 +1,4 @@
-import"./modulepreload-polyfill-Dezn_h7o.js";import{t as e}from"./authGuard-DMjBNp27.js";e(`etudiant`,async({profile:e})=>{let t=`${e.prenom?.[0]||``}${e.nom?.[0]||``}`;document.getElementById(`dashboard`).innerHTML=`
+import"./modulepreload-polyfill-Dezn_h7o.js";import{t as e}from"./authGuard-DIbRRCGk.js";e(`etudiant`,async({profile:e})=>{let t=`${e.prenom?.[0]||``}${e.nom?.[0]||``}`;document.getElementById(`dashboard`).innerHTML=`
 
 <section class="dashboard-header">
 

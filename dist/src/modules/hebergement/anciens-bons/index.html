@@ -10,18 +10,31 @@
     <title>Anciens bons</title>
 
 
-  <script type="module" crossorigin src="/assets/anciensBons-CgNysIEJ.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/authService-D2997x6y.js">
-  <link rel="modulepreload" crossorigin href="/assets/sidebar-CN3sq0y-.js">
+  <script type="module" crossorigin src="/assets/anciensBons-BRB_MTgn.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/authService-n_DqcOyb.js">
+  <link rel="modulepreload" crossorigin href="/assets/sidebar-DrnrPw2u.js">
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-Dezn_h7o.js">
-  <link rel="modulepreload" crossorigin href="/assets/authGuard-DMjBNp27.js">
-  <link rel="modulepreload" crossorigin href="/assets/referentielService-gb5zYWnA.js">
-  <link rel="modulepreload" crossorigin href="/assets/bonsService-DNxlooij.js">
-  <link rel="stylesheet" crossorigin href="/assets/sidebar-CkPSazEI.css">
-  <link rel="stylesheet" crossorigin href="/assets/anciensBons-C1p9cTP8.css">
+  <link rel="modulepreload" crossorigin href="/assets/authGuard-DIbRRCGk.js">
+  <link rel="modulepreload" crossorigin href="/assets/referentielService-DdZT0jix.js">
+  <link rel="modulepreload" crossorigin href="/assets/bonsService-BRAjs5uZ.js">
+  <link rel="stylesheet" crossorigin href="/assets/sidebar-rw0k-oJ-.css">
+  <link rel="stylesheet" crossorigin href="/assets/anciensBons-COKLaBpn.css">
 </head>
 
 <body>
+
+    <!-- HEADER MOBILE -->
+    <header class="mobile-header">
+
+        <button id="mobile-menu-btn">
+            ☰
+        </button>
+
+        <h2 id="mobile-title">
+            Hébergement
+        </h2>
+
+    </header>
 
     <div id="app-loader">
 
@@ -39,151 +52,151 @@
 
         <section class="page-title">
 
-    <h1>Anciens bons - <span id="page-title"></span></h1>
+            <h1>Anciens bons - <span id="page-title"></span></h1>
 
-</section>
+        </section>
 
-<section class="card">
+        <section class="card">
 
-    <div class="card-header">
+            <div class="card-header">
 
-        <h2>Recherche et filtres</h2>
+                <h2>Recherche et filtres</h2>
 
-    </div>
+            </div>
 
-    <div class="grid">
+            <div class="grid">
 
-        <div>
+                <div>
 
-            <label>Recherche par date</label>
+                    <label>Recherche par date</label>
 
-            <input
-                type="text"
-                id="recherche"
-                placeholder="jj/mm/aaaa">
+                    <input
+                        type="text"
+                        id="recherche"
+                        placeholder="jj/mm/aaaa">
 
-        </div>
+                </div>
 
-        <div>
+                <div>
 
-            <label>Type de travail</label>
+                    <label>Type de travail</label>
 
-            <select id="typeFiltre">
+                    <select id="typeFiltre">
 
-                <option value="">Tous les types</option>
+                        <option value="">Tous les types</option>
 
-            </select>
+                    </select>
 
-        </div>
+                </div>
 
-        <div>
+                <div>
 
-            <label>Période</label>
+                    <label>Période</label>
 
-            <select id="periode">
+                    <select id="periode">
 
-                <option value="">Toutes les périodes</option>
+                        <option value="">Toutes les périodes</option>
 
-                <option value="semaine">Semaine passée</option>
+                        <option value="semaine">Semaine passée</option>
 
-                <option value="mois">Mois passé</option>
+                        <option value="mois">Mois passé</option>
 
-                <option value="annee">Année passée</option>
+                        <option value="annee">Année passée</option>
 
-            </select>
+                    </select>
 
-        </div>
+                </div>
 
-        <div>
+                <div>
 
-            <label>Année</label>
+                    <label>Année</label>
 
-            <select id="anneeFiltre">
+                    <select id="anneeFiltre">
 
-                <option value="">Toutes les années</option>
+                        <option value="">Toutes les années</option>
 
-            </select>
+                    </select>
 
-        </div>
+                </div>
 
-        <div>
+                <div>
 
-            <label>Mois</label>
+                    <label>Mois</label>
 
-            <select id="moisFiltre">
+                    <select id="moisFiltre">
 
-                <option value="">Tous les mois</option>
+                        <option value="">Tous les mois</option>
 
-                <option value="01">Janvier</option>
-                <option value="02">Février</option>
-                <option value="03">Mars</option>
-                <option value="04">Avril</option>
-                <option value="05">Mai</option>
-                <option value="06">Juin</option>
-                <option value="07">Juillet</option>
-                <option value="08">Août</option>
-                <option value="09">Septembre</option>
-                <option value="10">Octobre</option>
-                <option value="11">Novembre</option>
-                <option value="12">Décembre</option>
+                        <option value="01">Janvier</option>
+                        <option value="02">Février</option>
+                        <option value="03">Mars</option>
+                        <option value="04">Avril</option>
+                        <option value="05">Mai</option>
+                        <option value="06">Juin</option>
+                        <option value="07">Juillet</option>
+                        <option value="08">Août</option>
+                        <option value="09">Septembre</option>
+                        <option value="10">Octobre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Décembre</option>
 
-            </select>
+                    </select>
 
-        </div>
+                </div>
 
-    </div>
+            </div>
 
-</section>
+        </section>
 
-<section class="card">
+        <section class="card">
 
-    <div class="card-header">
+            <div class="card-header">
 
-        <h2>Historique des bons</h2>
+                <h2>Historique des bons</h2>
 
-    </div>
+            </div>
 
-    <table class="table">
+            <table class="table">
 
-        <thead>
+                <thead>
 
-            <tr>
+                    <tr>
 
-                <th>ID</th>
+                        <th>ID</th>
 
-                <th>Date</th>
+                        <th>Date</th>
 
-                <th>Type</th>
+                        <th>Type</th>
 
-                <th>Description</th>
+                        <th>Description</th>
 
-                <th>Pavillon</th>
+                        <th>Pavillon</th>
 
-                <th>Statut</th>
+                        <th>Statut</th>
 
-                <th>Cause</th>
+                        <th>Cause</th>
 
-            </tr>
+                    </tr>
 
-        </thead>
+                </thead>
 
-        <tbody id="anciens-body">
+                <tbody id="anciens-body">
 
-            <tr class="empty-row">
+                    <tr class="empty-row">
 
-                <td colspan="7">
+                        <td colspan="7">
 
-                    Aucun ancien bon trouvé.
+                            Aucun ancien bon trouvé.
 
-                </td>
+                        </td>
 
-            </tr>
+                    </tr>
 
-        </tbody>
+                </tbody>
 
-    </table>
+            </table>
 
-</section>
+        </section>
 
     </main>
 

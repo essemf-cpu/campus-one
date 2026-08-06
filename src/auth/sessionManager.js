@@ -8,26 +8,37 @@ let waiting = [];
 
 onAuthStateChanged(auth, async (firebaseUser) => {
 
-    if (!firebaseUser) {
+    try {
+
+        if (!firebaseUser) {
+
+            session = null;
+
+        } else {
+
+            const currentUser = await getCurrentUser(firebaseUser.uid);
+
+            console.log("CURRENT USER =", currentUser);
+
+            session = {
+                firebaseUser,
+                account: currentUser.account,
+                profile: currentUser.profile
+            };
+
+        }
+
+    } catch (e) {
+
+        console.error("ERREUR SESSION :", e);
 
         session = null;
-
-    } else {
-
-        const currentUser = await getCurrentUser(firebaseUser.uid);
-
-        session = {
-            firebaseUser,
-            account: currentUser.account,
-            profile: currentUser.profile
-        };
 
     }
 
     initialized = true;
 
     waiting.forEach(resolve => resolve(session));
-
     waiting = [];
 
 });

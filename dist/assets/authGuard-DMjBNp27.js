@@ -1,1 +1,0 @@
-import{c as e,m as t,s as n}from"./authService-D2997x6y.js";async function r(r,i){try{let e=await n();if(!e){window.location.href=`/src/auth/login.html`;return}let{account:t,profile:a}=e;if(t.role!==r){window.location.href=`/src/403.html`;return}await i({account:t,profile:a})}catch(n){console.error(n),await t(e),window.location.href=`/src/auth/login.html`}}export{r as t};

@@ -1,4 +1,4 @@
-import{t as e}from"./sidebar-CN3sq0y-.js";import"./modulepreload-polyfill-Dezn_h7o.js";import{t}from"./authGuard-DMjBNp27.js";import{t as n}from"./bonsService-DNxlooij.js";t(`agent`,async({profile:t})=>{if(t.service!==`Service de l'Hébergement`)return;await e(t),document.getElementById(`page-title`).textContent=t.affectation;let r=document.getElementById(`historique-body`),i=await n();r.innerHTML=``,i.length===0?r.innerHTML=`
+import{t as e}from"./sidebar-DrnrPw2u.js";import"./modulepreload-polyfill-Dezn_h7o.js";import{t}from"./authGuard-DIbRRCGk.js";import{t as n}from"./bonsService-BRAjs5uZ.js";t(`agent`,async({profile:t})=>{if(t.service!==`Service de l'Hébergement`)return;await e(t),document.getElementById(`page-title`).textContent=t.affectation;let r=document.getElementById(`historique-body`),i=await n();r.innerHTML=``,i.length===0?r.innerHTML=`
 
             <tr class="empty-row">
 

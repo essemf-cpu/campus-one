@@ -1,4 +1,4 @@
-import{t as e}from"./sidebar-CN3sq0y-.js";import"./modulepreload-polyfill-Dezn_h7o.js";import{t}from"./authGuard-DMjBNp27.js";import{t as n}from"./referentielService-gb5zYWnA.js";import{t as r}from"./bonsService-DNxlooij.js";t(`agent`,async({profile:t})=>{if(t.service!==`Service de l'Hébergement`)return;await e(t),document.getElementById(`page-title`).textContent=t.affectation;let i=document.getElementById(`typeFiltre`),a=await n();i.innerHTML=`<option value="">Tous les types</option>`,a.forEach(e=>{i.innerHTML+=`
+import{t as e}from"./sidebar-DrnrPw2u.js";import"./modulepreload-polyfill-Dezn_h7o.js";import{t}from"./authGuard-DIbRRCGk.js";import{t as n}from"./referentielService-DdZT0jix.js";import{t as r}from"./bonsService-BRAjs5uZ.js";t(`agent`,async({profile:t})=>{if(t.service!==`Service de l'Hébergement`)return;await e(t),document.getElementById(`page-title`).textContent=t.affectation;let i=document.getElementById(`typeFiltre`),a=await n();i.innerHTML=`<option value="">Tous les types</option>`,a.forEach(e=>{i.innerHTML+=`
 
             <option value="${e.id}">
 
