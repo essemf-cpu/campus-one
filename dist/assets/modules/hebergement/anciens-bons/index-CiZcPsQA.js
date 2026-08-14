@@ -1,4 +1,4 @@
-import{t as e}from"./sidebar-DrnrPw2u.js";import"./modulepreload-polyfill-Dezn_h7o.js";import{t}from"./authGuard-DIbRRCGk.js";import{t as n}from"./referentielService-DdZT0jix.js";import{t as r}from"./bonsService-BRAjs5uZ.js";t(`agent`,async({profile:t})=>{if(t.service!==`Service de l'Hébergement`)return;await e(t),document.getElementById(`page-title`).textContent=t.affectation;let i=document.getElementById(`typeFiltre`),a=await n();i.innerHTML=`<option value="">Tous les types</option>`,a.forEach(e=>{i.innerHTML+=`
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{t as e}from"../../../authGuard-CW5SVeA8.js";import{t}from"../../../sidebar-CVr9XrKA.js";import{t as n}from"../../../referentielService-CPPIVbdf.js";import{t as r}from"../../../bonsService-C_7dljiX.js";e(`agent`,async({profile:e})=>{if(e.service!==`Service de l'Hébergement`)return;await t(e),document.getElementById(`page-title`).textContent=e.affectation;let i=document.getElementById(`typeFiltre`),a=await n();i.innerHTML=`<option value="">Tous les types</option>`,a.forEach(e=>{i.innerHTML+=`
 
             <option value="${e.id}">
 

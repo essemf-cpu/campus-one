@@ -2,84 +2,154 @@ import { auth, db } from "../config/firebaseAdmin.js";
 
 export async function createUserAccount(matricule, password) {
 
-    // Recherche de l'utilisateur
+    console.log("=================================");
+    console.log("ACTIVATION :", matricule);
+    console.log("=================================");
+
+    // 1. Recherche agent
+    console.log("1️⃣ Recherche dans agents...");
+
     let doc = await db.collection("agents").doc(matricule).get();
 
     let collectionName = "agents";
     let role = "agent";
 
+    // 2. Recherche étudiant
     if (!doc.exists) {
+
+        console.log("➡️ Pas trouvé dans agents.");
+        console.log("2️⃣ Recherche dans etudiants...");
 
         doc = await db.collection("etudiants").doc(matricule).get();
 
         collectionName = "etudiants";
         role = "etudiant";
-
     }
 
     if (!doc.exists) {
 
-        throw new Error("Utilisateur introuvable.");
+        console.log("❌ Utilisateur introuvable.");
 
+        throw new Error("Utilisateur introuvable.");
     }
 
+    console.log("✅ Utilisateur trouvé :", collectionName);
+
     const userData = doc.data();
+
+    console.log("EMAIL :", userData.email);
+    console.log("NOM :", userData.prenom, userData.nom);
+    console.log("UID actuel :", userData.uid);
 
     if (userData.uid) {
 
         throw new Error("Ce compte est déjà activé.");
-
     }
 
-    // Création du compte Firebase Authentication
-    const user = await auth.createUser({
+    // 3. Firebase Authentication
+    console.log("3️⃣ Création Firebase Authentication...");
 
-        email: userData.email,
+    let user;
 
-        password,
+    try {
 
-        displayName: `${userData.prenom} ${userData.nom}`,
+        user = await auth.createUser({
 
-    });
+            email: userData.email,
 
-    // Création du document users
-    await db.collection("users").doc(user.uid).set({
+            password,
 
-        uid: user.uid,
+            displayName:
+                `${userData.prenom} ${userData.nom}`,
 
-        matricule: userData.matricule,
+        });
 
-        role,
+        console.log("✅ Firebase Authentication créé :", user.uid);
 
-        email: userData.email,
+    } catch (error) {
 
-        profile: `${collectionName}/${matricule}`,
+        console.error(
+            "❌ ERREUR Firebase Authentication :",
+            error
+        );
 
-        estActif: true,
+        throw error;
+    }
 
-        createdAt: new Date(),
+    // 4. Document users
+    console.log("4️⃣ Création du document users...");
 
-    });
+    try {
 
-    // Mise à jour du profil (agent ou étudiant)
-    await doc.ref.update({
+        await db.collection("users").doc(user.uid).set({
 
-        uid: user.uid,
+            uid: user.uid,
 
-        estActive: true,
+            matricule: userData.matricule,
 
-        dateActivation: new Date(),
+            role,
 
-    });
+            email: userData.email,
+
+            profile:
+                `${collectionName}/${matricule}`,
+
+            estActif: true,
+
+            createdAt: new Date(),
+
+        });
+
+        console.log("✅ Document users créé.");
+
+    } catch (error) {
+
+        console.error(
+            "❌ ERREUR création users :",
+            error
+        );
+
+        throw error;
+    }
+
+    // 5. Mise à jour étudiant/agent
+    console.log("5️⃣ Mise à jour du profil...");
+
+    try {
+
+        await doc.ref.update({
+
+            uid: user.uid,
+
+            estActive: true,
+
+            dateActivation: new Date(),
+
+        });
+
+        console.log("✅ Profil mis à jour.");
+
+    } catch (error) {
+
+        console.error(
+            "❌ ERREUR mise à jour profil :",
+            error
+        );
+
+        throw error;
+    }
+
+    console.log("🎉 ACTIVATION TERMINÉE");
 
     return {
 
         uid: user.uid,
 
-        nom: `${userData.prenom} ${userData.nom}`,
+        nom:
+            `${userData.prenom} ${userData.nom}`,
 
-        email: userData.email,
+        email:
+            userData.email,
 
     };
-
 }

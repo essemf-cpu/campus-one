@@ -1,0 +1,5 @@
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{t as e}from"../../../authGuard-CW5SVeA8.js";import{t}from"../../../sidebar-CVr9XrKA.js";import{t as n}from"../../../referentielService-CPPIVbdf.js";e(`agent`,async({profile:e})=>{if(console.log(`1 - requireRole OK`),e.service!==`Service de l'Hébergement`)return;console.log(`2 - service OK`),await t(e),console.log(`3 - sidebar chargée`),document.getElementById(`page-title`).textContent=e.affectation;let r=document.getElementById(`type`);if(r){console.log(`4 - select trouvé`);let e=await n();console.log(`5 - types récupérés`,e),r.innerHTML=``,e.forEach(e=>{r.innerHTML+=`
+                <option value="${e.id}">
+                    ${e.nom}
+                </option>
+            `})}console.log(`6 - page prête`),document.body.classList.add(`loaded`)});

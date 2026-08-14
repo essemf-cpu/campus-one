@@ -1,0 +1,511 @@
+/* ==========================
+   BASE
+========================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    background: #f5f7fb;
+    color: #111827;
+}
+
+
+/* ==========================
+   PAGE
+========================== */
+
+.notifications-page {
+
+    max-width: 460px;
+
+    min-height: 100vh;
+
+    margin: auto;
+
+    padding: 10px 20px 90px;
+
+    background: #f5f7fb;
+
+}
+
+
+/* ==========================
+   HEADER
+========================== */
+
+.notifications-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0 10px;
+}
+
+.notifications-header p {
+
+    font-size: 17px;
+
+    color: #64748b;
+
+    margin-bottom: 5px;
+
+}
+
+.notifications-header h1 {
+    font-size: 34px;
+
+}
+
+.header-notification-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 24px;
+
+}
+
+
+/* ==========================
+   RECHERCHE
+========================== */
+
+.modern-search {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    background: #fff;
+
+    margin: 25px 0;
+
+    padding: 18px 20px;
+
+    border-radius: 22px;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,.06);
+
+}
+
+.modern-search i {
+
+    color: #9ca3af;
+
+    font-size: 20px;
+
+}
+
+.modern-search input {
+
+    flex: 1;
+
+    border: none;
+
+    outline: none;
+
+    font-size: 17px;
+
+    background: transparent;
+
+    color: #111827;
+
+}
+
+.modern-search input::placeholder {
+
+    color: #9ca3af;
+
+}
+
+
+/* ==========================
+   FILTRES
+========================== */
+
+.notification-filters {
+
+    display: flex;
+
+    gap: 10px;
+
+    overflow-x: auto;
+
+    padding: 2px 0 8px;
+
+    scrollbar-width: none;
+
+}
+
+.notification-filters::-webkit-scrollbar {
+
+    display: none;
+
+}
+
+.category-pill {
+
+    flex-shrink: 0;
+
+    border: none;
+
+    background: #fff;
+
+    color: #111827;
+
+    padding: 13px 22px;
+
+    border-radius: 30px;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 14px rgba(0,0,0,.04);
+
+}
+
+.category-pill.active-pill {
+
+    background: #2563eb;
+
+    color: #fff;
+
+}
+
+
+/* ==========================
+   LISTE NOTIFICATIONS
+========================== */
+
+.notifications-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+
+    margin-top: 20px;
+
+}
+
+
+/* ==========================
+   CARTE
+========================== */
+
+.notification-card {
+
+    background: #fff;
+
+    border-radius: 24px;
+
+    padding: 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    box-shadow: 0 8px 24px rgba(0,0,0,.06);
+
+}
+
+.notification-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    min-width: 58px;
+
+    border-radius: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 23px;
+
+}
+
+.blue-bg {
+
+    background: #e8f1ff;
+
+    color: #2563eb;
+
+}
+
+.purple-bg {
+
+    background: #eee8ff;
+
+    color: #2563eb;
+
+}
+
+.notification-avatar {
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 18px;
+
+}
+
+.notification-info {
+
+    flex: 1;
+
+    min-width: 0;
+
+}
+
+.notification-info strong {
+
+    display: block;
+
+    font-size: 17px;
+
+    font-weight: 800;
+
+    color: #111827;
+
+    margin-bottom: 5px;
+
+}
+
+.notification-info p {
+
+    font-size: 15px;
+
+    color: #64748b;
+
+    line-height: 1.4;
+
+}
+
+.notification-info small {
+
+    display: block;
+
+    margin-top: 8px;
+
+    font-size: 12px;
+
+    color: #94a3b8;
+
+}
+
+
+/* ==========================
+   AUCUNE NOTIFICATION
+========================== */
+
+.notification-empty {
+
+    background: #fff;
+
+    border-radius: 22px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: #64748b;
+
+    box-shadow: 0 8px 24px rgba(0,0,0,.05);
+
+}
+
+
+/* ==========================
+   NAVBAR CAMPUS ONE
+========================== */
+
+.ios-navbar {
+
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    transform: none;
+
+    width: 100%;
+    max-width: none;
+
+    height: 68px;
+
+    background: #ffffff;
+
+    border-radius: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-around;
+
+    box-shadow:
+        0 -4px 18px rgba(0,0,0,.08);
+
+    z-index: 9999;
+
+}
+
+.ios-navbar a {
+
+    position: relative;
+
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    text-decoration: none;
+
+    color: #2563eb;
+
+}
+
+.ios-navbar a i {
+
+    font-size: 21px;
+
+}
+
+
+/* ==========================
+   NOTIFICATION ACTIVE
+========================== */
+
+.ios-navbar .nav-bell {
+
+    width: 52px;
+    height: 52px;
+
+    border-radius: 50%;
+
+    background: #eef4ff;
+
+    color: #2563eb;
+
+}
+
+
+/* ==========================
+   PROFIL
+========================== */
+
+.nav-avatar-placeholder {
+
+    width: 44px;
+    height: 44px;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: #2563eb;
+
+    font-size: 25px;
+
+}
+
+
+/* ==========================
+   BADGE
+========================== */
+
+.notification-badge {
+
+    position: absolute;
+
+    top: 2px;
+    right: 0;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 4px;
+
+    border-radius: 50px;
+
+    background: #ff3b30;
+
+    color: white;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+}
+
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media (max-width: 480px) {
+
+    .notifications-page {
+    padding: 10px 20px 90px;
+}
+
+    .notifications-header h1 {
+
+        font-size: 32px;
+
+    }
+
+    .notification-card {
+
+        padding: 18px;
+
+    }
+
+}

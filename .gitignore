@@ -1,4 +1,4 @@
 node_modules/
 .env
 .firebase/
-scripts/config/serviceAccountKey.json
+server/config/serviceAccountKey.json

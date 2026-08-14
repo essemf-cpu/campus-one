@@ -1,29 +1,107 @@
 import { defineConfig } from "vite";
-import { resolve } from "path";
+import { resolve, relative } from "path";
+import { readdirSync } from "fs";
+
+
+// ==================================================
+// RECHERCHE AUTOMATIQUE DES FICHIERS HTML
+// ==================================================
+
+function findHtmlFiles(directory) {
+
+    const files = [];
+
+    for (const entry of readdirSync(directory, {
+        withFileTypes: true
+    })) {
+
+        const fullPath = resolve(
+            directory,
+            entry.name
+        );
+
+        if (entry.isDirectory()) {
+
+            files.push(
+                ...findHtmlFiles(fullPath)
+            );
+
+        } else if (
+            entry.isFile() &&
+            entry.name.endsWith(".html")
+        ) {
+
+            files.push(fullPath);
+
+        }
+
+    }
+
+    return files;
+}
+
+
+// ==================================================
+// DOSSIERS
+// ==================================================
+
+const rootDir = __dirname;
+
+const srcDir = resolve(
+    rootDir,
+    "src"
+);
+
+
+// ==================================================
+// CONSTRUCTION AUTOMATIQUE DES INPUTS
+// ==================================================
+
+const input = {};
+
+
+// Page principale
+input.main = resolve(
+    rootDir,
+    "index.html"
+);
+
+
+// Toutes les pages HTML présentes dans src/
+const htmlFiles = findHtmlFiles(srcDir);
+
+for (const file of htmlFiles) {
+
+    const relativePath = relative(
+        srcDir,
+        file
+    );
+
+    const key = relativePath
+        .replace(/\\/g, "/")
+        .replace(/\.html$/i, "");
+
+    input[key] = file;
+
+}
+
+
+// ==================================================
+// CONFIGURATION VITE
+// ==================================================
 
 export default defineConfig({
-  build: {
-    outDir: "dist",
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, "index.html"),
 
-        login: resolve(__dirname, "src/auth/login.html"),
-        activateAccount: resolve(__dirname, "src/auth/activate-account.html"),
-        activationCode: resolve(__dirname, "src/auth/activation-code.html"),
-        activationMethod: resolve(__dirname, "src/auth/activation-method.html"),
-        createPassword: resolve(__dirname, "src/auth/create-password.html"),
+    build: {
 
-        agentDashboard: resolve(__dirname, "src/dashboards/agent/dashboard.html"),
-        etudiantDashboard: resolve(__dirname, "src/dashboards/etudiant/dashboard.html"),
+        outDir: "dist",
 
-        etudiantIndex: resolve(__dirname, "src/modules/etudiant/dashboard/index.html"),
+        rollupOptions: {
 
-        demandes: resolve(__dirname, "src/modules/hebergement/demandes/index.html"),
-        anciensBons: resolve(__dirname, "src/modules/hebergement/anciens-bons/index.html"),
-        historiqueDemandes: resolve(__dirname, "src/modules/hebergement/historique-demandes/index.html"),
-        tableauDeBord: resolve(__dirname, "src/modules/hebergement/tableau-de-bord/index.html")
-      }
+            input
+
+        }
+
     }
-  }
+
 });
