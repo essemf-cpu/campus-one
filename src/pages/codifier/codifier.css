@@ -1,0 +1,266 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.codifier-page {
+    width: 100%;
+    min-height: 100vh;
+
+    padding: 24px 18px 40px;
+}
+
+.codifier-content {
+    width: 100%;
+    max-width: 520px;
+
+    margin: 0 auto;
+}
+
+
+/* ==========================================
+   TITRE
+   ========================================== */
+
+.codifier-header {
+    margin-bottom: 24px;
+}
+
+.codifier-header h1 {
+    margin: 0 0 6px;
+
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.codifier-header p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   CARTE HÉBERGEMENT
+   ========================================== */
+
+.hebergement-card {
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.07);
+
+    border: 1px solid #e2e8f0;
+}
+
+.hebergement-card-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    margin-bottom: 22px;
+}
+
+.hebergement-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    font-size: 20px;
+}
+
+.hebergement-card-header h2 {
+    margin: 0;
+
+    font-size: 18px;
+}
+
+.hebergement-card-header p {
+    margin: 3px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* ==========================================
+   INFORMATIONS
+   ========================================== */
+
+.hebergement-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+.hebergement-row {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 13px 0;
+
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.hebergement-row:last-child {
+    border-bottom: none;
+}
+
+.hebergement-label {
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.hebergement-value {
+    font-size: 14px;
+
+    font-weight: 700;
+
+    text-align: right;
+}
+
+
+/* ==========================================
+   BOUTONS
+   ========================================== */
+
+.codifier-actions {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    margin-top: 20px;
+}
+
+.codifier-button {
+    width: 100%;
+
+    min-height: 50px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.codifier-button-primary {
+    background: #2563eb;
+
+    color: white;
+}
+
+.codifier-button-secondary {
+    background: #eff6ff;
+
+    color: #2563eb;
+}
+
+
+/* ==========================================
+   SERVICE INDISPONIBLE
+   ========================================== */
+
+.service-indisponible {
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 35px 24px;
+
+    text-align: center;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 8px 25px rgba(15, 23, 42, 0.06);
+}
+
+.service-indisponible-icon {
+    width: 64px;
+    height: 64px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fef3c7;
+
+    color: #d97706;
+
+    font-size: 25px;
+}
+
+.service-indisponible h2 {
+    margin: 0 0 8px;
+
+    font-size: 18px;
+}
+
+.service-indisponible p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}

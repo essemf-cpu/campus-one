@@ -1,5 +1,6 @@
 import { requireRole } from "../../../auth/authGuard.js";
 import QRCode from "qrcode";
+import { afficherBadgeNotifications } from "../notifications/notifications.js";
 
 requireRole("etudiant", async ({ profile }) => {
 
@@ -72,7 +73,7 @@ requireRole("etudiant", async ({ profile }) => {
 
 <section class="premium-grid">
 
-    <a href="../../pages/guide/index.html"
+    <a href="../../../pages/guide/index.html"
        class="premium-card">
 
         <i class="fa-solid fa-book"></i>
@@ -82,7 +83,7 @@ requireRole("etudiant", async ({ profile }) => {
     </a>
 
 
-    <a href="../../restaurant/index.html"
+    <a href="../../../restaurant/index.html"
        class="premium-card">
 
         <i class="fa-solid fa-utensils"></i>
@@ -92,7 +93,7 @@ requireRole("etudiant", async ({ profile }) => {
     </a>
 
 
-    <a href="../../pages/gps/index.html"
+    <a href="../../../pages/gps/index.html"
        class="premium-card">
 
         <i class="fa-solid fa-location-dot"></i>
@@ -102,7 +103,7 @@ requireRole("etudiant", async ({ profile }) => {
     </a>
 
 
-    <a href="../../pages/amis/index.html"
+    <a href="../../../pages/amis/index.html"
        class="premium-card">
 
         <i class="fa-solid fa-user-group"></i>
@@ -112,7 +113,7 @@ requireRole("etudiant", async ({ profile }) => {
     </a>
 
 
-    <a href="../../pages/messages/index.html"
+    <a href="../../../pages/messages/index.html"
        class="premium-card">
 
         <i class="fa-solid fa-comments"></i>
@@ -122,7 +123,7 @@ requireRole("etudiant", async ({ profile }) => {
     </a>
 
 
-    <a href="../../pages/codifier/index.html"
+    <a href="../../../pages/codifier/index.html"
        class="premium-card">
 
         <i class="fa-solid fa-id-badge"></i>
@@ -298,7 +299,7 @@ requireRole("etudiant", async ({ profile }) => {
 
 <nav class="ios-navbar">
 
-    <a href="#" aria-label="Accueil">
+    <a href="#" class="active" aria-label="Accueil">
 
         <i class="fa-solid fa-house"></i>
 
@@ -351,14 +352,7 @@ requireRole("etudiant", async ({ profile }) => {
     // BADGE NOTIFICATIONS
     // ==================================================
 
-    if (
-        typeof afficherBadgeNotifications === "function"
-    ) {
-
         afficherBadgeNotifications();
-
-    }
-
 
     // ==================================================
     // FONCTION : GÉNÉRER QR

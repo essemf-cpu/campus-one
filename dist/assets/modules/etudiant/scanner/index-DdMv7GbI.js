@@ -60,32 +60,32 @@ import{r as e,t}from"../../../rolldown-runtime-QTnfLwEv.js";import"../../../modu
             </div>
 
         `;let t=document.getElementById(`add-friend-btn`);t&&t.addEventListener(`click`,()=>g(e))}async function g(t){let r=document.getElementById(`add-friend-btn`);if(r){if(t.matricule===e.matricule){m(`Vous ne pouvez pas vous ajouter vous-même.`,`error`);return}r.disabled=!0,r.innerHTML=`
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            Envoi...
-        `;try{let r=await i(o(n(s,`friendRequests`),a(`from`,`==`,e.matricule),a(`to`,`==`,t.matricule),c(1)));if(!r.empty){let e=r.docs[0].data();if(e.status===`pending`){m(`Une demande est déjà en attente.`,`info`);return}if(e.status===`accepted`){m(`Vous êtes déjà amis.`,`info`);return}}await l(n(s,`friendRequests`),{from:e.matricule,fromNom:`${e.prenom} ${e.nom}`,fromAvatar:e.avatar||`assets/default-user.png`,to:t.matricule,status:`pending`,date:Date.now()}),d.innerHTML=`
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Envoi...
+    `;try{let r=await i(o(n(s,`friendRequests`),a(`from`,`==`,e.matricule),a(`to`,`==`,t.matricule),c(1)));if(!r.empty){let e=r.docs[0].data();if(e.status===`pending`){m(`Une demande est déjà en attente.`,`info`);return}if(e.status===`accepted`){m(`Vous êtes déjà amis.`,`info`);return}}await l(n(s,`friendRequests`),{from:e.matricule,fromNom:`${e.prenom} ${e.nom}`,fromAvatar:e.avatar||`assets/default-user.png`,to:t.matricule,status:`pending`,date:Date.now()}),await l(n(s,`notifications`),{to:t.matricule,type:`amis`,title:`Nouvelle demande d'ami`,text:`${e.prenom} ${e.nom} souhaite vous ajouter comme ami.`,from:e.matricule,fromNom:`${e.prenom} ${e.nom}`,fromAvatar:e.avatar||`assets/default-user.png`,date:Date.now(),seen:!1}),d.innerHTML=`
 
-                <div class="scan-success">
+            <div class="scan-success">
 
-                    <i class="fa-solid fa-check"></i>
+                <i class="fa-solid fa-check"></i>
 
-                    <h3>
-                        Demande envoyée
-                    </h3>
+                <h3>
+                    Demande envoyée
+                </h3>
 
-                    <p>
+                <p>
 
-                        Votre demande a été envoyée à
+                    Votre demande a été envoyée à
 
-                        <strong>
-                            ${t.prenom}
-                            ${t.nom}
-                        </strong>.
+                    <strong>
+                        ${t.prenom}
+                        ${t.nom}
+                    </strong>.
 
-                    </p>
+                </p>
 
-                </div>
+            </div>
 
-            `}catch(e){console.error(`Erreur demande ami :`,e),m(`Impossible d'envoyer la demande.`,`error`),r.disabled=!1,r.innerHTML=`
-                <i class="fa-solid fa-user-plus"></i>
-                Ajouter comme ami
-            `}}}async function _(e){if(p)return;p=!0;try{await f.stop()}catch(e){console.warn(`Arrêt scanner :`,e)}m(`QR détecté. Recherche de l'étudiant...`);let t=e.trim();try{let n=JSON.parse(e);n.type===`student`&&n.matricule&&(t=n.matricule)}catch{}try{let e=await i(o(n(s,`users`),a(`matricule`,`==`,t),a(`role`,`==`,`etudiant`),c(1)));if(e.empty){m(`Étudiant introuvable.`,`error`);return}let l=e.docs[0].data(),d=l.profile;if(!d){m(`Profil étudiant introuvable.`,`error`);return}let f=d.split(`/`),p=f[0],g=f[1],_=await r(u(s,p,g));if(!_.exists()){m(`Profil étudiant introuvable.`,`error`);return}let v=_.data();h({matricule:l.matricule,prenom:v.prenom||``,nom:v.nom||``,avatar:v.avatar||``})}catch(e){console.error(`Erreur recherche étudiant :`,e),m(`Impossible de rechercher cet étudiant.`,`error`)}}f.start({facingMode:`environment`},{fps:10,qrbox:250},_,()=>{}).catch(e=>{console.error(`Erreur caméra :`,e),m(`Impossible d'accéder à la caméra.`,`error`)})});
+        `}catch(e){console.error(`Erreur demande ami :`,e),m(`Impossible d'envoyer la demande.`,`error`),r.disabled=!1,r.innerHTML=`
+            <i class="fa-solid fa-user-plus"></i>
+            Ajouter comme ami
+        `}}}async function _(e){if(p)return;p=!0;try{await f.stop()}catch(e){console.warn(`Arrêt scanner :`,e)}m(`QR détecté. Recherche de l'étudiant...`);let t=e.trim();try{let n=JSON.parse(e);n.type===`student`&&n.matricule&&(t=n.matricule)}catch{}try{let e=await i(o(n(s,`users`),a(`matricule`,`==`,t),a(`role`,`==`,`etudiant`),c(1)));if(e.empty){m(`Étudiant introuvable.`,`error`);return}let l=e.docs[0].data(),d=l.profile;if(!d){m(`Profil étudiant introuvable.`,`error`);return}let f=d.split(`/`),p=f[0],g=f[1],_=await r(u(s,p,g));if(!_.exists()){m(`Profil étudiant introuvable.`,`error`);return}let v=_.data();h({matricule:l.matricule,prenom:v.prenom||``,nom:v.nom||``,avatar:v.avatar||``})}catch(e){console.error(`Erreur recherche étudiant :`,e),m(`Impossible de rechercher cet étudiant.`,`error`)}}f.start({facingMode:`environment`},{fps:10,qrbox:250},_,()=>{}).catch(e=>{console.error(`Erreur caméra :`,e),m(`Impossible d'accéder à la caméra.`,`error`)})});

@@ -134,208 +134,253 @@ requireRole("etudiant", async ({ profile }) => {
     }
 
 
+// ==========================
+// ENVOYER DEMANDE D'AMI
+// ==========================
+
+async function envoyerDemande(ami) {
+
+    const button =
+        document.getElementById(
+            "add-friend-btn"
+        );
+
+    if (!button) return;
+
+
     // ==========================
-    // ENVOYER DEMANDE D'AMI
+    // IMPOSSIBLE DE S'AJOUTER SOI-MÊME
     // ==========================
 
-    async function envoyerDemande(ami) {
+    if (
+        ami.matricule ===
+        profile.matricule
+    ) {
 
-        const button =
-            document.getElementById(
-                "add-friend-btn"
-            );
+        afficherMessage(
+            "Vous ne pouvez pas vous ajouter vous-même.",
+            "error"
+        );
 
-        if (!button) return;
-
-
-        // Impossible de s'ajouter soi-même
-
-        if (
-            ami.matricule ===
-            profile.matricule
-        ) {
-
-            afficherMessage(
-                "Vous ne pouvez pas vous ajouter vous-même.",
-                "error"
-            );
-
-            return;
-
-        }
+        return;
+    }
 
 
-        button.disabled = true;
+    button.disabled = true;
 
-        button.innerHTML = `
-            <i class="fa-solid fa-spinner fa-spin"></i>
-            Envoi...
-        `;
-
-
-        try {
-
-            // ==========================
-            // VÉRIFIER UNE DEMANDE EXISTANTE
-            // ==========================
-
-            const demandesQuery =
-                query(
-
-                    collection(
-                        db,
-                        "friendRequests"
-                    ),
-
-                    where(
-                        "from",
-                        "==",
-                        profile.matricule
-                    ),
-
-                    where(
-                        "to",
-                        "==",
-                        ami.matricule
-                    ),
-
-                    limit(1)
-
-                );
+    button.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Envoi...
+    `;
 
 
-            const existing =
-                await getDocs(
-                    demandesQuery
-                );
+    try {
 
+        // ==========================
+        // VÉRIFIER UNE DEMANDE EXISTANTE
+        // ==========================
 
-            if (!existing.empty) {
+        const demandesQuery =
+            query(
 
-                const demande =
-                    existing.docs[0].data();
-
-
-                if (
-                    demande.status ===
-                    "pending"
-                ) {
-
-                    afficherMessage(
-                        "Une demande est déjà en attente.",
-                        "info"
-                    );
-
-                    return;
-
-                }
-
-
-                if (
-                    demande.status ===
-                    "accepted"
-                ) {
-
-                    afficherMessage(
-                        "Vous êtes déjà amis.",
-                        "info"
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            // ==========================
-            // CRÉER LA DEMANDE
-            // ==========================
-
-            await addDoc(
                 collection(
                     db,
                     "friendRequests"
                 ),
-                {
 
-                    from:
-                        profile.matricule,
+                where(
+                    "from",
+                    "==",
+                    profile.matricule
+                ),
 
-                    fromNom:
-                        `${profile.prenom} ${profile.nom}`,
+                where(
+                    "to",
+                    "==",
+                    ami.matricule
+                ),
 
-                    fromAvatar:
-                        profile.avatar ||
-                        "assets/default-user.png",
+                limit(1)
 
-                    to:
-                        ami.matricule,
-
-                    status:
-                        "pending",
-
-                    date:
-                        Date.now()
-
-                }
             );
 
 
-            // ==========================
-            // SUCCÈS
-            // ==========================
-
-            result.innerHTML = `
-
-                <div class="scan-success">
-
-                    <i class="fa-solid fa-check"></i>
-
-                    <h3>
-                        Demande envoyée
-                    </h3>
-
-                    <p>
-
-                        Votre demande a été envoyée à
-
-                        <strong>
-                            ${ami.prenom}
-                            ${ami.nom}
-                        </strong>.
-
-                    </p>
-
-                </div>
-
-            `;
-
-
-        } catch (error) {
-
-            console.error(
-                "Erreur demande ami :",
-                error
+        const existing =
+            await getDocs(
+                demandesQuery
             );
 
 
-            afficherMessage(
-                "Impossible d'envoyer la demande.",
-                "error"
-            );
+        if (!existing.empty) {
+
+            const demande =
+                existing.docs[0].data();
 
 
-            button.disabled = false;
+            if (
+                demande.status ===
+                "pending"
+            ) {
 
-            button.innerHTML = `
-                <i class="fa-solid fa-user-plus"></i>
-                Ajouter comme ami
-            `;
+                afficherMessage(
+                    "Une demande est déjà en attente.",
+                    "info"
+                );
+
+                return;
+            }
+
+
+            if (
+                demande.status ===
+                "accepted"
+            ) {
+
+                afficherMessage(
+                    "Vous êtes déjà amis.",
+                    "info"
+                );
+
+                return;
+            }
 
         }
 
+
+        // ==========================
+        // CRÉER LA DEMANDE
+        // ==========================
+
+        await addDoc(
+            collection(
+                db,
+                "friendRequests"
+            ),
+            {
+
+                from:
+                    profile.matricule,
+
+                fromNom:
+                    `${profile.prenom} ${profile.nom}`,
+
+                fromAvatar:
+                    profile.avatar ||
+                    "assets/default-user.png",
+
+                to:
+                    ami.matricule,
+
+                status:
+                    "pending",
+
+                seen:
+                   false,
+
+                date:
+                    Date.now()
+
+            }
+        );
+
+
+        // ==========================
+        // CRÉER LA NOTIFICATION
+        // ==========================
+
+        await addDoc(
+            collection(
+                db,
+                "notifications"
+            ),
+            {
+
+                to:
+                    ami.matricule,
+
+                type:
+                    "amis",
+
+                title:
+                    "Nouvelle demande d'ami",
+
+                text:
+                    `${profile.prenom} ${profile.nom} souhaite vous ajouter comme ami.`,
+
+                from:
+                    profile.matricule,
+
+                fromNom:
+                    `${profile.prenom} ${profile.nom}`,
+
+                fromAvatar:
+                    profile.avatar ||
+                    "assets/default-user.png",
+
+                date:
+                    Date.now(),
+
+                seen:
+                    false
+
+            }
+        );
+
+
+        // ==========================
+        // SUCCÈS
+        // ==========================
+
+        result.innerHTML = `
+
+            <div class="scan-success">
+
+                <i class="fa-solid fa-check"></i>
+
+                <h3>
+                    Demande envoyée
+                </h3>
+
+                <p>
+
+                    Votre demande a été envoyée à
+
+                    <strong>
+                        ${ami.prenom}
+                        ${ami.nom}
+                    </strong>.
+
+                </p>
+
+            </div>
+
+        `;
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur demande ami :",
+            error
+        );
+
+
+        afficherMessage(
+            "Impossible d'envoyer la demande.",
+            "error"
+        );
+
+
+        button.disabled = false;
+
+        button.innerHTML = `
+            <i class="fa-solid fa-user-plus"></i>
+            Ajouter comme ami
+        `;
+
     }
+
+}
 
 
     // ==========================

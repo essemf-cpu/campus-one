@@ -545,10 +545,14 @@ body.loaded #app-loader{
 
     text-decoration:none;
 
-    color:#2563eb;
+    color:#64748b;
 
     border-radius:50%;
 
+}
+
+.ios-navbar a.active{
+    color:#2563eb;
 }
 
 .ios-navbar a i{
@@ -567,7 +571,31 @@ body.loaded #app-loader{
 
 .notification-badge{
 
+    position:absolute;
+
+    top:2px;
+    right:4px;
+
+    min-width:20px;
+    height:20px;
+
+    padding:0 5px;
+
+    border-radius:999px;
+
     display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    background:#ef4444;
+
+    color:white;
+
+    border:2px solid white;
+
+    font-size:10px;
+    font-weight:800;
 
 }
 
