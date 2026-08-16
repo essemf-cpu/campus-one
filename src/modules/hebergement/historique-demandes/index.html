@@ -5,16 +5,40 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <title>Historique des demandes</title>
+    <title>
+        Historique des demandes
+    </title>
 
-    <link rel="stylesheet" href="../components/sidebar.css">
-    <link rel="stylesheet" href="historique-demandes.css">
+
+    <link
+        rel="stylesheet"
+        href="../components/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="historique-demandes.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
 
 </head>
 
+
 <body>
+
+
+    <!-- ==========================================
+         HEADER MOBILE
+    =========================================== -->
 
     <header class="mobile-header">
 
@@ -24,6 +48,7 @@
 
         </button>
 
+
         <h2 id="mobile-title">
 
             Hébergement
@@ -32,85 +57,515 @@
 
     </header>
 
+
+    <!-- ==========================================
+         LOADER
+    =========================================== -->
+
     <div id="app-loader">
 
-        <img src="/src/assets/logo coud.png" alt="Campus One">
+        <img
+            src="/src/assets/logo coud.png"
+            alt="Campus One"
+        >
 
-        <h2>Campus One</h2>
 
-        <p>Chargement de votre espace...</p>
+        <h2>
+            Campus One
+        </h2>
+
+
+        <p>
+            Chargement de votre espace...
+        </p>
 
     </div>
 
+
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
+
     <div id="sidebar-container"></div>
+
+
+    <!-- ==========================================
+         CONTENU
+    =========================================== -->
 
     <main id="content">
 
+
+        <!-- ======================================
+             TITRE
+        ======================================= -->
+
         <section class="page-title">
 
-            <h1>Historique des demandes - <span id="page-title"></span></h1>
+            <h1>
+
+                Historique des demandes -
+
+                <span id="page-title"></span>
+
+            </h1>
 
         </section>
 
+
+        <!-- ======================================
+             CARTE
+        ======================================= -->
+
         <section class="card">
+
+
+            <!-- ==================================
+                 EN-TÊTE
+            =================================== -->
 
             <div class="card-header">
 
-                <h2>Historique des demandes étudiantes</h2>
+                <div>
+
+                    <h2>
+                        Historique des demandes étudiantes
+                    </h2>
+
+                </div>
 
             </div>
 
-            <table class="table">
 
-                <thead>
+            <!-- ==================================
+                 FILTRES
+            =================================== -->
 
-                    <tr>
+            <div class="historique-filters">
 
-                        <th>Date</th>
 
-                        <th>Nom</th>
+                <!-- ==============================
+                     RECHERCHE
+                =============================== -->
 
-                        <th>Chambre</th>
+                <div class="historique-search">
 
-                        <th>Niveau</th>
+                    <i
+                        class="fa-solid fa-magnifying-glass"
+                    ></i>
 
-                        <th>Type</th>
 
-                        <th>Description</th>
+                    <input
+                        type="search"
+                        id="historique-search"
+                        placeholder="Rechercher une demande..."
+                        autocomplete="off"
+                    >
 
-                        <th>Statut</th>
+                </div>
 
-                        <th>Cause</th>
 
-                        <th>Évaluation</th>
+                <!-- ==============================
+                     TRI
+                =============================== -->
 
-                        <th>Commentaire</th>
+                <div class="historique-filter-group">
 
-                    </tr>
+                    <label
+                        for="historique-sort"
+                    >
+                        Trier
+                    </label>
 
-                </thead>
 
-                <tbody id="historique-body">
+                    <select
+                        id="historique-sort"
+                    >
 
-                    <tr class="empty-row">
+                        <option value="recent">
+                            Plus récents
+                        </option>
 
-                        <td colspan="10">
 
-                            Aucun historique disponible.
+                        <option value="ancien">
+                            Plus anciens
+                        </option>
 
-                        </td>
+                    </select>
 
-                    </tr>
+                </div>
 
-                </tbody>
 
-            </table>
+                <!-- ==============================
+                     TYPE
+                =============================== -->
+
+                <div class="historique-filter-group">
+
+                    <label
+                        for="historique-type"
+                    >
+                        Type
+                    </label>
+
+
+                    <select
+                        id="historique-type"
+                    >
+
+                        <option value="tous">
+
+                            Tous les types
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <!-- ==============================
+     STATUT
+=============================== -->
+
+<div class="historique-filter-group">
+
+    <label
+        for="historique-statut"
+    >
+        Statut
+    </label>
+
+
+    <select
+        id="historique-statut"
+    >
+
+        <option value="tous">
+
+            Tous les statuts
+
+        </option>
+
+
+        <option value="termine">
+
+            Terminée
+
+        </option>
+
+
+        <option value="forclos">
+
+            Forclos
+
+        </option>
+
+
+        <option value="non_termine">
+
+            Non terminée
+
+        </option>
+
+    </select>
+
+</div>
+
+
+                <!-- ==============================
+                     PÉRIODE
+                =============================== -->
+
+                <div class="historique-filter-group">
+
+                    <label
+                        for="historique-periode"
+                    >
+                        Période
+                    </label>
+
+
+                    <select
+                        id="historique-periode"
+                    >
+
+                        <option value="toutes">
+
+                            Toutes les périodes
+
+                        </option>
+
+
+                        <option value="aujourd_hui">
+
+                            Aujourd'hui
+
+                        </option>
+
+
+                        <option value="hier">
+
+                            Hier
+
+                        </option>
+
+
+                        <option value="semaine">
+
+                            Cette semaine
+
+                        </option>
+
+
+                        <option value="mois">
+
+                            Ce mois
+
+                        </option>
+
+
+                        <option value="choisir_mois">
+
+                            Choisir un mois
+
+                        </option>
+
+
+                        <option value="annee">
+
+                            Cette année
+
+                        </option>
+
+
+                        <option value="choisir_annee">
+
+                            Choisir une année
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- ==============================
+                     ANNÉE
+                =============================== -->
+
+                <div
+                    class="historique-filter-group historique-date-filter"
+                    id="historique-annee-container"
+                    hidden
+                >
+
+                    <label
+                        for="historique-annee"
+                    >
+                        Année
+                    </label>
+
+
+                    <select
+                        id="historique-annee"
+                    >
+
+                        <option value="">
+
+                            Choisir une année
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- ==============================
+                     MOIS
+                =============================== -->
+
+                <div
+                    class="historique-filter-group historique-date-filter"
+                    id="historique-mois-container"
+                    hidden
+                >
+
+                    <label
+                        for="historique-mois"
+                    >
+                        Mois
+                    </label>
+
+
+                    <select
+                        id="historique-mois"
+                    >
+
+                        <option value="">
+
+                            Choisir un mois
+
+                        </option>
+
+
+                        <option value="0">
+                            Janvier
+                        </option>
+
+
+                        <option value="1">
+                            Février
+                        </option>
+
+
+                        <option value="2">
+                            Mars
+                        </option>
+
+
+                        <option value="3">
+                            Avril
+                        </option>
+
+
+                        <option value="4">
+                            Mai
+                        </option>
+
+
+                        <option value="5">
+                            Juin
+                        </option>
+
+
+                        <option value="6">
+                            Juillet
+                        </option>
+
+
+                        <option value="7">
+                            Août
+                        </option>
+
+
+                        <option value="8">
+                            Septembre
+                        </option>
+
+
+                        <option value="9">
+                            Octobre
+                        </option>
+
+
+                        <option value="10">
+                            Novembre
+                        </option>
+
+
+                        <option value="11">
+                            Décembre
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- ==================================
+                 TABLEAU
+            =================================== -->
+
+            <div class="table-container">
+
+                <table class="table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Date
+                            </th>
+
+
+                            <th>
+                                Nom
+                            </th>
+
+
+                            <th>
+                                Chambre
+                            </th>
+
+
+                            <th>
+                                Type
+                            </th>
+
+
+                            <th>
+                                Description
+                            </th>
+
+
+                            <th>
+                                Statut
+                            </th>
+
+
+                            <th>
+                                Cause
+                            </th>
+
+
+                            <th>
+                                Évaluation
+                            </th>
+
+
+                            <th>
+                                Commentaire
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="historique-body">
+
+                        <tr class="empty-row">
+
+                            <td colspan="9">
+
+                                Aucun historique disponible.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
 
         </section>
 
     </main>
 
-    <script type="module" src="historique-demandes.js"></script>
+
+    <script
+        type="module"
+        src="historique-demandes.js"
+    ></script>
+
 
 </body>
 

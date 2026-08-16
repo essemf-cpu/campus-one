@@ -1,0 +1,872 @@
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+
+    margin: 0;
+
+    font-family:
+        "Inter",
+        Arial,
+        sans-serif;
+
+    background:
+        #f5f7fa;
+
+    color:
+        #1f2937;
+
+}
+
+
+.mes-demandes-page {
+
+    width: 100%;
+
+    max-width: 1200px;
+
+    margin: 0 auto;
+
+    padding: 30px 24px 50px;
+
+}
+
+
+/* ==========================================
+   EN-TÊTE
+========================================== */
+
+.page-header {
+
+    margin-bottom: 25px;
+
+}
+
+
+.back-button {
+
+    border: none;
+
+    background: transparent;
+
+    color: #374151;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px 0;
+
+}
+
+
+.back-button:hover {
+
+    color: #111827;
+
+}
+
+
+.page-header-content {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 15px;
+
+}
+
+
+.page-icon {
+
+    width: 52px;
+
+    height: 52px;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background: #eef2ff;
+
+    color: #4f46e5;
+
+    font-size: 21px;
+
+}
+
+
+.page-header h1 {
+
+    margin: 0 0 5px;
+
+    font-size: 28px;
+
+}
+
+
+.page-header p {
+
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+}
+
+
+/* ==========================================
+   CARTE
+========================================== */
+
+.demandes-card {
+
+    background: #ffffff;
+
+    border-radius: 14px;
+
+    border: 1px solid #e5e7eb;
+
+    overflow: hidden;
+
+}
+
+
+.card-header {
+
+    padding: 22px 24px;
+
+    border-bottom: 1px solid #e5e7eb;
+
+}
+
+
+.card-header h2 {
+
+    margin: 0 0 5px;
+
+    font-size: 18px;
+
+}
+
+
+.card-header p {
+
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 13px;
+
+}
+
+
+/* ==========================================
+   CONTENEUR
+========================================== */
+
+.demandes-container {
+
+    padding: 20px;
+
+}
+
+
+.demande-item {
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.demande-item:last-child {
+
+    margin-bottom: 0;
+
+}
+
+
+/* ==========================================
+   EN-TÊTE DEMANDE
+========================================== */
+
+.demande-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 15px;
+
+    margin-bottom: 18px;
+
+}
+
+
+.demande-title {
+
+    margin: 0;
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+}
+
+
+.demande-date {
+
+    margin-top: 5px;
+
+    color: #6b7280;
+
+    font-size: 12px;
+
+}
+
+
+/* ==========================================
+   STATUT
+========================================== */
+
+.demande-status {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 6px 11px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+}
+
+
+.status-attente {
+
+    background: #fff7ed;
+
+    color: #c2410c;
+
+}
+
+
+.status-cours {
+
+    background: #eff6ff;
+
+    color: #1d4ed8;
+
+}
+
+
+.status-termine {
+
+    background: #ecfdf5;
+
+    color: #047857;
+
+}
+
+
+.status-forclos {
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+}
+
+
+.status-non-termine {
+
+    background: #fffbeb;
+
+    color: #a16207;
+
+}
+
+
+/* ==========================================
+   INFORMATIONS
+========================================== */
+
+.demande-info {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px 25px;
+
+}
+
+
+.info-block {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 4px;
+
+}
+
+
+.info-label {
+
+    color: #6b7280;
+
+    font-size: 12px;
+
+}
+
+
+.info-value {
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+}
+
+
+/* ==========================================
+   CAUSE
+========================================== */
+
+.demande-cause {
+
+    margin-top: 18px;
+
+    padding: 13px 15px;
+
+    border-radius: 9px;
+
+    background: #f9fafb;
+
+    border: 1px solid #e5e7eb;
+
+}
+
+
+.cause-label {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color: #6b7280;
+
+}
+
+
+.cause-text {
+
+    margin: 0;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+}
+
+
+/* ==========================================
+   FEEDBACK
+========================================== */
+
+.feedback-section {
+
+    margin-top: 18px;
+
+    padding-top: 18px;
+
+    border-top: 1px solid #e5e7eb;
+
+}
+
+
+.feedback-locked {
+
+    color: #6b7280;
+
+    font-size: 13px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+}
+
+
+.feedback-button {
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 9px 14px;
+
+    background: #111827;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+}
+
+
+.feedback-button:hover {
+
+    opacity: 0.9;
+
+}
+
+
+/* ==========================================
+   ÉTATS
+========================================== */
+
+.loading-state,
+.empty-state,
+.error-state {
+
+    min-height: 180px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    color: #6b7280;
+
+}
+
+
+.loading-state i {
+
+    font-size: 22px;
+
+    margin-bottom: 12px;
+
+}
+
+
+.empty-state i,
+.error-state i {
+
+    font-size: 28px;
+
+    margin-bottom: 12px;
+
+}
+
+
+.empty-state p,
+.error-state p,
+.loading-state p {
+
+    margin: 0;
+
+    font-size: 14px;
+
+}
+
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+
+    .mes-demandes-page {
+
+        padding:
+            20px 15px 40px;
+
+    }
+
+
+    .page-header h1 {
+
+        font-size: 23px;
+
+    }
+
+
+    .demande-header {
+
+        flex-direction: column;
+
+    }
+
+
+    .demande-info {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    .demande-status {
+
+        align-self: flex-start;
+
+    }
+
+}
+
+/* ==========================================
+   FEEDBACK WOMA
+========================================== */
+
+.feedback-form {
+
+    margin-top: 5px;
+
+}
+
+
+.feedback-title {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-bottom: 15px;
+
+}
+
+
+.feedback-group {
+
+    margin-bottom: 15px;
+
+}
+
+
+.feedback-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 12px;
+
+    color: #6b7280;
+
+    font-weight: 500;
+
+}
+
+
+/* ÉTOILES */
+
+.feedback-stars-select {
+
+    display: flex;
+
+    gap: 5px;
+
+}
+
+
+.feedback-star {
+
+    border: none;
+
+    background: transparent;
+
+    padding: 0;
+
+    font-size: 30px;
+
+    line-height: 1;
+
+    color: #d1d5db;
+
+    cursor: pointer;
+
+    transition: transform 0.15s ease;
+
+}
+
+
+.feedback-star:hover {
+
+    transform: scale(1.1);
+
+}
+
+
+.feedback-star.selected {
+
+    color: #f59e0b;
+
+}
+
+
+/* AVIS */
+
+.feedback-choices {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+}
+
+
+.feedback-choice {
+
+    border: 1px solid #d1d5db;
+
+    background: #ffffff;
+
+    color: #374151;
+
+    border-radius: 8px;
+
+    padding: 8px 12px;
+
+    font-size: 12px;
+
+    cursor: pointer;
+
+}
+
+
+.feedback-choice:hover {
+
+    border-color: #9ca3af;
+
+}
+
+
+.feedback-choice.selected {
+
+    background: #111827;
+
+    border-color: #111827;
+
+    color: #ffffff;
+
+}
+
+
+/* VALIDER */
+
+.feedback-submit {
+
+    border: none;
+
+    border-radius: 8px;
+
+    padding: 9px 16px;
+
+    background: #111827;
+
+    color: #ffffff;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+}
+
+
+.feedback-submit:disabled {
+
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+}
+
+
+/* FEEDBACK ENREGISTRÉ */
+
+.feedback-result {
+
+    padding-top: 2px;
+
+}
+
+
+.feedback-result-title {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    margin-bottom: 8px;
+
+}
+
+
+.feedback-stars {
+
+    display: flex;
+
+    gap: 3px;
+
+    margin-bottom: 10px;
+
+}
+
+
+.feedback-stars span {
+
+    font-size: 24px;
+
+}
+
+
+.star-active {
+
+    color: #f59e0b;
+
+}
+
+
+.star-inactive {
+
+    color: #d1d5db;
+
+}
+
+
+.feedback-comment {
+
+    display: inline-block;
+
+    padding: 7px 10px;
+
+    border-radius: 7px;
+
+    background: #f3f4f6;
+
+    color: #374151;
+
+    font-size: 12px;
+
+}
+
+.demandes-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.demandes-search {
+    position: relative;
+    flex: 1;
+    max-width: 500px;
+}
+
+.demandes-search i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+.demandes-search input {
+    width: 100%;
+    padding: 10px 12px 10px 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 13px;
+}
+
+.demandes-search input:focus {
+    border-color: #6b7280;
+}
+
+.demandes-sort {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.demandes-sort label {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.demandes-sort select {
+    padding: 9px 30px 9px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+
+    .demandes-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .demandes-search {
+        max-width: none;
+    }
+
+    .demandes-sort {
+        justify-content: space-between;
+    }
+
+}

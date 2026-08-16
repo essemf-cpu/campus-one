@@ -3,17 +3,19 @@ import { requireRole } from "../../../auth/authGuard.js";
 import { loadSidebar } from "../components/sidebar.js";
 
 import {
-    getTypesTravaux
-} from "../../../services/referentielService.js";
-
-import {
     collection,
     query,
     where,
-    getDocs
+    onSnapshot,
+    doc,
+    updateDoc
 } from "firebase/firestore";
 
 import { db } from "../../../firebase/firebase.js";
+
+import {
+    getTypesTravaux
+} from "../../../services/referentielService.js";
 
 
 requireRole(
@@ -179,6 +181,23 @@ requireRole(
 
         }
 
+        // =====================================================
+// RÉFÉRENTIEL DES TYPES DE TRAVAUX
+// =====================================================
+
+const typesTravaux =
+    await getTypesTravaux();
+
+const typesTravauxMap =
+    new Map(
+        typesTravaux.map(
+            type => [
+                type.id,
+                type.nom
+            ]
+        )
+    );
+
 
         // =====================================================
         // REQUÊTE FIRESTORE
@@ -207,161 +226,231 @@ requireRole(
             );
 
 
-        try {
+        // =====================================================
+// ÉCOUTE TEMPS RÉEL DES DEMANDES
+// =====================================================
 
-            const snapshot =
-                await getDocs(
-                    demandesQuery
-                );
+onSnapshot(
+    demandesQuery,
+
+    (snapshot) => {
+
+        console.log(
+            "📋 Demandes mises à jour :",
+            snapshot.size
+        );
 
 
-            console.log(
-                "📋 Demandes trouvées :",
-                snapshot.size
-            );
+        // =================================================
+        // AFFICHAGE
+        // =================================================
+
+        demandesBody.innerHTML = "";
 
 
-            // =================================================
-            // AUCUNE DEMANDE
-            // =================================================
+        let demandesActives = 0;
 
-            if (
-                snapshot.empty
-            ) {
 
-                demandesBody.innerHTML = `
+        snapshot.forEach(
+            (document) => {
 
-                    <tr class="empty-row">
+                const demande =
+                    document.data();
 
-                        <td colspan="10">
 
-                            Aucune demande pour le moment
+                // =================================================
+                // UNIQUEMENT LES DEMANDES ACTIVES
+                // =================================================
 
+                if (
+                    demande.statut &&
+                    demande.statut !== "en_attente" &&
+                    demande.statut !== "en_cours"
+                ) {
+
+                    return;
+
+                }
+
+
+                demandesActives++;
+
+
+                const nomComplet =
+                    `${demande.prenom || ""} ${demande.nom || ""}`
+                        .trim();
+
+
+                // =================================================
+                // ACTIONS
+                // =================================================
+
+                let actions = "";
+
+
+                // =============================================
+                // EN ATTENTE
+                // =============================================
+
+                if (
+                    (demande.statut || "en_attente") ===
+                    "en_attente"
+                ) {
+
+                    actions = `
+
+                        <div class="demande-actions">
+
+                            <button
+                                type="button"
+                                class="demande-action-btn demande-action-encours"
+                                data-id="${document.id}"
+                                data-action="encours"
+                            >
+                                En cours
+                            </button>
+
+                            <button
+                                type="button"
+                                class="demande-action-btn demande-action-forclos"
+                                data-id="${document.id}"
+                                data-action="forclos"
+                            >
+                                Forclos
+                            </button>
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                // =============================================
+                // EN COURS
+                // =============================================
+
+                else if (
+                    demande.statut ===
+                    "en_cours"
+                ) {
+
+                    actions = `
+
+                        <div class="demande-actions">
+
+                            <button
+                                type="button"
+                                class="demande-action-btn demande-action-termine"
+                                data-id="${document.id}"
+                                data-action="termine"
+                            >
+                                Terminée
+                            </button>
+
+                            <button
+                                type="button"
+                                class="demande-action-btn demande-action-nontermine"
+                                data-id="${document.id}"
+                                data-action="nontermine"
+                            >
+                                Non terminée
+                            </button>
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                // =================================================
+                // LIGNE
+                // =================================================
+
+                demandesBody.innerHTML += `
+
+                    <tr>
+
+                        <!-- ÉTUDIANT -->
+
+                        <td>
+
+                            <strong>
+                                ${nomComplet}
+                            </strong>
+
+                        </td>
+
+
+                        <!-- CARTE -->
+
+                        <td>
+                            ${demande.matricule || "-"}
+                        </td>
+
+
+                        <!-- CHAMBRE -->
+
+                        <td>
+                            ${demande.chambre || "-"}
+                        </td>
+
+
+                        <!-- TYPE -->
+
+                        <td>
+                           ${
+                             typesTravauxMap.get(
+                                          demande.type
+                                                  ) || "-"
+                                                     }
+                        </td>
+
+
+                        <!-- LOCALISATION -->
+
+                        <td>
+                            ${demande.localisation || "-"}
+                        </td>
+
+
+                        <!-- PROBLÈME -->
+
+                        <td>
+                            ${demande.probleme || "-"}
+                        </td>
+
+
+                        <!-- ACTION -->
+
+                        <td>
+                            ${actions}
                         </td>
 
                     </tr>
 
                 `;
 
-                return;
-
             }
+        );
 
 
-            // =================================================
-            // AFFICHAGE
-            // =================================================
+        // =================================================
+        // AUCUNE DEMANDE ACTIVE
+        // =================================================
 
-            demandesBody.innerHTML = "";
-
-
-            snapshot.forEach(
-                (document) => {
-
-                    const demande =
-                        document.data();
-
-
-                    const nomComplet =
-                        `${demande.prenom || ""} ${demande.nom || ""}`
-                            .trim();
-
-
-                    demandesBody.innerHTML += `
-
-                        <tr>
-
-                            <!-- ÉTUDIANT -->
-
-                            <td>
-
-                                <strong>
-                                    ${nomComplet}
-                                </strong>
-
-                            </td>
-
-
-                            <!-- CARTE -->
-
-                            <td>
-                                ${demande.matricule || "-"}
-                            </td>
-
-                            
-                            <!-- CHAMBRE -->
-
-                            <td>
-                                ${demande.chambre || "-"}
-                            </td>
-
-
-                            <!-- LIT -->
-
-                            <td>
-                                ${demande.lit || "-"}
-                            </td>
-
-
-                            <!-- TYPE -->
-
-                            <td>
-                                ${demande.type || "-"}
-                            </td>
-
-
-                            <!-- LOCALISATION -->
-
-                            <td>
-                                ${demande.localisation || "-"}
-                            </td>
-
-
-                            <!-- PROBLÈME -->
-
-                            <td>
-                                ${demande.probleme || "-"}
-                            </td>
-
-
-                            <!-- ACTION -->
-
-                            <td>
-
-                                <button
-                                    type="button"
-                                    class="primary-btn"
-                                    data-id="${document.id}"
-                                >
-                                    Voir
-                                </button>
-
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                }
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "❌ Erreur récupération demandes :",
-                error
-            );
-
+        if (
+            demandesActives === 0
+        ) {
 
             demandesBody.innerHTML = `
 
                 <tr class="empty-row">
 
-                    <td colspan="10">
+                    <td colspan="7">
 
-                        Impossible de charger
-                        les demandes.
+                        Aucune demande pour le moment
 
                     </td>
 
@@ -371,6 +460,213 @@ requireRole(
 
         }
 
+    },
+
+    // =====================================================
+    // ERREUR ÉCOUTE TEMPS RÉEL
+    // =====================================================
+
+    (error) => {
+
+        console.error(
+            "❌ Erreur écoute demandes :",
+            error
+        );
+
+
+        demandesBody.innerHTML = `
+
+            <tr class="empty-row">
+
+                <td colspan="7">
+
+                    Impossible de charger
+                    les demandes.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+);
+
+
+// =====================================================
+// ACTIONS DES DEMANDES ÉTUDIANTS
+// =====================================================
+
+demandesBody.addEventListener(
+    "click",
+    async (event) => {
+
+        const button =
+            event.target.closest(
+                ".demande-action-btn"
+            );
+
+
+        if (!button) {
+            return;
+        }
+
+
+        const id =
+            button.dataset.id;
+
+
+        const action =
+            button.dataset.action;
+
+
+        if (
+            !id ||
+            !action
+        ) {
+
+            return;
+
+        }
+
+
+        // Empêche les doubles clics
+
+        if (
+            button.disabled
+        ) {
+
+            return;
+
+        }
+
+
+        button.disabled = true;
+
+
+        try {
+
+            // =========================================
+            // EN COURS
+            // =========================================
+
+            if (
+                action === "encours"
+            ) {
+
+                await updateDoc(
+                    doc(
+                        db,
+                        "demandes_etudiants",
+                        id
+                    ),
+                    {
+                        statut: "en_cours",
+                        cause: "",
+                        feedbackAutorise: false
+                    }
+                );
+
+            }
+
+
+            // =========================================
+            // FORCLOS
+            // =========================================
+
+            else if (
+                action === "forclos"
+            ) {
+
+                await updateDoc(
+                    doc(
+                        db,
+                        "demandes_etudiants",
+                        id
+                    ),
+                    {
+                        statut: "forclos",
+
+                        cause:
+                            "Votre demande a déjà été formulée par un(e) de vos camarades / colocataires.",
+
+                        feedbackAutorise: false
+                    }
+                );
+
+            }
+
+
+            // =========================================
+            // TERMINÉE
+            // =========================================
+
+            else if (
+                action === "termine"
+            ) {
+
+                await updateDoc(
+                    doc(
+                        db,
+                        "demandes_etudiants",
+                        id
+                    ),
+                    {
+                        statut: "termine",
+                        cause: "",
+                        feedbackAutorise: true
+                    }
+                );
+
+            }
+
+
+            // =========================================
+            // NON TERMINÉE
+            // =========================================
+
+            else if (
+                action === "nontermine"
+            ) {
+
+                await updateDoc(
+                    doc(
+                        db,
+                        "demandes_etudiants",
+                        id
+                    ),
+                    {
+                        statut: "non_termine",
+
+                        cause:
+                            "Stock de matériel, merci de formuler votre demande dans les jours à venir.",
+
+                        feedbackAutorise: false
+                    }
+                );
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "❌ Erreur action demande :",
+                error
+            );
+
+
+            button.disabled = false;
+
+
+            alert(
+                "Impossible de modifier la demande."
+            );
+
+        }
+
+    }
+);
 
         console.log(
             "6 - page prête"

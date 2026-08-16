@@ -351,12 +351,13 @@ requireRole(
 
 
                         <button
-                            class="
-                                codifier-button
-                                codifier-button-secondary
-                            "
-                            type="button"
-                        >
+    id="voir-demandes-btn"
+    class="
+        codifier-button
+        codifier-button-secondary
+    "
+    type="button"
+>
 
                             <i
                                 class="
@@ -380,6 +381,7 @@ requireRole(
         "faire-reclamation-btn"
     );
 
+
 if (reclamationButton) {
 
     reclamationButton.addEventListener(
@@ -388,6 +390,31 @@ if (reclamationButton) {
 
             window.location.href =
                 "./reclamation/index.html";
+
+        }
+    );
+
+}
+
+
+// ==========================================
+// VOIR MES DEMANDES
+// ==========================================
+
+const voirDemandesButton =
+    document.getElementById(
+        "voir-demandes-btn"
+    );
+
+
+if (voirDemandesButton) {
+
+    voirDemandesButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "./mes-demandes/index.html";
 
         }
     );
