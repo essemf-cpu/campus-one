@@ -517,7 +517,7 @@ const problemes = {
 
     peinture: {
 
-        "Chambre": [
+        "Mur de la chambre": [
             "Peinture écaillée",
             "Mur taché",
             "Mur dégradé",
@@ -793,7 +793,9 @@ envoyerDemandeButton.addEventListener(
                         new Date(),
 
                     statut:
-                        "en_attente"
+                        "en_attente",
+
+                    notificationVue: false
 
                 }
             );

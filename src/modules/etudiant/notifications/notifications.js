@@ -810,6 +810,13 @@ async function marquerNotificationsCommeLues() {
                     // NOTIFICATION POUR LE DEMANDEUR
                     // =============================================
 
+                    console.log(
+    "🔔 NOTIFICATION ACCEPTATION :",
+    {
+        amiMatricule,
+        profileMatricule: profile.matricule
+    }
+);
                     await addDoc(
 
                         collection(
@@ -1668,22 +1675,18 @@ export function afficherBadgeNotifications() {
                 (snapshot) => {
 
                     notificationsNonLues =
-                        snapshot.docs.filter(
-                            (document) => {
+    snapshot.docs.filter(
+        (document) => {
 
-                                const n =
-                                    document.data();
+            const n =
+                document.data();
 
+            return (
+                n.seen === false
+            );
 
-                                return (
-                                    n.type !==
-                                    "amis" &&
-                                    n.seen ===
-                                    false
-                                );
-
-                            }
-                        ).length;
+        }
+    ).length;
 
 
                     updateBadge();

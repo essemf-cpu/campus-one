@@ -46,8 +46,7 @@ body{
 .sidebar.collapsed .section h4,
 .sidebar.collapsed .section span,
 .sidebar.collapsed .agent-info,
-.sidebar.collapsed .agent-menu,
-.sidebar.collapsed .badge{
+.sidebar.collapsed .agent-menu{
     display:none;
 }
 

@@ -1,1 +1,0 @@
-import{_ as e,f as t,l as n}from"./authService-DxBSWa94.js";async function r(){return(await t(e(n,`typesTravaux`))).docs.map(e=>({id:e.id,...e.data()}))}export{r as t};

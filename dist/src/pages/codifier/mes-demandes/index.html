@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Mes demandes - Campus One
+    </title>
+
+
+
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+  <script type="module" crossorigin src="/assets/pages/codifier/mes-demandes/index-whTFKNEI.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="/assets/authService-DTiP6P1g.js">
+  <link rel="modulepreload" crossorigin href="/assets/authGuard-BnlEFo-L.js">
+  <link rel="modulepreload" crossorigin href="/assets/referentielService-Vwd3uLQj.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-CJGJ8Qvg.css">
+</head>
+
+
+<body>
+
+    <main class="mes-demandes-page">
+
+
+        <!-- ==========================================
+             EN-TÊTE
+        =========================================== -->
+
+        <div class="page-header">
+
+
+            <button
+                id="retour-btn"
+                class="back-button"
+                type="button"
+            >
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Retour
+
+            </button>
+
+
+            <div class="page-header-content">
+
+
+                <div class="page-icon">
+
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+
+                </div>
+
+
+                <div>
+
+                    <h1>
+                        Mes demandes
+                    </h1>
+
+                    <p>
+                        Suivez l'évolution de vos demandes de réclamation.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             CARTE
+        =========================================== -->
+
+        <section class="demandes-card">
+
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+                        Mes demandes de réclamation
+                    </h2>
+
+                    <p>
+                        Retrouvez ici toutes vos demandes.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==========================================
+                 RECHERCHE ET TRI
+            =========================================== -->
+
+            <!-- ==========================================
+     RECHERCHE ET FILTRES
+=========================================== -->
+
+<div class="demandes-controls">
+
+
+    <!-- ==============================
+         RECHERCHE
+    =============================== -->
+
+    <div class="demandes-search">
+
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+            type="search"
+            id="demandes-search"
+            placeholder="Rechercher une demande..."
+            autocomplete="off"
+        >
+
+    </div>
+
+
+    <!-- ==============================
+         TRI
+    =============================== -->
+
+    <div class="demandes-sort">
+
+        <label for="demandes-sort-select">
+            Trier par
+        </label>
+
+
+        <select
+            id="demandes-sort-select"
+        >
+
+            <option value="date_desc">
+                Plus récente
+            </option>
+
+            <option value="date_asc">
+                Plus ancienne
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- ==============================
+         TYPE
+    =============================== -->
+
+    <div class="demandes-sort">
+
+        <label for="demandes-type-select">
+            Type
+        </label>
+
+
+        <select
+            id="demandes-type-select"
+        >
+
+            <option value="tous">
+                Tous les types
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <!-- ==============================
+         STATUT
+    =============================== -->
+
+    <div class="demandes-sort">
+
+        <label for="demandes-statut-select">
+            Statut
+        </label>
+
+
+        <select
+            id="demandes-statut-select"
+        >
+
+            <option value="tous">
+                Tous les statuts
+            </option>
+
+            <option value="en_attente">
+                En attente
+            </option>
+
+            <option value="en_cours">
+                En cours
+            </option>
+
+            <option value="termine">
+                Terminée
+            </option>
+
+            <option value="forclos">
+                Forclos
+            </option>
+
+            <option value="non_termine">
+                Non terminée
+            </option>
+
+        </select>
+
+    </div>
+
+</div>
+
+
+            <!-- ==========================================
+                 DEMANDES
+            =========================================== -->
+
+            <div
+                id="demandes-container"
+                class="demandes-container"
+            >
+
+                <div class="loading-state">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                    <p>
+                        Chargement de vos demandes...
+                    </p>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+
+</body>
+
+</html>

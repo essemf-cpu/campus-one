@@ -564,7 +564,8 @@ demandesBody.addEventListener(
                     {
                         statut: "en_cours",
                         cause: "",
-                        feedbackAutorise: false
+                        feedbackAutorise: false,
+                        notificationVue: true
                     }
                 );
 
@@ -591,7 +592,8 @@ demandesBody.addEventListener(
                         cause:
                             "Votre demande a déjà été formulée par un(e) de vos camarades / colocataires.",
 
-                        feedbackAutorise: false
+                        feedbackAutorise: false,
+                        notificationVue: true
                     }
                 );
 

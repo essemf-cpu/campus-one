@@ -2,6 +2,14 @@ import { createIcons, icons } from "lucide";
 import { signOut } from "firebase/auth";
 import { auth } from "../../../firebase/firebase.js";
 import { clearCurrentUserCache } from "../../../auth/authService.js";
+import {
+    collection,
+    query,
+    where,
+    onSnapshot
+} from "firebase/firestore";
+
+import { db } from "../../../firebase/firebase.js";
 import logo from "../../../assets/logo coud.png";
 
 
@@ -208,8 +216,6 @@ if (suiviLink && !suiviLink.dataset.binded) {
     // Icônes
     createIcons({ icons });
 
-    document.getElementById("notif-count").style.display = "none";
-
     // Déconnexion
     const logout = document.getElementById("logout-btn");
 
@@ -300,18 +306,143 @@ document.addEventListener("click",(e)=>{
 
 });
 
-   const notifBtn = document.querySelector(".notif-btn");
+   // =====================================================
+// NOTIFICATIONS — DEMANDES ÉTUDIANTES
+// =====================================================
 
-if (notifBtn && !notifBtn.dataset.binded) {
+const notifCount =
+    document.getElementById(
+        "notif-count"
+    );
 
-    notifBtn.dataset.binded = "true";
 
-    notifBtn.onclick = () => {
+if (
+    notifCount
+) {
 
-        window.location.href = "../notifications/index.html";
+    const siteAgent =
+        profile.site;
 
-    };
 
-};
+    const pavillonAgent =
+        profile.affectation
+            ?.replace(
+                /^Pavillon\s+/i,
+                ""
+            )
+            .trim();
+
+
+    if (
+        siteAgent &&
+        pavillonAgent
+    ) {
+
+        console.log(
+    "🔔 Notification agent :",
+    {
+        siteAgent,
+        pavillonAgent,
+        affectationOriginale:
+            profile.affectation
+    }
+);
+
+        const notificationsQuery =
+            query(
+
+                collection(
+                    db,
+                    "demandes_etudiants"
+                ),
+
+                where(
+                    "site",
+                    "==",
+                    siteAgent
+                ),
+
+                where(
+                    "pavillon",
+                    "==",
+                    pavillonAgent
+                ),
+
+                where(
+                    "notificationVue",
+                    "==",
+                    false
+                )
+
+            );
+
+
+        onSnapshot(
+            notificationsQuery,
+
+            (snapshot) => {
+
+                console.log(
+    "🔔 Demandes non vues :",
+    snapshot.size
+);
+
+                const nombre =
+                    snapshot.size;
+
+
+                if (
+                    nombre > 0
+                ) {
+
+                    notifCount.textContent =
+                        nombre > 99
+                            ? "99+"
+                            : nombre;
+
+
+                    notifCount.classList.remove(
+                        "hidden"
+                    );
+
+                }
+
+                else {
+
+                    notifCount.textContent =
+                        "";
+
+
+                    notifCount.classList.add(
+                        "hidden"
+                    );
+
+                }
+
+            },
+
+
+            (error) => {
+
+                console.error(
+                    "❌ Erreur compteur notifications :",
+                    error
+                );
+
+
+                notifCount.textContent =
+                    "";
+
+
+                notifCount.classList.add(
+                    "hidden"
+                );
+
+            }
+        );
+
+    }
+
+}
 
 }

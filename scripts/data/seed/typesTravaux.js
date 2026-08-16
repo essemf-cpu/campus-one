@@ -18,6 +18,16 @@ export default [
     {
         id: "peinture",
         nom: "Peinture"
+    },
+
+    {
+        id: "mobilier_equipement",
+        nom: "Mobilier / Équipement"
+    },
+
+    {
+        id: "maconnerie",
+        nom: "Maçonnerie"
     }
 
 ];
