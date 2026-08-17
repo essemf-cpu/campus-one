@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Résidents</title>
+
+    <link
+        rel="stylesheet"
+        href="../components/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="residents.css"
+    >
+
+</head>
+
+<body>
+
+    <header class="mobile-header">
+
+        <button id="mobile-menu-btn">
+            ☰
+        </button>
+
+        <h2 id="mobile-title">
+            Hébergement
+        </h2>
+
+    </header>
+
+
+    <div id="app-loader">
+
+        <img
+            src="/src/assets/logo coud.png"
+            alt="Campus One"
+        >
+
+        <h2>
+            Campus One
+        </h2>
+
+        <p>
+            Chargement de votre espace...
+        </p>
+
+    </div>
+
+
+    <div id="sidebar-container"></div>
+
+
+    <main id="content">
+
+        <section class="page-title">
+
+    <h1 id="residents-page-title">
+    Résidents
+    </h1>
+
+    <p id="residents-page-subtitle">
+    Résidents de l’année académique
+    <span id="annee-academique"></span>
+    du pavillon
+    <span id="pavillon-concerne"></span>
+</p>
+
+</section>
+
+
+<div class="residents-footer">
+
+    <div class="total-residents">
+
+    <span id="total-label">
+        Nombre total de résidents :
+    </span>
+
+    <strong id="total-residents">
+        0
+    </strong>
+
+</div>
+
+
+    <button
+        type="button"
+        id="voir-suppleants-btn"
+        class="secondary-action-btn"
+    >
+
+        Voir suppléants
+
+    </button>
+
+</div>
+
+
+<section class="card">
+
+    <div class="card-header">
+
+        <h2>
+            Recherche et filtres
+        </h2>
+
+    </div>
+
+    <div class="grid">
+
+        <div>
+
+            <label for="search-resident">
+                Recherche
+            </label>
+
+            <input
+                type="text"
+                id="search-resident"
+                placeholder="Nom, prénom, matricule ou téléphone..."
+            >
+
+        </div>
+
+
+        <div>
+
+            <label for="niveau-filter">
+                Niveau
+            </label>
+
+            <select id="niveau-filter">
+
+                <option value="">
+                    Tous les niveaux
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="card">
+
+    <div
+    id="table-title-container"
+    class="table-title-container"
+>
+    <h2 id="table-title">
+        Liste des résidents
+    </h2>
+</div>
+
+
+    <div class="table-container">
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Chambre</th>
+                    <th id="occupant-column-title">
+                       Résidents
+                    </th>
+                    <th>N° carte</th>
+                    <th>Téléphone</th>
+                    <th>Établissement</th>
+                    <th>Filière</th>
+                    <th>Niveau</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="residents-body">
+
+                <tr class="empty-row">
+
+                    <td colspan="7">
+                        Chargement...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+    </main>
+
+
+    <div
+        id="resident-modal"
+        class="modal hidden"
+    >
+
+        <div class="modal-overlay"></div>
+
+        <div class="modal-content">
+
+            <button
+                id="close-modal"
+                class="close-modal"
+            >
+                ×
+            </button>
+
+            <div id="resident-details"></div>
+
+        </div>
+
+    </div>
+
+
+    <script
+        type="module"
+        src="./residents.js"
+    ></script>
+
+</body>
+
+</html>

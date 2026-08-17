@@ -62,7 +62,7 @@ import{r as e,t}from"../../../rolldown-runtime-QTnfLwEv.js";import"../../../modu
         `;let t=document.getElementById(`add-friend-btn`);t&&t.addEventListener(`click`,()=>g(e))}async function g(t){let n=document.getElementById(`add-friend-btn`);if(n){if(t.matricule===e.matricule){m(`Vous ne pouvez pas vous ajouter vous-même.`,`error`);return}n.disabled=!0,n.innerHTML=`
         <i class="fa-solid fa-spinner fa-spin"></i>
         Envoi...
-    `;try{let n=await i(a(u(o,`friendRequests`),l(`from`,`==`,e.matricule),l(`to`,`==`,t.matricule),s(1)));if(!n.empty){let e=n.docs[0].data();if(e.status===`pending`){m(`Une demande est déjà en attente.`,`info`);return}if(e.status===`accepted`){m(`Vous êtes déjà amis.`,`info`);return}}await c(u(o,`friendRequests`),{from:e.matricule,fromNom:`${e.prenom} ${e.nom}`,fromAvatar:e.avatar||`assets/default-user.png`,to:t.matricule,status:`pending`,seen:!1,date:Date.now()}),await c(u(o,`notifications`),{to:t.matricule,type:`amis`,title:`Nouvelle demande d'ami`,text:`${e.prenom} ${e.nom} souhaite vous ajouter comme ami.`,from:e.matricule,fromNom:`${e.prenom} ${e.nom}`,fromAvatar:e.avatar||`assets/default-user.png`,date:Date.now(),seen:!1}),d.innerHTML=`
+    `;try{let n=await i(a(u(o,`friendRequests`),l(`from`,`==`,e.matricule),l(`to`,`==`,t.matricule),s(1)));if(!n.empty){let e=n.docs[0].data();if(e.status===`pending`){m(`Une demande est déjà en attente.`,`info`);return}if(e.status===`accepted`){m(`Vous êtes déjà amis.`,`info`);return}}await c(u(o,`friendRequests`),{from:e.matricule,fromNom:`${e.prenom} ${e.nom}`,fromAvatar:e.avatar||`assets/default-user.png`,to:t.matricule,status:`pending`,seen:!1,date:Date.now()}),d.innerHTML=`
 
             <div class="scan-success">
 

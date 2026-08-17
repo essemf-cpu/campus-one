@@ -231,3 +231,84 @@ button:disabled {
 
     cursor: not-allowed;
 }
+
+/* =====================================================
+   ANNÉE ACADÉMIQUE
+===================================================== */
+
+#annee-group {
+    margin-top: 4px;
+}
+
+
+#anneeAcademique {
+    width: 100%;
+    height: 52px;
+
+    padding: 0 45px 0 16px;
+
+    border: 1px solid #d5dce5;
+    border-radius: 10px;
+
+    background-color: #ffffff;
+
+    color: #1f2937;
+
+    font-size: 16px;
+    font-family: inherit;
+
+    cursor: pointer;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+
+    appearance: auto;
+}
+
+
+/* Au passage de la souris */
+
+#anneeAcademique:hover {
+    border-color: #1785c7;
+}
+
+
+/* Quand on clique */
+
+#anneeAcademique:focus {
+    border-color: #1785c7;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            23,
+            133,
+            199,
+            0.12
+        );
+}
+
+
+/* Première option */
+
+#anneeAcademique option {
+    padding: 10px;
+
+    background-color: #ffffff;
+
+    color: #1f2937;
+}
+
+
+/* Option "Choisir..." */
+
+#anneeAcademique option[value=""] {
+    color: #8a94a3;
+}
+
+    #annee-group {
+        margin-top: 20px;
+        }

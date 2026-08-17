@@ -55,67 +55,181 @@ export function afficherNotifications() {
 
             let notifications = [];
 
+
             // =====================================================
-// MARQUER LES NOTIFICATIONS COMME LUES
-// =====================================================
+            // MARQUER LES NOTIFICATIONS COMME LUES
+            // =====================================================
 
-async function marquerNotificationsCommeLues() {
+            async function marquerNotificationsCommeLues() {
 
-    try {
+                try {
 
-        const demandesSnapshot =
-            await getDocs(
-                query(
-                    collection(
-                        db,
-                        "friendRequests"
-                    ),
-                    where(
-                        "to",
-                        "==",
-                        matricule
-                    )
-                )
-            );
+                    // -------------------------------------------------
+                    // DEMANDES D'AMIS
+                    // -------------------------------------------------
 
-        for (
-            const document
-            of demandesSnapshot.docs
-        ) {
+                    const demandesSnapshot =
+                        await getDocs(
+                            query(
+                                collection(
+                                    db,
+                                    "friendRequests"
+                                ),
+                                where(
+                                    "to",
+                                    "==",
+                                    matricule
+                                )
+                            )
+                        );
 
-            const demande =
-                document.data();
 
-            if (
-                demande.status === "pending" &&
-                demande.seen !== true
-            ) {
+                    for (
+                        const document
+                        of demandesSnapshot.docs
+                    ) {
 
-                await updateDoc(
-                    doc(
-                        db,
-                        "friendRequests",
-                        document.id
-                    ),
-                    {
-                        seen: true
+                        const demande =
+                            document.data();
+
+
+                        if (
+                            demande.status ===
+                                "pending" &&
+                            demande.seen !== true
+                        ) {
+
+                            await updateDoc(
+                                doc(
+                                    db,
+                                    "friendRequests",
+                                    document.id
+                                ),
+                                {
+                                    seen: true
+                                }
+                            );
+
+                        }
+
                     }
-                );
+
+
+                    // -------------------------------------------------
+                    // NOTIFICATIONS SYSTÈME
+                    // -------------------------------------------------
+
+                    const notificationsSnapshot =
+                        await getDocs(
+                            query(
+                                collection(
+                                    db,
+                                    "notifications"
+                                ),
+                                where(
+                                    "to",
+                                    "==",
+                                    matricule
+                                )
+                            )
+                        );
+
+
+                    for (
+                        const document
+                        of notificationsSnapshot.docs
+                    ) {
+
+                        const notification =
+                            document.data();
+
+
+                        if (
+                            notification.seen !==
+                            true
+                        ) {
+
+                            await updateDoc(
+                                doc(
+                                    db,
+                                    "notifications",
+                                    document.id
+                                ),
+                                {
+                                    seen: true
+                                }
+                            );
+
+                        }
+
+                    }
+
+
+                    // -------------------------------------------------
+                    // RESTAURANT
+                    // -------------------------------------------------
+
+                    const restaurantSnapshot =
+                        await getDocs(
+                            query(
+                                collection(
+                                    db,
+                                    "restaurantNotifications"
+                                ),
+                                where(
+                                    "to",
+                                    "==",
+                                    matricule
+                                )
+                            )
+                        );
+
+
+                    for (
+                        const document
+                        of restaurantSnapshot.docs
+                    ) {
+
+                        const notification =
+                            document.data();
+
+
+                        if (
+                            notification.seen !==
+                            true
+                        ) {
+
+                            await updateDoc(
+                                doc(
+                                    db,
+                                    "restaurantNotifications",
+                                    document.id
+                                ),
+                                {
+                                    seen: true
+                                }
+                            );
+
+                        }
+
+                    }
+
+
+                    console.log(
+                        "✅ Notifications marquées comme lues."
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        "❌ Erreur lecture notifications :",
+                        error
+                    );
+
+                }
 
             }
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "❌ Erreur lecture notifications :",
-            error
-        );
-
-    }
-
-}
 
 
             // =====================================================
@@ -133,11 +247,13 @@ async function marquerNotificationsCommeLues() {
                     [...notifications];
 
 
-                // ==========================
+                // =================================================
                 // FILTRE
-                // ==========================
+                // =================================================
 
-                if (type !== "all") {
+                if (
+                    type !== "all"
+                ) {
 
                     liste =
                         liste.filter(
@@ -148,64 +264,134 @@ async function marquerNotificationsCommeLues() {
                 }
 
 
-                // ==========================
-                // TRI
-                // ==========================
+                // =================================================
+                // SUPPRESSION DES DOUBLONS
+                // =================================================
 
-                liste.sort(
-                    (a, b) =>
-                        b.date - a.date
-                );
+                const dejaAffichees =
+                    new Set();
 
 
-                // ==========================
-                // AUCUNE NOTIFICATION
-                // ==========================
+                liste =
+                    liste.filter(
+                        (n) => {
 
-                if (
-                    liste.length === 0
-                ) {
+                            let cle;
 
-                    zone.innerHTML = `
+
+                            if (
+    n.source ===
+    "friends"
+) {
+
+    // =================================================
+    // DEMANDE ACCEPTÉE
+    // =================================================
+
+    if (
+        n.status ===
+        "accepted"
+    ) {
+
+        zone.innerHTML += `
+
+            <div
+                class="
+                    notification-card
+                    friend-request-card
+                "
+            >
+
+                <div
+                    class="
+                        friend-request-avatar
+                    "
+                >
+
+                    ${
+                        n.avatar
+                        ?
+
+                        `
+                        <img
+                            src="${n.avatar}"
+                            alt="Avatar"
+                            onerror="
+                                this.style.display='none';
+                                this.nextElementSibling.style.display='flex';
+                            "
+                        >
 
                         <div
-                            class="notification-empty">
-
-                            <i
-                                class="fa-solid fa-bell-slash">
-                            </i>
-
-                            <p>
-                                Aucune notification
-                            </p>
-
+                            class="
+                                avatar-fallback
+                            "
+                            style="display:none;"
+                        >
+                            ${getInitiales(
+                                n.fromNom
+                            )}
                         </div>
+                        `
 
-                    `;
+                        :
 
-                    return;
-                }
+                        `
+                        <div
+                            class="
+                                avatar-fallback
+                            "
+                        >
+                            ${getInitiales(
+                                n.fromNom
+                            )}
+                        </div>
+                        `
+                    }
+
+                </div>
 
 
-                // ==========================
-                // AFFICHAGE
-                // ==========================
+                <div
+                    class="
+                        notification-info
+                        friend-request-info
+                    "
+                >
 
-                liste.forEach((n) => {
+                    <strong>
+                        Vous êtes désormais amis
+                    </strong>
 
-                    // ---------------------------------
-                    // DEMANDE D'AMI
-                    // ---------------------------------
+                    <p>
+                        Vous et
+                        <b>
+                            ${escapeHtml(
+                                n.fromNom
+                            )}
+                        </b>
+                        êtes désormais amis.
+                    </p>
 
-                    if (
-                        n.source ===
-                        "friends"
-                    ) {
+                    <small>
+                        ${formatDate(
+                            n.date
+                        )}
+                    </small>
 
-                        if (
-    n.status ===
-    "accepted"
-) {
+                </div>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    // =================================================
+    // DEMANDE EN ATTENTE
+    // =================================================
 
     zone.innerHTML += `
 
@@ -274,20 +460,22 @@ async function marquerNotificationsCommeLues() {
             >
 
                 <strong>
-                    Vous et
-                    ${escapeHtml(
-                        n.fromNom
-                    )}
-                    êtes désormais amis
+                    Nouvelle demande d'ami
                 </strong>
 
                 <p>
-                    Vous pouvez maintenant
-                    échanger avec
-                    ${escapeHtml(
-                        n.fromNom
-                    )}.
+
+                    <b>
+                        ${escapeHtml(
+                            n.fromNom
+                        )}
+                    </b>
+
+                    souhaite vous ajouter
+                    comme ami.
+
                 </p>
+
 
                 <small>
                     ${formatDate(
@@ -295,94 +483,167 @@ async function marquerNotificationsCommeLues() {
                     )}
                 </small>
 
+
+                <div
+                    class="
+                        friend-request-actions
+                    "
+                >
+
+                    <button
+                        class="
+                            accept-friend-btn
+                        "
+                        data-id="${n.id}"
+                        data-matricule="${n.from}"
+                        data-nom="${escapeAttribute(
+                            n.fromNom
+                        )}"
+                        data-avatar="${escapeAttribute(
+                            n.avatar || ""
+                        )}"
+                    >
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-check
+                            ">
+                        </i>
+
+                        Accepter
+
+                    </button>
+
+
+                    <button
+                        class="
+                            reject-friend-btn
+                        "
+                        data-id="${n.id}"
+                    >
+
+                        <i
+                            class="
+                                fa-solid
+                                fa-xmark
+                            ">
+                        </i>
+
+                        Refuser
+
+                    </button>
+
+                </div>
+
             </div>
 
         </div>
 
     `;
 
-    return;
-}
+                            return;
+
+                        }
+
+
+                        // -----------------------------------------
+                        // NOTIFICATION NORMALE
+                        // -----------------------------------------
 
                         zone.innerHTML += `
 
                             <div
                                 class="
                                     notification-card
-                                    friend-request-card
+                                    normal-notification-card
                                 "
                             >
 
                                 <div
-                                    class="
-                                        friend-request-avatar
-                                    "
-                                >
+    class="
+        notification-icon
+        ${n.iconBg || ""}
+    "
+>
 
-                                    ${
-                                        n.avatar
-                                        ?
+    ${
+        n.type === "amis" &&
+        n.title === "Demande acceptée"
 
-                                        `
-                                        <img
-                                            src="${n.avatar}"
-                                            alt="Avatar"
-                                            onerror="
-                                                this.style.display='none';
-                                                this.nextElementSibling.style.display='flex';
-                                            "
-                                        >
+        ?
 
-                                        <div
-                                            class="
-                                                avatar-fallback
-                                            "
-                                            style="display:none;"
-                                        >
-                                            ${getInitiales(
-                                                n.fromNom
-                                            )}
-                                        </div>
-                                        `
+        (
+            n.fromAvatar
 
-                                        :
+            ?
 
-                                        `
-                                        <div
-                                            class="
-                                                avatar-fallback
-                                            "
-                                        >
-                                            ${getInitiales(
-                                                n.fromNom
-                                            )}
-                                        </div>
-                                        `
-                                    }
+            `
+            <img
+                src="${escapeAttribute(n.fromAvatar)}"
+                alt="${escapeAttribute(n.fromNom || "")}"
+                class="notification-user-avatar"
+                onerror="
+                    this.style.display='none';
+                    this.nextElementSibling.style.display='flex';
+                "
+            >
 
-                                </div>
+            <span
+                class="notification-user-initial"
+                style="display:none;"
+            >
+                ${getInitiales(
+                    n.fromNom || ""
+                )}
+            </span>
+            `
+
+            :
+
+            `
+            <span
+                class="notification-user-initial"
+            >
+                ${getInitiales(
+                    n.fromNom || ""
+                )}
+            </span>
+            `
+        )
+
+        :
+
+        `
+        <i
+            class="${
+                n.icon ||
+                "fa-solid fa-bell"
+            }">
+        </i>
+        `
+    }
+
+</div>
 
 
                                 <div
                                     class="
                                         notification-info
-                                        friend-request-info
                                     "
                                 >
 
                                     <strong>
-                                        Nouvelle demande d'ami
+                                        ${escapeHtml(
+                                            n.title
+                                        )}
                                     </strong>
 
-                                    <p>
-                                        <b>
-                                            ${escapeHtml(
-                                                n.fromNom
-                                            )}
-                                        </b>
 
-                                        souhaite vous ajouter
-                                        comme ami.
+                                    <p>
+                                        ${escapeHtml(
+                                            n.text
+                                        )}
                                     </p>
 
 
@@ -392,133 +653,14 @@ async function marquerNotificationsCommeLues() {
                                         )}
                                     </small>
 
-
-                                    <div
-                                        class="
-                                            friend-request-actions
-                                        "
-                                    >
-
-                                        <button
-                                            class="
-                                                accept-friend-btn
-                                            "
-                                            data-id="${n.id}"
-                                            data-matricule="${n.from}"
-                                            data-nom="${escapeAttribute(
-                                                n.fromNom
-                                            )}"
-                                            data-avatar="${escapeAttribute(
-                                                n.avatar || ""
-                                            )}"
-                                        >
-
-                                            <i
-                                                class="
-                                                    fa-solid
-                                                    fa-check
-                                                ">
-                                            </i>
-
-                                            Accepter
-
-                                        </button>
-
-
-                                        <button
-                                            class="
-                                                reject-friend-btn
-                                            "
-                                            data-id="${n.id}"
-                                        >
-
-                                            <i
-                                                class="
-                                                    fa-solid
-                                                    fa-xmark
-                                                ">
-                                            </i>
-
-                                            Refuser
-
-                                        </button>
-
-                                    </div>
-
                                 </div>
 
                             </div>
 
                         `;
 
-
-                        return;
                     }
-
-
-                    // ---------------------------------
-                    // NOTIFICATION NORMALE
-                    // ---------------------------------
-
-                    zone.innerHTML += `
-
-                        <div
-                            class="
-                                notification-card
-                                normal-notification-card
-                            "
-                        >
-
-                            <div
-                                class="
-                                    notification-icon
-                                    ${n.iconBg || ""}
-                                "
-                            >
-
-                                <i
-                                    class="${
-                                        n.icon ||
-                                        "fa-solid fa-bell"
-                                    }">
-                                </i>
-
-                            </div>
-
-
-                            <div
-                                class="
-                                    notification-info
-                                "
-                            >
-
-                                <strong>
-                                    ${escapeHtml(
-                                        n.title
-                                    )}
-                                </strong>
-
-
-                                <p>
-                                    ${escapeHtml(
-                                        n.text
-                                    )}
-                                </p>
-
-
-                                <small>
-                                    ${formatDate(
-                                        n.date
-                                    )}
-                                </small>
-
-                            </div>
-
-                        </div>
-
-                    `;
-
-                });
+                );
 
 
                 // =================================================
@@ -598,11 +740,14 @@ async function marquerNotificationsCommeLues() {
                     button.dataset.avatar;
 
 
-                if (!requestId) return;
+                if (
+                    !requestId
+                ) return;
 
 
                 button.disabled =
                     true;
+
 
                 button.innerHTML = `
 
@@ -622,7 +767,7 @@ async function marquerNotificationsCommeLues() {
                 try {
 
                     // =============================================
-                    // VÉRIFIER LA DEMANDE
+                    // RÉFÉRENCE DE LA DEMANDE
                     // =============================================
 
                     const requestRef =
@@ -632,6 +777,10 @@ async function marquerNotificationsCommeLues() {
                             requestId
                         );
 
+
+                    // =============================================
+                    // VÉRIFIER LA DEMANDE
+                    // =============================================
 
                     const requestSnapshot =
                         await getDocs(
@@ -796,6 +945,9 @@ async function marquerNotificationsCommeLues() {
                             status:
                                 "accepted",
 
+                            seen:
+                                true,
+
                             message:
                                 `${profile.prenom} ${profile.nom} a accepté votre demande d'ami.`,
 
@@ -810,43 +962,35 @@ async function marquerNotificationsCommeLues() {
                     // NOTIFICATION POUR LE DEMANDEUR
                     // =============================================
 
-                    console.log(
-    "🔔 NOTIFICATION ACCEPTATION :",
+                    await addDoc(
+    collection(db, "notifications"),
     {
-        amiMatricule,
-        profileMatricule: profile.matricule
+        to: amiMatricule,
+
+        type: "amis",
+
+        title: "Demande acceptée",
+
+        text:
+            `${profile.prenom} ${profile.nom} a accepté votre demande d'ami.`,
+
+        // Personne ayant accepté
+        from:
+            profile.matricule,
+
+        fromNom:
+            `${profile.prenom} ${profile.nom}`,
+
+        fromAvatar:
+            profile.avatar ||
+            "",
+
+        date:
+            Date.now(),
+
+        seen: false
     }
 );
-                    await addDoc(
-
-                        collection(
-                            db,
-                            "notifications"
-                        ),
-
-                        {
-
-                            to:
-                                amiMatricule,
-
-                            type:
-                                "amis",
-
-                            title:
-                                "Demande acceptée",
-
-                            text:
-                                `${profile.prenom} ${profile.nom} a accepté votre demande d'ami.`,
-
-                            date:
-                                Date.now(),
-
-                            seen:
-                                false
-
-                        }
-
-                    );
 
 
                     console.log(
@@ -858,11 +1002,15 @@ async function marquerNotificationsCommeLues() {
                     // MESSAGE TEMPORAIRE
                     // =============================================
 
-                    button
-                        .closest(
+                    const card =
+                        button.closest(
                             ".friend-request-card"
-                        )
-                        .innerHTML = `
+                        );
+
+
+                    if (card) {
+
+                        card.innerHTML = `
 
                             <div
                                 class="
@@ -904,6 +1052,8 @@ async function marquerNotificationsCommeLues() {
                             </div>
 
                         `;
+
+                    }
 
 
                 } catch (error) {
@@ -953,7 +1103,9 @@ async function marquerNotificationsCommeLues() {
                     button.dataset.id;
 
 
-                if (!requestId) return;
+                if (
+                    !requestId
+                ) return;
 
 
                 button.disabled =
@@ -989,6 +1141,9 @@ async function marquerNotificationsCommeLues() {
 
                             status:
                                 "rejected",
+
+                            seen:
+                                true,
 
                             date:
                                 Date.now()
@@ -1039,125 +1194,225 @@ async function marquerNotificationsCommeLues() {
 
 
             // =====================================================
-            // DEMANDES D'AMIS
-            // =====================================================
+// DEMANDES D'AMIS
+// =====================================================
 
-            await marquerNotificationsCommeLues();
+const demandesQuery =
+    query(
+        collection(
+            db,
+            "friendRequests"
+        ),
+        where(
+            "to",
+            "==",
+            matricule
+        )
+    );
 
-            const demandesQuery =
-                query(
 
-                    collection(
-                        db,
-                        "friendRequests"
-                    ),
+onSnapshot(
 
-                    where(
-                        "to",
-                        "==",
-                        matricule
+    demandesQuery,
+
+    (snapshot) => {
+
+        console.log(
+            "👥 Demandes reçues :",
+            snapshot.size
+        );
+
+
+        // -------------------------------------------------
+        // RETIRER LES ANCIENNES DEMANDES DE LA LISTE
+        // -------------------------------------------------
+
+        notifications =
+            notifications.filter(
+                (n) =>
+                    n.source !==
+                    "friends"
+            );
+
+
+        const expediteursDejaVus =
+            new Set();
+
+
+        snapshot.forEach(
+            (document) => {
+
+                const d =
+                    document.data();
+
+
+                // -------------------------------------------------
+                // REFUSÉE
+                // -------------------------------------------------
+                // Une demande refusée ne doit jamais apparaître.
+                // Le demandeur ne reçoit aucune notification.
+                // -------------------------------------------------
+
+                if (
+                    d.status ===
+                    "rejected"
+                ) {
+
+                    return;
+
+                }
+
+
+                // -------------------------------------------------
+                // UNE SEULE DEMANDE PAR EXPÉDITEUR
+                // -------------------------------------------------
+
+                if (
+                    d.from &&
+                    expediteursDejaVus.has(
+                        d.from
                     )
+                ) {
 
-                );
+                    return;
 
-
-            onSnapshot(
-
-                demandesQuery,
-
-                (snapshot) => {
-
-                    console.log(
-                        "👥 Demandes reçues :",
-                        snapshot.size
-                    );
+                }
 
 
-                    notifications =
-                        notifications.filter(
-                            (n) =>
-                                n.source !==
-                                "friends"
-                        );
+                if (d.from) {
 
-
-                    snapshot.forEach(
-                        (document) => {
-
-                            const d =
-                                document.data();
-
-
-                            // ==================================
-                            // ON AFFICHE UNIQUEMENT LES DEMANDES
-                            // EN ATTENTE
-                            // ==================================
-
-                            if (
-                                d.status ===
-                                "rejected"
-                            ) {
-
-                                return;
-
-                            }
-
-
-                            notifications.push({
-
-                                id:
-                                    document.id,
-
-                                source:
-                                    "friends",
-
-                                type:
-                                    "amis",
-
-                                title:
-                                    "Nouvelle demande d'ami",
-
-                                text:
-                                    `${d.fromNom} souhaite vous ajouter comme ami.`,
-
-                                date:
-                                    d.date ||
-                                    Date.now(),
-
-                                avatar:
-                                    d.fromAvatar ||
-                                    "",
-
-                                from:
-                                    d.from,
-
-                                fromNom:
-                                    d.fromNom,
-
-                                status:
-                                    d.status
-
-                            });
-
-                        }
-                    );
-
-
-                    renderNotifications();
-
-                },
-
-                (error) => {
-
-                    console.error(
-                        "❌ Erreur demandes d'amis :",
-                        error
+                    expediteursDejaVus.add(
+                        d.from
                     );
 
                 }
 
-            );
 
+                // -------------------------------------------------
+                // DEMANDE EN ATTENTE
+                // -------------------------------------------------
+
+                if (
+                    d.status ===
+                    "pending"
+                ) {
+
+                    notifications.push({
+
+                        id:
+                            document.id,
+
+                        source:
+                            "friends",
+
+                        type:
+                            "amis",
+
+                        title:
+                            "Nouvelle demande d'ami",
+
+                        text:
+                            `${d.fromNom} souhaite vous ajouter comme ami.`,
+
+                        date:
+                            d.date ||
+                            Date.now(),
+
+                        avatar:
+                            d.fromAvatar ||
+                            "",
+
+                        from:
+                            d.from,
+
+                        fromNom:
+                            d.fromNom,
+
+                        status:
+                            "pending",
+
+                        seen:
+                            d.seen ??
+                            false
+
+                    });
+
+                    return;
+
+                }
+
+
+                // -------------------------------------------------
+                // DEMANDE ACCEPTÉE
+                // -------------------------------------------------
+                // Elle reste dans les notifications.
+                // Elle n'est simplement plus une demande à traiter.
+                // -------------------------------------------------
+
+                if (
+                    d.status ===
+                    "accepted"
+                ) {
+
+                    notifications.push({
+
+                        id:
+                            document.id,
+
+                        source:
+                            "friends",
+
+                        type:
+                            "amis",
+
+                        title:
+                            "Vous êtes désormais amis",
+
+                        text:
+                            `Vous et ${d.fromNom} êtes désormais amis.`,
+
+                        date:
+                            d.date ||
+                            Date.now(),
+
+                        avatar:
+                            d.fromAvatar ||
+                            "",
+
+                        from:
+                            d.from,
+
+                        fromNom:
+                            d.fromNom,
+
+                        status:
+                            "accepted",
+
+                        seen:
+                            true
+
+                    });
+
+                }
+
+            }
+        );
+
+
+        renderNotifications();
+
+    },
+
+    (error) => {
+
+        console.error(
+            "❌ Erreur demandes d'amis :",
+            error
+        );
+
+    }
+
+);
 
             // =====================================================
             // NOTIFICATIONS SYSTÈME
@@ -1207,14 +1462,21 @@ async function marquerNotificationsCommeLues() {
                                 document.data();
 
 
-                            // ==================================
-                            // LES NOTIFICATIONS "AMIS"
-                            // SONT GÉRÉES PAR friendRequests
-                            // ==================================
+                            // ---------------------------------
+                            // UNE ANCIENNE NOTIFICATION
+                            // "NOUVELLE DEMANDE D'AMI"
+                            // NE DOIT PAS ÊTRE AFFICHÉE ICI.
+                            //
+                            // La demande est gérée par
+                            // friendRequests.
+                            //
+                            // "Demande acceptée" reste affichée.
+                            // ---------------------------------
 
                             if (
-                                n.type ===
-                                "amis"
+                                n.type === "amis" &&
+                                n.title ===
+                                    "Nouvelle demande d'ami"
                             ) {
 
                                 return;
@@ -1224,39 +1486,55 @@ async function marquerNotificationsCommeLues() {
 
                             notifications.push({
 
-                                id:
-                                    document.id,
+    id:
+        document.id,
 
-                                source:
-                                    "system",
+    source:
+        "system",
 
-                                type:
-                                    n.type ||
-                                    "campus",
+    type:
+        n.type ||
+        "campus",
 
-                                title:
-                                    n.title ||
-                                    "Notification",
+    title:
+        n.title ||
+        "Notification",
 
-                                text:
-                                    n.text ||
-                                    "",
+    text:
+        n.text ||
+        "",
 
-                                date:
-                                    n.date ||
-                                    Date.now(),
+    date:
+        n.date ||
+        Date.now(),
 
-                                seen:
-                                    n.seen ??
-                                    false,
+    seen:
+        n.seen ??
+        false,
 
-                                icon:
-                                    "fa-solid fa-bell",
+    // =========================================
+    // INFORMATIONS DE LA PERSONNE
+    // =========================================
 
-                                iconBg:
-                                    "blue-bg"
+    from:
+        n.from ||
+        "",
 
-                            });
+    fromNom:
+        n.fromNom ||
+        "",
+
+    fromAvatar:
+        n.fromAvatar ||
+        "",
+
+    icon:
+        "fa-solid fa-bell",
+
+    iconBg:
+        "blue-bg"
+
+});
 
                         }
                     );
@@ -1420,13 +1698,9 @@ async function marquerNotificationsCommeLues() {
                                         texte.includes(
                                             recherche
                                         )
-
                                         ?
-
                                         ""
-
                                         :
-
                                         "none";
 
                                 }
@@ -1496,9 +1770,6 @@ async function marquerNotificationsCommeLues() {
                                 );
 
 
-                                // Réappliquer
-                                // la recherche
-
                                 if (
                                     searchInput &&
                                     searchInput.value
@@ -1518,6 +1789,15 @@ async function marquerNotificationsCommeLues() {
 
                     }
                 );
+
+
+            // =====================================================
+            // IMPORTANT :
+            // ON MARQUE COMME LUES APRÈS AVOIR INSTALLÉ
+            // LES LISTENERS
+            // =====================================================
+
+            await marquerNotificationsCommeLues();
 
         }
     );
@@ -1562,7 +1842,7 @@ export function afficherBadgeNotifications() {
 
 
             // =================================================
-            // BADGE
+            // MISE À JOUR DU BADGE
             // =================================================
 
             function updateBadge() {
@@ -1571,6 +1851,17 @@ export function afficherBadgeNotifications() {
                     demandes +
                     notificationsNonLues +
                     restaurantNonLues;
+
+
+                console.log(
+                    "🔔 BADGE :",
+                    {
+                        demandes,
+                        notificationsNonLues,
+                        restaurantNonLues,
+                        total
+                    }
+                );
 
 
                 if (
@@ -1598,7 +1889,7 @@ export function afficherBadgeNotifications() {
 
 
             // =================================================
-            // DEMANDES AMIS
+            // DEMANDES D'AMIS
             // =================================================
 
             const demandesQuery =
@@ -1624,23 +1915,48 @@ export function afficherBadgeNotifications() {
 
                 (snapshot) => {
 
+                    const expediteurs =
+                        new Set();
+
+
+                    snapshot.docs.forEach(
+                        (document) => {
+
+                            const d =
+                                document.data();
+
+
+                            if (
+                                d.status ===
+                                    "pending" &&
+                                d.seen !== true
+                            ) {
+
+                                expediteurs.add(
+                                    d.from ||
+                                    document.id
+                                );
+
+                            }
+
+                        }
+                    );
+
+
                     demandes =
-    snapshot.docs.filter(
-        (document) => {
-
-            const d =
-                document.data();
-
-            return (
-                d.status === "pending" &&
-                d.seen !== true
-            );
-
-        }
-    ).length;
+                        expediteurs.size;
 
 
                     updateBadge();
+
+                },
+
+                (error) => {
+
+                    console.error(
+                        "❌ Erreur badge demandes :",
+                        error
+                    );
 
                 }
 
@@ -1648,7 +1964,7 @@ export function afficherBadgeNotifications() {
 
 
             // =================================================
-            // NOTIFICATIONS
+            // NOTIFICATIONS SYSTÈME
             // =================================================
 
             const notificationsQuery =
@@ -1675,21 +1991,47 @@ export function afficherBadgeNotifications() {
                 (snapshot) => {
 
                     notificationsNonLues =
-    snapshot.docs.filter(
-        (document) => {
+                        snapshot.docs.filter(
+                            (document) => {
 
-            const n =
-                document.data();
+                                const n =
+                                    document.data();
 
-            return (
-                n.seen === false
-            );
 
-        }
-    ).length;
+                                // ---------------------------------
+                                // UNE "NOUVELLE DEMANDE D'AMI"
+                                // EST DÉJÀ COMPTÉE DANS friendRequests
+                                // ---------------------------------
+
+                                if (
+                                    n.type === "amis" &&
+                                    n.title ===
+                                        "Nouvelle demande d'ami"
+                                ) {
+
+                                    return false;
+
+                                }
+
+
+                                return (
+                                    n.seen !== true
+                                );
+
+                            }
+                        ).length;
 
 
                     updateBadge();
+
+                },
+
+                (error) => {
+
+                    console.error(
+                        "❌ Erreur badge notifications :",
+                        error
+                    );
 
                 }
 
@@ -1725,15 +2067,30 @@ export function afficherBadgeNotifications() {
 
                     restaurantNonLues =
                         snapshot.docs.filter(
-                            (document) =>
-                                document
-                                    .data()
-                                    .seen ===
-                                false
+                            (document) => {
+
+                                const r =
+                                    document.data();
+
+
+                                return (
+                                    r.seen !== true
+                                );
+
+                            }
                         ).length;
 
 
                     updateBadge();
+
+                },
+
+                (error) => {
+
+                    console.error(
+                        "❌ Erreur badge restaurant :",
+                        error
+                    );
 
                 }
 

@@ -16,21 +16,49 @@ onAuthStateChanged(auth, async (firebaseUser) => {
 
         } else {
 
-            const currentUser = await getCurrentUser(firebaseUser.uid);
+            const currentUser =
+                await getCurrentUser(
+                    firebaseUser.uid
+                );
 
-            console.log("CURRENT USER =", currentUser);
+            console.log(
+                "CURRENT USER =",
+                currentUser
+            );
+
+            // ==========================================
+            // ANNÉE ACADÉMIQUE DE LA SESSION
+            // ==========================================
+
+            const anneeAcademique =
+                sessionStorage.getItem(
+                    "anneeAcademique"
+                );
+
 
             session = {
+
                 firebaseUser,
-                account: currentUser.account,
-                profile: currentUser.profile
+
+                account:
+                    currentUser.account,
+
+                profile:
+                    currentUser.profile,
+
+                anneeAcademique:
+                    anneeAcademique || null
+
             };
 
         }
 
     } catch (e) {
 
-        console.error("ERREUR SESSION :", e);
+        console.error(
+            "ERREUR SESSION :",
+            e
+        );
 
         session = null;
 
@@ -38,10 +66,14 @@ onAuthStateChanged(auth, async (firebaseUser) => {
 
     initialized = true;
 
-    waiting.forEach(resolve => resolve(session));
+    waiting.forEach(
+        resolve => resolve(session)
+    );
+
     waiting = [];
 
 });
+
 
 export async function getSession() {
 
@@ -51,13 +83,16 @@ export async function getSession() {
 
     }
 
-    return new Promise(resolve => {
+    return new Promise(
+        resolve => {
 
-        waiting.push(resolve);
+            waiting.push(resolve);
 
-    });
+        }
+    );
 
 }
+
 
 export function clearSession() {
 

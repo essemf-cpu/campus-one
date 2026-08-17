@@ -991,33 +991,49 @@ if (statutSelect) {
 // -----------------------------------------
 
 let evaluation =
-    "En attente";
+    "-";
 
+
+// -------------------------------------------------
+// UNE ÉVALUATION N'EST POSSIBLE QUE POUR UNE
+// DEMANDE TERMINÉE
+// -------------------------------------------------
 
 if (
-    demande.evaluation === 1
+    demande.statut ===
+    "termine"
 ) {
 
     evaluation =
-        "⭐";
+        "En attente";
 
-}
 
-else if (
-    demande.evaluation === 2
-) {
+    if (
+        demande.evaluation === 1
+    ) {
 
-    evaluation =
-        "⭐⭐";
+        evaluation =
+            "⭐";
 
-}
+    }
 
-else if (
-    demande.evaluation === 3
-) {
+    else if (
+        demande.evaluation === 2
+    ) {
 
-    evaluation =
-        "⭐⭐⭐";
+        evaluation =
+            "⭐⭐";
+
+    }
+
+    else if (
+        demande.evaluation === 3
+    ) {
+
+        evaluation =
+            "⭐⭐⭐";
+
+    }
 
 }
 

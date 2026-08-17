@@ -15,7 +15,11 @@ export async function requireRole(expectedRole, callback) {
 
         }
 
-        const { account, profile } = session;
+        const {
+    account,
+    profile,
+    anneeAcademique
+} = session;
 
         if (account.role !== expectedRole) {
 
@@ -26,7 +30,8 @@ export async function requireRole(expectedRole, callback) {
 
         await callback({
             account,
-            profile
+            profile,
+            anneeAcademique
         });
 
     } catch (error) {

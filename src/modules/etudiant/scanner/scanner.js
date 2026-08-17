@@ -285,49 +285,6 @@ async function envoyerDemande(ami) {
 
 
         // ==========================
-        // CRÉER LA NOTIFICATION
-        // ==========================
-
-        await addDoc(
-            collection(
-                db,
-                "notifications"
-            ),
-            {
-
-                to:
-                    ami.matricule,
-
-                type:
-                    "amis",
-
-                title:
-                    "Nouvelle demande d'ami",
-
-                text:
-                    `${profile.prenom} ${profile.nom} souhaite vous ajouter comme ami.`,
-
-                from:
-                    profile.matricule,
-
-                fromNom:
-                    `${profile.prenom} ${profile.nom}`,
-
-                fromAvatar:
-                    profile.avatar ||
-                    "assets/default-user.png",
-
-                date:
-                    Date.now(),
-
-                seen:
-                    false
-
-            }
-        );
-
-
-        // ==========================
         // SUCCÈS
         // ==========================
 
