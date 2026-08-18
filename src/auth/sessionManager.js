@@ -6,74 +6,108 @@ let session = null;
 let initialized = false;
 let waiting = [];
 
-onAuthStateChanged(auth, async (firebaseUser) => {
 
-    try {
+// =====================================================
+// AUTHENTIFICATION FIREBASE
+// =====================================================
 
-        if (!firebaseUser) {
+onAuthStateChanged(
+    auth,
+    async (firebaseUser) => {
+
+        try {
+
+            // =============================================
+            // AUCUN UTILISATEUR CONNECTÉ
+            // =============================================
+
+            if (!firebaseUser) {
+
+                session = null;
+
+            } else {
+
+                // =========================================
+                // RÉCUPÉRER L'UTILISATEUR
+                // =========================================
+
+                const currentUser =
+                    await getCurrentUser(
+                        firebaseUser.uid
+                    );
+
+
+                console.log(
+                    "CURRENT USER =",
+                    currentUser
+                );
+
+
+                // =========================================
+                // ANNÉE ACADÉMIQUE SÉLECTIONNÉE
+                // =========================================
+
+                const anneeAcademique =
+                    sessionStorage.getItem(
+                        "anneeAcademique"
+                    );
+
+
+                // =========================================
+                // CONSTRUIRE LA SESSION
+                // =========================================
+
+                session = {
+
+                    firebaseUser,
+
+                    account:
+                        currentUser.account,
+
+                    profile:
+                        currentUser.profile,
+
+                    anneeAcademique:
+                        anneeAcademique || null
+
+                };
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "ERREUR SESSION :",
+                error
+            );
 
             session = null;
 
-        } else {
-
-            const currentUser =
-                await getCurrentUser(
-                    firebaseUser.uid
-                );
-
-            console.log(
-                "CURRENT USER =",
-                currentUser
-            );
-
-            // ==========================================
-            // ANNÉE ACADÉMIQUE DE LA SESSION
-            // ==========================================
-
-            const anneeAcademique =
-                sessionStorage.getItem(
-                    "anneeAcademique"
-                );
-
-
-            session = {
-
-                firebaseUser,
-
-                account:
-                    currentUser.account,
-
-                profile:
-                    currentUser.profile,
-
-                anneeAcademique:
-                    anneeAcademique || null
-
-            };
-
         }
 
-    } catch (e) {
 
-        console.error(
-            "ERREUR SESSION :",
-            e
+        // =============================================
+        // SESSION INITIALISÉE
+        // =============================================
+
+        initialized = true;
+
+
+        waiting.forEach(
+            resolve =>
+                resolve(session)
         );
 
-        session = null;
+
+        waiting = [];
 
     }
+);
 
-    initialized = true;
 
-    waiting.forEach(
-        resolve => resolve(session)
-    );
-
-    waiting = [];
-
-});
-
+// =====================================================
+// RÉCUPÉRER LA SESSION
+// =====================================================
 
 export async function getSession() {
 
@@ -83,10 +117,13 @@ export async function getSession() {
 
     }
 
+
     return new Promise(
         resolve => {
 
-            waiting.push(resolve);
+            waiting.push(
+                resolve
+            );
 
         }
     );
@@ -94,10 +131,83 @@ export async function getSession() {
 }
 
 
+// =====================================================
+// RÉCUPÉRER L'ANNÉE ACADÉMIQUE COURANTE
+// =====================================================
+
+export async function getAnneeAcademique() {
+
+    const currentSession =
+        await getSession();
+
+
+    if (!currentSession) {
+
+        return null;
+
+    }
+
+
+    return (
+        currentSession.anneeAcademique ||
+        null
+    );
+
+}
+
+
+// =====================================================
+// DÉFINIR L'ANNÉE ACADÉMIQUE
+// =====================================================
+
+export function setAnneeAcademique(
+    anneeAcademique
+) {
+
+    if (!anneeAcademique) {
+
+        sessionStorage.removeItem(
+            "anneeAcademique"
+        );
+
+        if (session) {
+
+            session.anneeAcademique =
+                null;
+
+        }
+
+        return;
+
+    }
+
+
+    sessionStorage.setItem(
+        "anneeAcademique",
+        anneeAcademique
+    );
+
+
+    if (session) {
+
+        session.anneeAcademique =
+            anneeAcademique;
+
+    }
+
+}
+
+
+// =====================================================
+// EFFACER LA SESSION
+// =====================================================
+
 export function clearSession() {
 
     session = null;
 
     initialized = false;
+
+    waiting = [];
 
 }

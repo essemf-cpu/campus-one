@@ -1,4 +1,4 @@
-import"../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,l as n,v as r,y as i}from"../../authService-DTiP6P1g.js";import{t as a}from"../../authGuard-BnlEFo-L.js";a(`etudiant`,async({profile:a})=>{let o=document.getElementById(`codifier-content`),s=a.matricule;if(!s){o.innerHTML=`
+import"../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,l as n,v as r,y as i}from"../../authService-kcLQHjqZ.js";import{t as a}from"../../authGuard-NXoHQF1z.js";a(`etudiant`,async({profile:a})=>{let o=document.getElementById(`codifier-content`),s=a.matricule;if(!s){o.innerHTML=`
 
                 <div
                     class="service-indisponible"

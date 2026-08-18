@@ -1,4 +1,4 @@
-import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,l as r,m as i,v as a,y as o}from"../../../authService-DTiP6P1g.js";import{t as s}from"../../../authGuard-BnlEFo-L.js";import{t as c}from"../../../referentielService-Vwd3uLQj.js";s(`etudiant`,async({profile:s})=>{let l=document.getElementById(`demandes-container`);if(!l){console.error(`❌ demandes-container introuvable`);return}let u=s.matricule;if(!u){l.innerHTML=`
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,l as r,m as i,v as a,y as o}from"../../../authService-kcLQHjqZ.js";import{t as s}from"../../../authGuard-NXoHQF1z.js";import{t as c}from"../../../referentielService-lzYZwhmV.js";s(`etudiant`,async({profile:s})=>{let l=document.getElementById(`demandes-container`);if(!l){console.error(`❌ demandes-container introuvable`);return}let u=s.matricule;if(!u){l.innerHTML=`
 
                 <div class="error-state">
 

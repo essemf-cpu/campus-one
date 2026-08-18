@@ -11,8 +11,14 @@ import typesTravaux from "./data/seed/typesTravaux.js";
 
 // Agents
 import agents from "./data/seed/agents.js";
+import affectationsAgents
+    from "./data/seed/affectationsAgents.js";
 import etudiants from "./data/seed/etudiants.js";
 import hebergements from "./data/seed/hebergements.js";
+
+import anneesAcademiques from "./data/seed/anneesAcademiques.js";
+import situationsAcademiques
+    from "./data/seed/situationsAcademiques.js";
 
 import { seedCollection } from "./utils/seedCollection.js";
 
@@ -34,12 +40,31 @@ async function seed() {
         await seedCollection("ateliers", ateliers);
         await seedCollection("typesTravaux", typesTravaux);
 
+        // Années académiques
+await seedCollection(
+    "anneesAcademiques",
+    anneesAcademiques
+);
+
         // Agents
         await seedCollection("agents", agents);
+        await seedCollection(
+    "affectationsAgents",
+    affectationsAgents
+);
 
-        // Étudiants
-        await seedCollection("etudiants", etudiants);
-        await seedCollection("hebergements", hebergements);
+       // Étudiants
+await seedCollection("etudiants", etudiants);
+
+await seedCollection(
+    "situationsAcademiques",
+    situationsAcademiques
+);
+
+await seedCollection(
+    "hebergements",
+    hebergements
+);
 
         console.log("\n🎉 Seeder terminé avec succès !");
         process.exit(0);

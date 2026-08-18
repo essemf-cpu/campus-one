@@ -4,6 +4,9 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../firebase/firebase.js";
+import {
+    setAnneeAcademique
+} from "./sessionManager.js";
 import { findUser, login } from "./authService.js";
 import t from "../i18n/index.js";
 
@@ -318,8 +321,7 @@ form.addEventListener(
             // ANNÉE ACADÉMIQUE CHOISIE
             // ---------------------------------------------
 
-            sessionStorage.setItem(
-                "anneeAcademique",
+            setAnneeAcademique(
                 anneeChoisie
             );
 

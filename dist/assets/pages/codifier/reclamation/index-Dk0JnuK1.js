@@ -1,4 +1,4 @@
-import"../../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,l as n,u as r,v as i,y as a}from"../../../authService-DTiP6P1g.js";import{t as o}from"../../../authGuard-BnlEFo-L.js";o(`etudiant`,async({profile:o})=>{let s=document.getElementById(`reclamation-content`),c=o.matricule,l=await e(t(a(n,`hebergements`),i(`matricule`,`==`,c)));if(l.empty){s.innerHTML=`
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,l as n,u as r,v as i,y as a}from"../../../authService-kcLQHjqZ.js";import{t as o}from"../../../authGuard-NXoHQF1z.js";o(`etudiant`,async({profile:o})=>{let s=document.getElementById(`reclamation-content`),c=o.matricule,l=await e(t(a(n,`hebergements`),i(`matricule`,`==`,c)));if(l.empty){s.innerHTML=`
 
                 <div class="reclamation-unavailable">
 
