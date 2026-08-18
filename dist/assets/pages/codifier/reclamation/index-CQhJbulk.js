@@ -1,4 +1,4 @@
-import"../../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,l as n,u as r,v as i,y as a}from"../../../authService-kcLQHjqZ.js";import{t as o}from"../../../authGuard-NXoHQF1z.js";o(`etudiant`,async({profile:o})=>{let s=document.getElementById(`reclamation-content`),c=o.matricule,l=await e(t(a(n,`hebergements`),i(`matricule`,`==`,c)));if(l.empty){s.innerHTML=`
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,d as n,p as r,u as i,y as a}from"../../../authService-CdYSz198.js";import{t as o}from"../../../authGuard-BeXI_65M.js";o(`etudiant`,async({profile:o})=>{let s=document.getElementById(`reclamation-content`),c=o.matricule,l=await r(e(t(i,`hebergements`),a(`matricule`,`==`,c)));if(l.empty){s.innerHTML=`
 
                 <div class="reclamation-unavailable">
 
@@ -174,10 +174,10 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,l as n,
                     <option value="${e}">
                         ${e}
                     </option>
-                `}),m.style.display=`block`});let v=document.getElementById(`envoyer-demande-btn`);v.addEventListener(`click`,async()=>{let e=d.value,t=p.value,i=h.value;if(!e||!t||!i){alert(`Veuillez sélectionner le type, la localisation et le problème.`);return}try{v.disabled=!0,v.innerHTML=`
+                `}),m.style.display=`block`});let v=document.getElementById(`envoyer-demande-btn`);v.addEventListener(`click`,async()=>{let e=d.value,r=p.value,a=h.value;if(!e||!r||!a){alert(`Veuillez sélectionner le type, la localisation et le problème.`);return}try{v.disabled=!0,v.innerHTML=`
                 <i class="fa-solid fa-spinner fa-spin"></i>
                 Envoi en cours...
-            `,await r(a(n,`demandes_etudiants`),{matricule:o.matricule,numeroEtudiant:o.numeroEtudiant||o.matricule,prenom:o.prenom,nom:o.nom,site:u.site,pavillon:u.pavillon,chambre:u.chambre,lit:u.lit,type:e,localisation:t,probleme:i,date:new Date,statut:`en_attente`,notificationVue:!1}),alert(`Votre demande a été envoyée avec succès.`)}catch(e){console.error(`❌ Erreur envoi demande :`,e),alert(`Impossible d'envoyer la demande. Veuillez réessayer.`)}finally{v.disabled=!1,v.innerHTML=`
+            `,await n(t(i,`demandes_etudiants`),{matricule:o.matricule,numeroEtudiant:o.numeroEtudiant||o.matricule,prenom:o.prenom,nom:o.nom,site:u.site,pavillon:u.pavillon,chambre:u.chambre,lit:u.lit,type:e,localisation:r,probleme:a,date:new Date,statut:`en_attente`,notificationVue:!1}),alert(`Votre demande a été envoyée avec succès.`)}catch(e){console.error(`❌ Erreur envoi demande :`,e),alert(`Impossible d'envoyer la demande. Veuillez réessayer.`)}finally{v.disabled=!1,v.innerHTML=`
                 <i class="fa-solid fa-paper-plane"></i>
                 Envoyer la demande
             `}})});

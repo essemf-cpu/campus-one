@@ -518,6 +518,24 @@ async function envoyerDemande(ami) {
             const student =
                 profileDoc.data();
 
+                // =====================================================
+// VÉRIFICATION DU STATUT ACADÉMIQUE
+// =====================================================
+
+if (
+    student.statutAcademique !==
+    "actif"
+) {
+
+    afficherMessage(
+        "Le QR de cet étudiant n'est plus actif.",
+        "error"
+    );
+
+    return;
+
+}
+
 
             // ==========================
             // AFFICHER L'ÉTUDIANT

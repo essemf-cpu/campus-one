@@ -1,5 +1,4 @@
 import { requireRole } from "../../../auth/authGuard.js";
-
 import { loadSidebar } from "../components/sidebar.js";
 
 import {
@@ -20,7 +19,19 @@ import {
 
 requireRole(
     "agent",
-    async ({ profile }) => {
+    async ({
+        profile,
+        permissions,
+        affectation,
+        posteId,
+        anneeAcademique,
+        lectureSeule
+    }) => {
+
+        console.log(
+            "🔐 MODE LECTURE SEULE =",
+            lectureSeule
+        );
 
         console.log("1 - requireRole OK");
 
@@ -204,26 +215,32 @@ const typesTravauxMap =
         // =====================================================
 
         const demandesQuery =
-            query(
+    query(
 
-                collection(
-                    db,
-                    "demandes_etudiants"
-                ),
+        collection(
+            db,
+            "demandes_etudiants"
+        ),
 
-                where(
-                    "site",
-                    "==",
-                    siteAgent
-                ),
+        where(
+            "site",
+            "==",
+            siteAgent
+        ),
 
-                where(
-                    "pavillon",
-                    "==",
-                    pavillonAgent
-                )
+        where(
+            "pavillon",
+            "==",
+            pavillonAgent
+        ),
 
-            );
+        where(
+            "anneeAcademique",
+            "==",
+            anneeAcademique
+        )
+
+    );
 
 
         // =====================================================
@@ -293,9 +310,10 @@ onSnapshot(
                 // =============================================
 
                 if (
-                    (demande.statut || "en_attente") ===
-                    "en_attente"
-                ) {
+    !lectureSeule &&
+    (demande.statut || "en_attente") ===
+    "en_attente"
+) {
 
                     actions = `
 
@@ -331,9 +349,10 @@ onSnapshot(
                 // =============================================
 
                 else if (
-                    demande.statut ===
-                    "en_cours"
-                ) {
+    !lectureSeule &&
+    demande.statut ===
+    "en_cours"
+) {
 
                     actions = `
 
@@ -501,6 +520,16 @@ onSnapshot(
 demandesBody.addEventListener(
     "click",
     async (event) => {
+
+        if (lectureSeule) {
+
+    console.warn(
+        "🔒 Action bloquée : session en lecture seule."
+    );
+
+    return;
+
+}
 
         const button =
             event.target.closest(

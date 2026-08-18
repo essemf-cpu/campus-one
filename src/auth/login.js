@@ -308,22 +308,22 @@ form.addEventListener(
 
 
             // ---------------------------------------------
-            // CONNEXION FIREBASE
-            // ---------------------------------------------
+// ANNÉE ACADÉMIQUE CHOISIE
+// ---------------------------------------------
 
-            await login(
-                user.email,
-                mdp
-            );
+setAnneeAcademique(
+    anneeChoisie
+);
 
 
-            // ---------------------------------------------
-            // ANNÉE ACADÉMIQUE CHOISIE
-            // ---------------------------------------------
+// ---------------------------------------------
+// CONNEXION FIREBASE
+// ---------------------------------------------
 
-            setAnneeAcademique(
-                anneeChoisie
-            );
+await login(
+    user.email,
+    mdp
+);
 
 
             // ---------------------------------------------
@@ -388,6 +388,8 @@ form.addEventListener(
             }
 
         } catch (error) {
+
+            setAnneeAcademique(null);
 
             console.error(
                 "❌ ERREUR CONNEXION :",

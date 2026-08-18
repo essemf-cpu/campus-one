@@ -251,6 +251,88 @@ export async function loadSidebar(profile) {
 
     }
 
+    console.log(
+    "🔐 PERMISSIONS SIDEBAR =",
+    profile.permissions
+);
+
+    // =====================================================
+// PERMISSIONS — SIDEBAR
+// =====================================================
+
+const permissions =
+    profile.permissions || {};
+
+
+// Résidents
+if (!permissions.voirResidents) {
+
+    document
+        .getElementById("menu-residents")
+        ?.remove();
+
+}
+
+
+// Recouvrement
+if (!permissions.voirRecouvrement) {
+
+    document
+        .getElementById("menu-recouvrement")
+        ?.remove();
+
+}
+
+
+// Demandes
+if (!permissions.voirDemandes) {
+
+    document
+        .getElementById("menu-demandes")
+        ?.remove();
+
+}
+
+
+// Suivi
+if (!permissions.suivreBons) {
+
+    document
+        .getElementById("menu-suivi")
+        ?.remove();
+
+}
+
+
+// Anciens bons
+if (!permissions.voirAnciensBons) {
+
+    document
+        .getElementById("menu-anciens")
+        ?.remove();
+
+}
+
+
+// Historique des demandes
+if (!permissions.suivreBons) {
+
+    document
+        .getElementById("menu-historique")
+        ?.remove();
+
+}
+
+
+// Tableau de bord
+if (!permissions.voirTableauDeBord) {
+
+    document
+        .getElementById("menu-dashboard")
+        ?.remove();
+
+}
+
 
 
     // =====================================================

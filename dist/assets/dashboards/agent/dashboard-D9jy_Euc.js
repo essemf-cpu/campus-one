@@ -1,1 +1,0 @@
-import"../../modulepreload-polyfill-Dezn_h7o.js";import{t as e}from"../../authGuard-NXoHQF1z.js";e(`agent`,async({profile:e})=>{e.service===`Service de l'Hébergement`&&(window.location.href=`../../modules/hebergement/demandes/index.html`)});

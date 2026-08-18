@@ -130,7 +130,7 @@ export default [
     departement: "Département des Cités Universitaires",
     service: "Service de l'Hébergement",
     fonction: "Chef de Résidence",
-    affectation: "Pavillon G",
+    affectation: "Pavillon G1",
     site: "ESP",
     statutProfessionnel: "actif",
   },

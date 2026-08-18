@@ -1,5 +1,40 @@
 export default [
 
+    {
+    id: "ABC2026_2025-2026",
+
+    agentMatricule: "ABC2026",
+
+    anneeAcademique: "2025-2026",
+
+    departement:
+        "Département des Cités Universitaires",
+
+    service:
+        "Service de l'Hébergement",
+
+    posteId:
+    "chef_pavillon",
+
+    fonction:
+        "Chef de Pavillon",
+
+    affectation:
+        "Pavillon G1",
+
+    site:
+        "ESP",
+
+    dateDebut:
+        new Date("2025-01-01"),
+
+    dateFin:
+        new Date("2026-01-01"),
+
+    statut:
+        "terminee"
+},
+
     // =====================================================
     // MOUSSA DIOP
     // =====================================================
@@ -16,6 +51,9 @@ export default [
 
         service:
             "Service de l'Hébergement",
+
+        posteId:
+            "chef_pavillon",
 
         fonction:
             "Chef de Pavillon",
@@ -54,6 +92,11 @@ export default [
         service:
             "Service de l'Entretien et de la Maintenance",
 
+        // Poste non encore exploité dans Campus One
+        // pour le moment.
+        posteId:
+            null,
+
         fonction:
             "Technicien de maintenance",
 
@@ -90,6 +133,9 @@ export default [
 
         service:
             "Service du Contrôle et de la Qualité",
+
+        posteId:
+            null,
 
         fonction:
             "Contrôleur restaurant",
@@ -128,6 +174,9 @@ export default [
         service:
             "Service du Contrôle et de la Qualité",
 
+        posteId:
+            null,
+
         fonction:
             "Responsable restaurant",
 
@@ -164,6 +213,9 @@ export default [
 
         service:
             "Service Médical",
+
+        posteId:
+            "medecin",
 
         fonction:
             "Médecin",
@@ -202,6 +254,9 @@ export default [
         service:
             "Service de la Gestion Administrative du Personnel",
 
+        posteId:
+            null,
+
         fonction:
             "Agent RH",
 
@@ -238,6 +293,9 @@ export default [
 
         service:
             "Supervision Administrative et Financière",
+
+        posteId:
+            null,
 
         fonction:
             "Superviseur Administratif et Financier",
@@ -276,11 +334,14 @@ export default [
         service:
             "Service de l'Hébergement",
 
+        posteId:
+            "chef_residence",
+
         fonction:
             "Chef de Résidence",
 
         affectation:
-            "Pavillon G",
+            "Pavillon G1",
 
         site:
             "ESP",
@@ -312,6 +373,9 @@ export default [
 
         service:
             "Service Comptabilité",
+
+        posteId:
+            "comptable",
 
         fonction:
             "Comptable",

@@ -1,5 +1,9 @@
 export default [
 
+  // =====================================================
+  // 2026ABC
+  // =====================================================
+
   {
     id: "2026ABC_2026-2027_01",
     matricule: "2026ABC",
@@ -13,6 +17,26 @@ export default [
     statutOccupation: "actif",
     typeOccupation: "titulaire",
   },
+
+  // =====================================================
+  // HISTORIQUE 2025-2026
+  // =====================================================
+
+  {
+    id: "2026ABC_2025-2026_01",
+    matricule: "2026ABC",
+    numeroEtudiant: "2026ABC",
+    anneeAcademique: "2025-2026",
+    site: "ESP",
+    pavillon: "G1",
+    chambre: "84",
+    lit: "1",
+    dateDebut: new Date("2025-01-03"),
+    dateFin: new Date("2026-01-02"),
+    statutOccupation: "termine",
+    typeOccupation: "titulaire",
+  },
+
 
   {
     id: "2026ABD_2026-2027_01",
@@ -314,12 +338,12 @@ export default [
     numeroEtudiant: "2026ACC",
     anneeAcademique: "2026-2027",
     site: "ESP",
-    pavillon: "H2",
     chambre: "71",
     lit: "2",
     dateDebut: new Date("2026-01-06"),
     statutOccupation: "actif",
     typeOccupation: "titulaire",
+    pavillon: "H2",
   },
 
   {
@@ -363,6 +387,7 @@ export default [
     statutOccupation: "actif",
     typeOccupation: "titulaire",
   },
+
 
   // =====================================================
   // SUPPLÉANTS — ESP / G1

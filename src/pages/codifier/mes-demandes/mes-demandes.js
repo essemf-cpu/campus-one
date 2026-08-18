@@ -18,7 +18,10 @@ import { db } from "../../../firebase/firebase.js";
 
 requireRole(
     "etudiant",
-    async ({ profile }) => {
+    async ({
+        profile,
+        anneeAcademique
+    }) => {
 
         const container =
             document.getElementById(
@@ -39,6 +42,30 @@ requireRole(
 
         const matricule =
             profile.matricule;
+
+            if (!anneeAcademique) {
+
+    container.innerHTML = `
+
+        <div class="error-state">
+
+            <i class="
+                fa-solid
+                fa-triangle-exclamation
+            "></i>
+
+            <p>
+                Impossible de déterminer
+                l'année académique.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+
+}
 
 
         if (!matricule) {
@@ -1108,20 +1135,26 @@ if (
         // ==========================================
 
         const demandesQuery =
-            query(
+    query(
 
-                collection(
-                    db,
-                    "demandes_etudiants"
-                ),
+        collection(
+            db,
+            "demandes_etudiants"
+        ),
 
-                where(
-                    "matricule",
-                    "==",
-                    matricule
-                )
+        where(
+            "matricule",
+            "==",
+            matricule
+        ),
 
-            );
+        where(
+            "anneeAcademique",
+            "==",
+            anneeAcademique
+        )
+
+    );
 
 
         // ==========================================

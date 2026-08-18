@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase/firebase.js";
 import { getCurrentUser } from "./authService.js";
+import { getAgentPermissions } from "./permissionsService.js";
 
 let session = null;
 let initialized = false;
@@ -36,41 +37,117 @@ onAuthStateChanged(
                         firebaseUser.uid
                     );
 
+                   // =========================================
+// ANNÉE ACADÉMIQUE SÉLECTIONNÉE
+// =========================================
 
-                console.log(
-                    "CURRENT USER =",
-                    currentUser
-                );
-
-
-                // =========================================
-                // ANNÉE ACADÉMIQUE SÉLECTIONNÉE
-                // =========================================
-
-                const anneeAcademique =
-                    sessionStorage.getItem(
-                        "anneeAcademique"
-                    );
+const anneeAcademique =
+    sessionStorage.getItem(
+        "anneeAcademique"
+    );
 
 
-                // =========================================
-                // CONSTRUIRE LA SESSION
-                // =========================================
+// =========================================
+// DROITS DE L'UTILISATEUR
+// =========================================
 
-                session = {
+let droits = {
 
-                    firebaseUser,
+    affectation:
+        currentUser.affectation || null,
 
-                    account:
-                        currentUser.account,
+    posteId:
+        currentUser.profile?.posteId || null,
 
-                    profile:
-                        currentUser.profile,
+    permissions:
+        currentUser.profile?.permissions || {},
 
-                    anneeAcademique:
-                        anneeAcademique || null
+    mode:
+        currentUser.mode || "normal",
 
-                };
+    lectureSeule:
+        currentUser.lectureSeule === true
+
+};
+
+
+// =========================================
+// DROITS SPÉCIFIQUES DE L'AGENT
+// =========================================
+
+if (
+    currentUser.account?.role ===
+    "agent"
+) {
+
+    droits =
+        await getAgentPermissions(
+            currentUser.profile?.matricule,
+            anneeAcademique
+        );
+
+}
+
+
+// =========================================
+// CONSTRUIRE LA SESSION
+// =========================================
+
+session = {
+
+    firebaseUser,
+
+    account:
+        currentUser.account,
+
+    profile:
+        currentUser.profile,
+
+    anneeAcademique:
+        anneeAcademique || null,
+
+    affectation:
+    droits.affectation,
+
+posteId:
+    droits.posteId,
+
+permissions:
+    droits.permissions,
+
+mode:
+    droits.mode,
+
+lectureSeule:
+    droits.lectureSeule
+
+};
+
+
+console.log(
+    "🔐 DROITS SESSION =",
+    {
+
+        anneeAcademique:
+            session.anneeAcademique,
+
+        affectation:
+            session.affectation,
+
+        posteId:
+            session.posteId,
+
+        mode:
+            session.mode,
+
+        lectureSeule:
+            session.lectureSeule,
+
+        permissions:
+            session.permissions
+
+    }
+);
 
             }
 

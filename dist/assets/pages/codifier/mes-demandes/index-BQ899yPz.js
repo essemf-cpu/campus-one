@@ -1,4 +1,4 @@
-import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,l as r,m as i,v as a,y as o}from"../../../authService-kcLQHjqZ.js";import{t as s}from"../../../authGuard-NXoHQF1z.js";import{t as c}from"../../../referentielService-lzYZwhmV.js";s(`etudiant`,async({profile:s})=>{let l=document.getElementById(`demandes-container`);if(!l){console.error(`❌ demandes-container introuvable`);return}let u=s.matricule;if(!u){l.innerHTML=`
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,u as r,v as i,x as a,y as o}from"../../../authService-CdYSz198.js";import{t as s}from"../../../authGuard-BeXI_65M.js";import{t as c}from"../../../referentielService-DYr6ElNg.js";s(`etudiant`,async({profile:s})=>{let l=document.getElementById(`demandes-container`);if(!l){console.error(`❌ demandes-container introuvable`);return}let u=s.matricule;if(!u){l.innerHTML=`
 
                 <div class="error-state">
 
@@ -330,7 +330,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,
 
                             </article>
 
-                        `})};f&&f.addEventListener(`input`,()=>{_=f.value,w()}),p&&p.addEventListener(`change`,()=>{v=p.value,w()}),m&&m.addEventListener(`change`,()=>{y=m.value,w()}),h&&h.addEventListener(`change`,()=>{b=h.value,w()}),i(n(o(r,`demandes_etudiants`),a(`matricule`,`==`,u)),e=>{console.log(`📋 Mes demandes :`,e.size),g=[],e.forEach(e=>{g.push({id:e.id,...e.data()})}),w()},e=>{console.error(`❌ Erreur écoute demandes :`,e),l.innerHTML=`
+                        `})};f&&f.addEventListener(`input`,()=>{_=f.value,w()}),p&&p.addEventListener(`change`,()=>{v=p.value,w()}),m&&m.addEventListener(`change`,()=>{y=m.value,w()}),h&&h.addEventListener(`change`,()=>{b=h.value,w()}),n(e(t(r,`demandes_etudiants`),o(`matricule`,`==`,u)),e=>{console.log(`📋 Mes demandes :`,e.size),g=[],e.forEach(e=>{g.push({id:e.id,...e.data()})}),w()},e=>{console.error(`❌ Erreur écoute demandes :`,e),l.innerHTML=`
 
                     <div class="error-state">
 
@@ -348,7 +348,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,
 
                     </div>
 
-                `}),l.addEventListener(`click`,async n=>{let i=n.target.closest(`.feedback-star`);if(i){let e=i.closest(`.feedback-form`);if(!e)return;let t=Number(i.dataset.note);e.dataset.note=t,e.querySelectorAll(`.feedback-star`).forEach(e=>{let n=Number(e.dataset.note);e.classList.toggle(`selected`,n<=t)});let n=e.querySelector(`.feedback-submit`);n&&e.dataset.avis&&(n.disabled=!1);return}let a=n.target.closest(`.feedback-choice`);if(a){let e=a.closest(`.feedback-form`);if(!e)return;e.dataset.avis=a.dataset.avis,e.querySelectorAll(`.feedback-choice`).forEach(e=>{e.classList.remove(`selected`)}),a.classList.add(`selected`);let t=e.querySelector(`.feedback-submit`);t&&e.dataset.note&&(t.disabled=!1);return}let o=n.target.closest(`.feedback-submit`);if(!o)return;let s=o.closest(`.feedback-form`),c=o.dataset.id;if(!s||!c)return;let l=Number(s.dataset.note),u=s.dataset.avis;if(!(!l||!u||o.disabled)){o.disabled=!0,o.innerHTML=`
+                `}),l.addEventListener(`click`,async e=>{let t=e.target.closest(`.feedback-star`);if(t){let e=t.closest(`.feedback-form`);if(!e)return;let n=Number(t.dataset.note);e.dataset.note=n,e.querySelectorAll(`.feedback-star`).forEach(e=>{let t=Number(e.dataset.note);e.classList.toggle(`selected`,t<=n)});let r=e.querySelector(`.feedback-submit`);r&&e.dataset.avis&&(r.disabled=!1);return}let n=e.target.closest(`.feedback-choice`);if(n){let e=n.closest(`.feedback-form`);if(!e)return;e.dataset.avis=n.dataset.avis,e.querySelectorAll(`.feedback-choice`).forEach(e=>{e.classList.remove(`selected`)}),n.classList.add(`selected`);let t=e.querySelector(`.feedback-submit`);t&&e.dataset.note&&(t.disabled=!1);return}let o=e.target.closest(`.feedback-submit`);if(!o)return;let s=o.closest(`.feedback-form`),c=o.dataset.id;if(!s||!c)return;let l=Number(s.dataset.note),u=s.dataset.avis;if(!(!l||!u||o.disabled)){o.disabled=!0,o.innerHTML=`
 
                     <i class="
                         fa-solid
@@ -358,4 +358,4 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,
 
                     Enregistrement...
 
-                `;try{await e(t(r,`demandes_etudiants`,c),{evaluation:l,commentaire:u,feedbackAutorise:!1}),console.log(`✅ Feedback enregistré`)}catch(e){console.error(`❌ Erreur feedback :`,e),o.disabled=!1,o.innerHTML=`Valider`,alert(`Impossible d'enregistrer votre évaluation.`)}}})});
+                `;try{await i(a(r,`demandes_etudiants`,c),{evaluation:l,commentaire:u,feedbackAutorise:!1}),console.log(`✅ Feedback enregistré`)}catch(e){console.error(`❌ Erreur feedback :`,e),o.disabled=!1,o.innerHTML=`Valider`,alert(`Impossible d'enregistrer votre évaluation.`)}}})});

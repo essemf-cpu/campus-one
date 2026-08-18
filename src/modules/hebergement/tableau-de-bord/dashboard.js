@@ -24,4 +24,7 @@ requireRole("agent", async ({ profile }) => {
 
     console.timeEnd("PAGE");
 
-});
+},
+
+"voirTableauDeBord"
+);

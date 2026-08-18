@@ -2,6 +2,8 @@ import departements from "./data/departements.js";
 import rattachements from "./data/rattachements.js";
 import services from "./data/services.js";
 import postes from "./data/postes.js";
+import permissionsPostes
+    from "./data/seed/permissionsPostes.js";
 
 // Hébergement
 import sites from "./data/seed/sites.js";
@@ -33,6 +35,7 @@ async function seed() {
         await seedCollection("services", services);
         await seedCollection("rattachements", rattachements);
         await seedCollection("postes", postes);
+        await seedCollection("permissionsPostes", permissionsPostes);
 
         // Hébergement
         await seedCollection("sites", sites);

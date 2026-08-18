@@ -13,7 +13,10 @@ import { db } from "../../../firebase/firebase.js";
 
 requireRole(
     "etudiant",
-    async ({ profile }) => {
+    async ({
+        profile,
+        anneeAcademique
+    }) => {
 
         const content =
             document.getElementById(
@@ -747,6 +750,16 @@ envoyerDemandeButton.addEventListener(
                 Envoi en cours...
             `;
 
+            if (!anneeAcademique) {
+
+    alert(
+        "Impossible de déterminer l'année académique."
+    );
+
+    return;
+
+}
+
 
             await addDoc(
                 collection(
@@ -757,6 +770,9 @@ envoyerDemandeButton.addEventListener(
 
                     matricule:
                         profile.matricule,
+
+                    anneeAcademique:
+    anneeAcademique,
 
                     numeroEtudiant:
                         profile.numeroEtudiant ||

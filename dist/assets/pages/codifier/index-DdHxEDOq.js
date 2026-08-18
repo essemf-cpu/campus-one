@@ -1,4 +1,4 @@
-import"../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,l as n,v as r,y as i}from"../../authService-kcLQHjqZ.js";import{t as a}from"../../authGuard-NXoHQF1z.js";a(`etudiant`,async({profile:a})=>{let o=document.getElementById(`codifier-content`),s=a.matricule;if(!s){o.innerHTML=`
+import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u as r,y as i}from"../../authService-CdYSz198.js";import{t as a}from"../../authGuard-BeXI_65M.js";a(`etudiant`,async({profile:a})=>{let o=document.getElementById(`codifier-content`),s=a.matricule;if(!s){o.innerHTML=`
 
                 <div
                     class="service-indisponible"
@@ -29,7 +29,7 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,l as n,v a
 
                 </div>
 
-            `;return}try{let c=await e(t(i(n,`hebergements`),r(`matricule`,`==`,s)));if(c.empty){o.innerHTML=`
+            `;return}try{let c=await n(e(t(r,`hebergements`),i(`matricule`,`==`,s)));if(c.empty){o.innerHTML=`
 
                     <div
                         class="
