@@ -10,13 +10,57 @@ import {
     where,
     limit,
     getDocs,
-    doc,
-    getDoc,
     addDoc
 } from "firebase/firestore";
 
 
-requireRole("etudiant", async ({ profile }) => {
+requireRole("etudiant", async ({ profile, anneeAcademique }) => {
+
+
+    const scannerAutorise =
+        profile.statutAcademique === "actif" &&
+        profile.anneeAcademique === anneeAcademique;
+
+
+    if (!scannerAutorise) {
+
+        const result =
+            document.getElementById(
+                "scan-result"
+            );
+
+
+        if (result) {
+
+            result.className =
+                "scan-result-card error";
+
+            result.innerHTML = `
+
+                <div class="scan-success">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                    <h3>
+                        Service momentanément indisponible
+                    </h3>
+
+                    <p>
+                        Le scanner QR est disponible
+                        uniquement pour votre année
+                        académique active.
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+
+        return;
+
+    }
 
     const reader =
         document.getElementById("reader");
@@ -24,18 +68,20 @@ requireRole("etudiant", async ({ profile }) => {
     const result =
         document.getElementById("scan-result");
 
+
     if (!reader || !result) return;
 
 
     const scanner =
         new Html5Qrcode("reader");
 
+
     let traitementEnCours = false;
 
 
-    // ==========================
+    // =====================================================
     // MESSAGE
-    // ==========================
+    // =====================================================
 
     function afficherMessage(
         message,
@@ -51,9 +97,9 @@ requireRole("etudiant", async ({ profile }) => {
     }
 
 
-    // ==========================
+    // =====================================================
     // AFFICHER L'ÉTUDIANT
-    // ==========================
+    // =====================================================
 
     function afficherEtudiant(ami) {
 
@@ -134,215 +180,221 @@ requireRole("etudiant", async ({ profile }) => {
     }
 
 
-// ==========================
-// ENVOYER DEMANDE D'AMI
-// ==========================
+    // =====================================================
+    // ENVOYER DEMANDE D'AMI
+    // =====================================================
 
-async function envoyerDemande(ami) {
+    async function envoyerDemande(ami) {
 
-    const button =
-        document.getElementById(
-            "add-friend-btn"
-        );
-
-    if (!button) return;
-
-
-    // ==========================
-    // IMPOSSIBLE DE S'AJOUTER SOI-MÊME
-    // ==========================
-
-    if (
-        ami.matricule ===
-        profile.matricule
-    ) {
-
-        afficherMessage(
-            "Vous ne pouvez pas vous ajouter vous-même.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    button.disabled = true;
-
-    button.innerHTML = `
-        <i class="fa-solid fa-spinner fa-spin"></i>
-        Envoi...
-    `;
-
-
-    try {
-
-        // ==========================
-        // VÉRIFIER UNE DEMANDE EXISTANTE
-        // ==========================
-
-        const demandesQuery =
-            query(
-
-                collection(
-                    db,
-                    "friendRequests"
-                ),
-
-                where(
-                    "from",
-                    "==",
-                    profile.matricule
-                ),
-
-                where(
-                    "to",
-                    "==",
-                    ami.matricule
-                ),
-
-                limit(1)
-
+        const button =
+            document.getElementById(
+                "add-friend-btn"
             );
 
 
-        const existing =
-            await getDocs(
-                demandesQuery
+        if (!button) return;
+
+
+        // -------------------------------------------------
+        // IMPOSSIBLE DE S'AJOUTER SOI-MÊME
+        // -------------------------------------------------
+
+        if (
+            ami.matricule ===
+            profile.matricule
+        ) {
+
+            afficherMessage(
+                "Vous ne pouvez pas vous ajouter vous-même.",
+                "error"
             );
 
-
-        if (!existing.empty) {
-
-            const demande =
-                existing.docs[0].data();
-
-
-            if (
-                demande.status ===
-                "pending"
-            ) {
-
-                afficherMessage(
-                    "Une demande est déjà en attente.",
-                    "info"
-                );
-
-                return;
-            }
-
-
-            if (
-                demande.status ===
-                "accepted"
-            ) {
-
-                afficherMessage(
-                    "Vous êtes déjà amis.",
-                    "info"
-                );
-
-                return;
-            }
-
+            return;
         }
 
 
-        // ==========================
-        // CRÉER LA DEMANDE
-        // ==========================
+        button.disabled = true;
 
-        await addDoc(
-            collection(
-                db,
-                "friendRequests"
-            ),
-            {
-
-                from:
-                    profile.matricule,
-
-                fromNom:
-                    `${profile.prenom} ${profile.nom}`,
-
-                fromAvatar:
-                    profile.avatar ||
-                    "assets/default-user.png",
-
-                to:
-                    ami.matricule,
-
-                status:
-                    "pending",
-
-                seen:
-                   false,
-
-                date:
-                    Date.now()
-
-            }
-        );
-
-
-        // ==========================
-        // SUCCÈS
-        // ==========================
-
-        result.innerHTML = `
-
-            <div class="scan-success">
-
-                <i class="fa-solid fa-check"></i>
-
-                <h3>
-                    Demande envoyée
-                </h3>
-
-                <p>
-
-                    Votre demande a été envoyée à
-
-                    <strong>
-                        ${ami.prenom}
-                        ${ami.nom}
-                    </strong>.
-
-                </p>
-
-            </div>
-
-        `;
-
-
-    } catch (error) {
-
-        console.error(
-            "Erreur demande ami :",
-            error
-        );
-
-
-        afficherMessage(
-            "Impossible d'envoyer la demande.",
-            "error"
-        );
-
-
-        button.disabled = false;
 
         button.innerHTML = `
-            <i class="fa-solid fa-user-plus"></i>
-            Ajouter comme ami
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Envoi...
         `;
+
+
+        try {
+
+            // =============================================
+            // DEMANDE EXISTANTE
+            // =============================================
+
+            const demandesQuery =
+                query(
+
+                    collection(
+                        db,
+                        "friendRequests"
+                    ),
+
+                    where(
+                        "from",
+                        "==",
+                        profile.matricule
+                    ),
+
+                    where(
+                        "to",
+                        "==",
+                        ami.matricule
+                    ),
+
+                    limit(1)
+
+                );
+
+
+            const existing =
+                await getDocs(
+                    demandesQuery
+                );
+
+
+            if (!existing.empty) {
+
+                const demande =
+                    existing.docs[0].data();
+
+
+                if (
+                    demande.status ===
+                    "pending"
+                ) {
+
+                    afficherMessage(
+                        "Une demande est déjà en attente.",
+                        "info"
+                    );
+
+                    return;
+                }
+
+
+                if (
+                    demande.status ===
+                    "accepted"
+                ) {
+
+                    afficherMessage(
+                        "Vous êtes déjà amis.",
+                        "info"
+                    );
+
+                    return;
+                }
+
+            }
+
+
+            // =============================================
+            // CRÉATION
+            // =============================================
+
+            await addDoc(
+    collection(
+        db,
+        "friendRequests"
+    ),
+    {
+
+        from:
+            profile.matricule,
+
+        fromNom:
+            `${profile.prenom} ${profile.nom}`,
+
+        fromAvatar:
+            profile.avatar ||
+            "assets/default-user.png",
+
+        to:
+            ami.matricule,
+
+        anneeAcademique:
+            anneeAcademique,
+
+        status:
+            "pending",
+
+        seen:
+            false,
+
+        date:
+            Date.now()
+
+    }
+);
+
+
+            // =============================================
+            // SUCCÈS
+            // =============================================
+
+            result.innerHTML = `
+
+                <div class="scan-success">
+
+                    <i class="fa-solid fa-check"></i>
+
+                    <h3>
+                        Demande envoyée
+                    </h3>
+
+                    <p>
+
+                        Votre demande a été envoyée à
+
+                        <strong>
+                            ${ami.prenom}
+                            ${ami.nom}
+                        </strong>.
+
+                    </p>
+
+                </div>
+
+            `;
+
+
+        } catch (error) {
+
+            console.error(
+                "Erreur demande ami :",
+                error
+            );
+
+
+            afficherMessage(
+                "Impossible d'envoyer la demande.",
+                "error"
+            );
+
+
+            button.disabled = false;
+
+
+            button.innerHTML = `
+                <i class="fa-solid fa-user-plus"></i>
+                Ajouter comme ami
+            `;
+
+        }
 
     }
 
-}
 
-
-    // ==========================
+    // =====================================================
     // TRAITER LE QR
-    // ==========================
+    // =====================================================
 
     async function traiterQR(
         decodedText
@@ -374,13 +426,17 @@ async function envoyerDemande(ami) {
         );
 
 
+        // =================================================
+        // RÉCUPÉRER LE MATRICULE
+        // =================================================
+
         let matricule =
             decodedText.trim();
 
 
-        // ==========================
+        // =================================================
         // QR JSON
-        // ==========================
+        // =================================================
 
         try {
 
@@ -400,36 +456,30 @@ async function envoyerDemande(ami) {
 
         } catch {
 
-            // Le QR peut aussi contenir
-            // directement le matricule.
+            // Le QR peut contenir directement
+            // le matricule.
 
         }
 
 
-        // ==========================
-        // RECHERCHE DANS USERS
-        // ==========================
+        // =================================================
+        // RECHERCHE DIRECTE DANS ETUDIANTS
+        // =================================================
 
         try {
 
-            const usersQuery =
+            const etudiantQuery =
                 query(
 
                     collection(
                         db,
-                        "users"
+                        "etudiants"
                     ),
 
                     where(
                         "matricule",
                         "==",
                         matricule
-                    ),
-
-                    where(
-                        "role",
-                        "==",
-                        "etudiant"
                     ),
 
                     limit(1)
@@ -439,9 +489,13 @@ async function envoyerDemande(ami) {
 
             const snapshot =
                 await getDocs(
-                    usersQuery
+                    etudiantQuery
                 );
 
+
+            // =================================================
+            // ÉTUDIANT INTROUVABLE
+            // =================================================
 
             if (snapshot.empty) {
 
@@ -455,22 +509,21 @@ async function envoyerDemande(ami) {
             }
 
 
-            const userData =
+            const student =
                 snapshot.docs[0].data();
 
 
-            // ==========================
-            // RÉCUPÉRER LE PROFIL
-            // ==========================
+            // =================================================
+            // QR INVALIDE : ÉTUDIANT NON ACTIF
+            // =================================================
 
-            const profileRef =
-                userData.profile;
-
-
-            if (!profileRef) {
+            if (
+                student.statutAcademique !==
+                "actif"
+            ) {
 
                 afficherMessage(
-                    "Profil étudiant introuvable.",
+                    "Ce QR Code n'est plus actif.",
                     "error"
                 );
 
@@ -479,72 +532,14 @@ async function envoyerDemande(ami) {
             }
 
 
-            const parts =
-                profileRef.split("/");
-
-
-            const collectionName =
-                parts[0];
-
-
-            const documentId =
-                parts[1];
-
-
-            const profileDoc =
-                await getDoc(
-
-                    doc(
-                        db,
-                        collectionName,
-                        documentId
-                    )
-
-                );
-
-
-            if (!profileDoc.exists()) {
-
-                afficherMessage(
-                    "Profil étudiant introuvable.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            const student =
-                profileDoc.data();
-
-                // =====================================================
-// VÉRIFICATION DU STATUT ACADÉMIQUE
-// =====================================================
-
-if (
-    student.statutAcademique !==
-    "actif"
-) {
-
-    afficherMessage(
-        "Le QR de cet étudiant n'est plus actif.",
-        "error"
-    );
-
-    return;
-
-}
-
-
-            // ==========================
-            // AFFICHER L'ÉTUDIANT
-            // ==========================
+            // =================================================
+            // ÉTUDIANT VALIDE
+            // =================================================
 
             afficherEtudiant({
 
                 matricule:
-                    userData.matricule,
+                    student.matricule,
 
                 prenom:
                     student.prenom || "",
@@ -576,9 +571,9 @@ if (
     }
 
 
-    // ==========================
+    // =====================================================
     // DÉMARRAGE CAMÉRA
-    // ==========================
+    // =====================================================
 
     scanner.start(
 

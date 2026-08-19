@@ -1,6 +1,14 @@
 export default [
 
     {
+    id: "2026ABC_2025-2026",
+    matricule: "2026ABC",
+    anneeAcademique: "2025-2026",
+
+    statut: "termine"
+},
+
+    {
         id: "2026ABC_2026-2027",
         matricule: "2026ABC",
         anneeAcademique: "2026-2027",

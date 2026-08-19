@@ -1,10 +1,10 @@
-import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,u as r,v as i,x as a,y as o}from"../../../authService-CdYSz198.js";import{t as s}from"../../../authGuard-BeXI_65M.js";import{t as c}from"../../../sidebar-kDZzUBxa.js";import{t as l}from"../../../referentielService-DYr6ElNg.js";s(`agent`,async({profile:s})=>{if(console.log(`1 - requireRole OK`),s.service!==`Service de l'Hébergement`)return;console.log(`2 - service OK`),await c(s),console.log(`3 - sidebar chargée`),document.getElementById(`page-title`).textContent=s.affectation;let u=document.getElementById(`type`);if(u){console.log(`4 - select trouvé`);let e=await l();console.log(`5 - types récupérés`,e),u.innerHTML=``,e.forEach(e=>{u.innerHTML+=`
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,m as r,u as i,v as a,y as o}from"../../../authService-eWRmw6sD.js";import{t as s}from"../../../authGuard-Bjwicrlv.js";import{t as c}from"../../../sidebar-C_1Ijxsm.js";import{t as l}from"../../../referentielService-CKTal9Ki.js";s(`agent`,async({profile:s,permissions:u,affectation:d,posteId:f,anneeAcademique:p,lectureSeule:m})=>{if(console.log(`🔐 MODE LECTURE SEULE =`,m),console.log(`1 - requireRole OK`),s.service!==`Service de l'Hébergement`)return;console.log(`2 - service OK`),await c(s),console.log(`3 - sidebar chargée`),document.getElementById(`page-title`).textContent=s.affectation;let h=document.getElementById(`type`);if(h){console.log(`4 - select trouvé`);let e=await l();console.log(`5 - types récupérés`,e),h.innerHTML=``,e.forEach(e=>{h.innerHTML+=`
 
                         <option value="${e.id}">
                             ${e.nom}
                         </option>
 
-                    `})}let d=document.getElementById(`demandes-body`);if(!d){console.error(`❌ demandes-body introuvable`);return}let f=s.site,p=s.affectation?.replace(/^Pavillon\s+/i,``).trim();if(console.log(`🏢 Site agent :`,f),console.log(`🏠 Pavillon agent :`,p),!f||!p){d.innerHTML=`
+                    `})}let g=document.getElementById(`demandes-body`);if(!g){console.error(`❌ demandes-body introuvable`);return}let _=s.site,v=s.affectation?.replace(/^Pavillon\s+/i,``).trim();if(console.log(`🏢 Site agent :`,_),console.log(`🏠 Pavillon agent :`,v),!_||!v){g.innerHTML=`
 
                 <tr class="empty-row">
 
@@ -17,7 +17,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                 </tr>
 
-            `;return}let m=await l(),h=new Map(m.map(e=>[e.id,e.nom]));n(e(t(r,`demandes_etudiants`),o(`site`,`==`,f),o(`pavillon`,`==`,p)),e=>{console.log(`📋 Demandes mises à jour :`,e.size),d.innerHTML=``;let t=0;e.forEach(e=>{let n=e.data();if(n.statut&&n.statut!==`en_attente`&&n.statut!==`en_cours`)return;t++;let r=`${n.prenom||``} ${n.nom||``}`.trim(),i=``;(n.statut||`en_attente`)===`en_attente`?i=`
+            `;return}let y=await l(),b=new Map(y.map(e=>[e.id,e.nom]));r(n(o(i,`demandes_etudiants`),a(`site`,`==`,_),a(`pavillon`,`==`,v),a(`anneeAcademique`,`==`,p)),e=>{console.log(`📋 Demandes mises à jour :`,e.size),g.innerHTML=``;let t=0;e.forEach(e=>{let n=e.data();if(n.statut&&n.statut!==`en_attente`&&n.statut!==`en_cours`)return;t++;let r=`${n.prenom||``} ${n.nom||``}`.trim(),i=``;!m&&(n.statut||`en_attente`)===`en_attente`?i=`
 
                         <div class="demande-actions">
 
@@ -41,7 +41,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                         </div>
 
-                    `:n.statut===`en_cours`&&(i=`
+                    `:!m&&n.statut===`en_cours`&&(i=`
 
                         <div class="demande-actions">
 
@@ -65,7 +65,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                         </div>
 
-                    `),d.innerHTML+=`
+                    `),g.innerHTML+=`
 
                     <tr>
 
@@ -97,7 +97,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
                         <!-- TYPE -->
 
                         <td>
-                           ${h.get(n.type)||`-`}
+                           ${b.get(n.type)||`-`}
                         </td>
 
 
@@ -123,7 +123,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                     </tr>
 
-                `}),t===0&&(d.innerHTML=`
+                `}),t===0&&(g.innerHTML=`
 
                 <tr class="empty-row">
 
@@ -135,7 +135,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                 </tr>
 
-            `)},e=>{console.error(`❌ Erreur écoute demandes :`,e),d.innerHTML=`
+            `)},e=>{console.error(`❌ Erreur écoute demandes :`,e),g.innerHTML=`
 
             <tr class="empty-row">
 
@@ -148,4 +148,4 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
             </tr>
 
-        `}),d.addEventListener(`click`,async e=>{let t=e.target.closest(`.demande-action-btn`);if(!t)return;let n=t.dataset.id,o=t.dataset.action;if(!(!n||!o)&&!t.disabled){t.disabled=!0;try{o===`encours`?await i(a(r,`demandes_etudiants`,n),{statut:`en_cours`,cause:``,feedbackAutorise:!1,notificationVue:!0}):o===`forclos`?await i(a(r,`demandes_etudiants`,n),{statut:`forclos`,cause:`Votre demande a déjà été formulée par un(e) de vos camarades / colocataires.`,feedbackAutorise:!1,notificationVue:!0}):o===`termine`?await i(a(r,`demandes_etudiants`,n),{statut:`termine`,cause:``,feedbackAutorise:!0}):o===`nontermine`&&await i(a(r,`demandes_etudiants`,n),{statut:`non_termine`,cause:`Stock de matériel, merci de formuler votre demande dans les jours à venir.`,feedbackAutorise:!1})}catch(e){console.error(`❌ Erreur action demande :`,e),t.disabled=!1,alert(`Impossible de modifier la demande.`)}}}),console.log(`6 - page prête`),document.body.classList.add(`loaded`)});
+        `}),g.addEventListener(`click`,async n=>{if(m){console.warn(`🔒 Action bloquée : session en lecture seule.`);return}let r=n.target.closest(`.demande-action-btn`);if(!r)return;let a=r.dataset.id,o=r.dataset.action;if(!(!a||!o)&&!r.disabled){r.disabled=!0;try{o===`encours`?await e(t(i,`demandes_etudiants`,a),{statut:`en_cours`,cause:``,feedbackAutorise:!1,notificationVue:!0}):o===`forclos`?await e(t(i,`demandes_etudiants`,a),{statut:`forclos`,cause:`Votre demande a déjà été formulée par un(e) de vos camarades / colocataires.`,feedbackAutorise:!1,notificationVue:!0}):o===`termine`?await e(t(i,`demandes_etudiants`,a),{statut:`termine`,cause:``,feedbackAutorise:!0}):o===`nontermine`&&await e(t(i,`demandes_etudiants`,a),{statut:`non_termine`,cause:`Stock de matériel, merci de formuler votre demande dans les jours à venir.`,feedbackAutorise:!1})}catch(e){console.error(`❌ Erreur action demande :`,e),r.disabled=!1,alert(`Impossible de modifier la demande.`)}}}),console.log(`6 - page prête`),document.body.classList.add(`loaded`)});

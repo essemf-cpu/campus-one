@@ -22,7 +22,10 @@ export function afficherNotifications() {
 
     requireRole(
         "etudiant",
-        async ({ profile }) => {
+        async ({
+    profile,
+    anneeAcademique
+}) => {
 
             const zone =
                 document.getElementById(
@@ -79,7 +82,13 @@ export function afficherNotifications() {
                                     "to",
                                     "==",
                                     matricule
-                                )
+                                ),
+
+                                where(
+    "anneeAcademique",
+    "==",
+    anneeAcademique
+)
                             )
                         );
 
@@ -130,7 +139,13 @@ export function afficherNotifications() {
                                     "to",
                                     "==",
                                     matricule
-                                )
+                                ),
+
+                                where(
+    "anneeAcademique",
+    "==",
+    anneeAcademique
+)
                             )
                         );
 
@@ -180,7 +195,13 @@ export function afficherNotifications() {
                                     "to",
                                     "==",
                                     matricule
-                                )
+                                ),
+
+                                where(
+    "anneeAcademique",
+    "==",
+    anneeAcademique
+)
                             )
                         );
 
@@ -680,7 +701,8 @@ export function afficherNotifications() {
 
                                     await accepterDemande(
                                         button,
-                                        profile
+                                        profile,
+                                        anneeAcademique
                                     );
 
                                 }
@@ -724,7 +746,8 @@ export function afficherNotifications() {
 
             async function accepterDemande(
                 button,
-                profile
+                profile,
+                anneeAcademique
             ) {
 
                 const requestId =
@@ -967,6 +990,9 @@ export function afficherNotifications() {
     {
         to: amiMatricule,
 
+        anneeAcademique:
+    anneeAcademique,
+
         type: "amis",
 
         title: "Demande acceptée",
@@ -1207,7 +1233,13 @@ const demandesQuery =
             "to",
             "==",
             matricule
-        )
+        ),
+
+        where(
+    "anneeAcademique",
+    "==",
+    anneeAcademique
+)
     );
 
 
@@ -1430,7 +1462,13 @@ onSnapshot(
                         "to",
                         "==",
                         matricule
-                    )
+                    ),
+
+                    where(
+    "anneeAcademique",
+    "==",
+    anneeAcademique
+)
 
                 );
 
@@ -1572,7 +1610,13 @@ onSnapshot(
                         "to",
                         "==",
                         matricule
-                    )
+                    ),
+
+                    where(
+    "anneeAcademique",
+    "==",
+    anneeAcademique
+)
 
                 );
 
@@ -1805,7 +1849,6 @@ onSnapshot(
 }
 
 
-
 // =====================================================
 // BADGE
 // =====================================================
@@ -1816,7 +1859,10 @@ export function afficherBadgeNotifications() {
 
         "etudiant",
 
-        async ({ profile }) => {
+        async ({
+            profile,
+            anneeAcademique
+        }) => {
 
             const badge =
                 document.getElementById(
@@ -1856,6 +1902,7 @@ export function afficherBadgeNotifications() {
                 console.log(
                     "🔔 BADGE :",
                     {
+                        anneeAcademique,
                         demandes,
                         notificationsNonLues,
                         restaurantNonLues,
@@ -1904,6 +1951,12 @@ export function afficherBadgeNotifications() {
                         "to",
                         "==",
                         matricule
+                    ),
+
+                    where(
+                        "anneeAcademique",
+                        "==",
+                        anneeAcademique
                     )
 
                 );
@@ -1979,6 +2032,12 @@ export function afficherBadgeNotifications() {
                         "to",
                         "==",
                         matricule
+                    ),
+
+                    where(
+                        "anneeAcademique",
+                        "==",
+                        anneeAcademique
                     )
 
                 );
@@ -2000,7 +2059,7 @@ export function afficherBadgeNotifications() {
 
                                 // ---------------------------------
                                 // UNE "NOUVELLE DEMANDE D'AMI"
-                                // EST DÉJÀ COMPTÉE DANS friendRequests
+                                // EST COMPTÉE DANS friendRequests
                                 // ---------------------------------
 
                                 if (
@@ -2054,6 +2113,12 @@ export function afficherBadgeNotifications() {
                         "to",
                         "==",
                         matricule
+                    ),
+
+                    where(
+                        "anneeAcademique",
+                        "==",
+                        anneeAcademique
                     )
 
                 );

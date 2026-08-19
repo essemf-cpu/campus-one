@@ -14,7 +14,12 @@ import {
 
 requireRole(
     "etudiant",
-    async ({ profile }) => {
+    async ({
+        profile,
+        lectureSeule,
+        mode,
+        anneeAcademique
+    }) => {
 
         const content =
             document.getElementById(
@@ -28,7 +33,6 @@ requireRole(
 
         const matricule =
             profile.matricule;
-
 
         if (!matricule) {
 
@@ -76,20 +80,26 @@ requireRole(
         try {
 
             const hebergementsQuery =
-                query(
+    query(
 
-                    collection(
-                        db,
-                        "hebergements"
-                    ),
+        collection(
+            db,
+            "hebergements"
+        ),
 
-                    where(
-                        "matricule",
-                        "==",
-                        matricule
-                    )
+        where(
+            "matricule",
+            "==",
+            matricule
+        ),
 
-                );
+        where(
+            "anneeAcademique",
+            "==",
+            anneeAcademique
+        )
+
+    );
 
 
             const snapshot =
@@ -167,6 +177,10 @@ requireRole(
 
                     <p>
                         Informations
+                    </p>
+
+                    <p>
+                      ${anneeAcademique}
                     </p>
 
                 </div>
@@ -324,53 +338,59 @@ requireRole(
 
 
                     <div
+    class="
+        codifier-actions
+    "
+>
+
+    ${
+        lectureSeule
+            ? ""
+            : `
+                <button
+                    id="faire-reclamation-btn"
+                    class="
+                        codifier-button
+                        codifier-button-primary
+                    "
+                    type="button"
+                >
+
+                    <i
                         class="
-                            codifier-actions
+                            fa-solid
+                            fa-screwdriver-wrench
                         "
-                    >
+                    ></i>
 
-                        <button
-    id="faire-reclamation-btn"
-    class="
-        codifier-button
-        codifier-button-primary
-    "
-    type="button"
->
+                    Faire une demande de réclamation
 
-                            <i
-                                class="
-                                    fa-solid
-                                    fa-screwdriver-wrench
-                                "
-                            ></i>
-
-                            Faire une demande de réclamation
-
-                        </button>
+                </button>
+            `
+    }
 
 
-                        <button
-    id="voir-demandes-btn"
-    class="
-        codifier-button
-        codifier-button-secondary
-    "
-    type="button"
->
+    <button
+        id="voir-demandes-btn"
+        class="
+            codifier-button
+            codifier-button-secondary
+        "
+        type="button"
+    >
 
-                            <i
-                                class="
-                                    fa-solid
-                                    fa-clock-rotate-left
-                                "
-                            ></i>
+        <i
+            class="
+                fa-solid
+                fa-clock-rotate-left
+            "
+        ></i>
 
-                            Voir mes demandes
+        Voir mes demandes
 
-                        </button>
+    </button>
 
-                    </div>
+</div>
 
                 </div>
 

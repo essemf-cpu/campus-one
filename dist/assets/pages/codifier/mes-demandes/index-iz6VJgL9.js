@@ -1,4 +1,4 @@
-import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,u as r,v as i,x as a,y as o}from"../../../authService-CdYSz198.js";import{t as s}from"../../../authGuard-BeXI_65M.js";import{t as c}from"../../../referentielService-DYr6ElNg.js";s(`etudiant`,async({profile:s})=>{let l=document.getElementById(`demandes-container`);if(!l){console.error(`❌ demandes-container introuvable`);return}let u=s.matricule;if(!u){l.innerHTML=`
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,m as r,s as i,u as a,v as o,y as s}from"../../../authService-eWRmw6sD.js";import{t as c}from"../../../authGuard-Bjwicrlv.js";import{t as l}from"../../../referentielService-CKTal9Ki.js";c(`etudiant`,async({profile:c})=>{let u=document.getElementById(`demandes-container`);if(!u){console.error(`❌ demandes-container introuvable`);return}let d=c.matricule;if(!d){u.innerHTML=`
 
                 <div class="error-state">
 
@@ -14,13 +14,19 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                 </div>
 
-            `;return}let d=document.getElementById(`retour-btn`);d&&d.addEventListener(`click`,()=>{window.location.href=`../index.html`});let f=document.getElementById(`demandes-search`),p=document.getElementById(`demandes-sort-select`),m=document.getElementById(`demandes-type-select`),h=document.getElementById(`demandes-statut-select`),g=[],_=``,v=`date_desc`,y=`tous`,b=`tous`,x=[];try{x=await c()}catch(e){console.error(`❌ Erreur récupération types de travaux :`,e)}m&&x.forEach(e=>{m.innerHTML+=`
+            `;return}let f=await i(),p=f?.anneeAcademique||sessionStorage.getItem(`anneeAcademique`),m=f?.lectureSeule===!0;console.log(`📅 Année académique =`,p),console.log(`🔒 Lecture seule =`,m);let h=document.getElementById(`retour-btn`);h&&h.addEventListener(`click`,()=>{window.location.href=`../index.html`});let g=document.getElementById(`demandes-search`),_=document.getElementById(`demandes-sort-select`),v=document.getElementById(`demandes-type-select`),y=document.getElementById(`demandes-statut-select`),b=[],x=``,S=`date_desc`,C=`tous`,w=`tous`,T=[];try{T=await l()}catch(e){console.error(`❌ Erreur récupération types de travaux :`,e)}v&&(v.innerHTML=`
 
-                <option value="${e.id}">
-                    ${e.nom}
+                <option value="tous">
+                    Tous les types
                 </option>
 
-            `});let S=e=>{if(e.date?.toDate)return e.date.toDate();if(e.date){let t=new Date(e.date);if(!isNaN(t.getTime()))return t}return new Date(0)},C=e=>e===`en_cours`?`En cours`:e===`termine`?`Terminée`:e===`forclos`?`Forclos`:e===`non_termine`?`Non terminée`:`En attente`,w=()=>{let e=[...g];if(_){let t=_.toLowerCase().trim();e=e.filter(e=>{let n=C(e.statut);return[e.probleme,e.type,e.localisation,e.chambre,n,e.cause].filter(Boolean).join(` `).toLowerCase().includes(t)})}if(y!==`tous`&&(e=e.filter(e=>e.type===y)),b!==`tous`&&(e=e.filter(e=>(e.statut||`en_attente`)===b)),e.sort((e,t)=>v===`date_desc`?S(t)-S(e):v===`date_asc`?S(e)-S(t):v===`statut`?C(e.statut).localeCompare(C(t.statut),`fr`):v===`type`?`${e.type||``}`.localeCompare(`${t.type||``}`,`fr`):0),e.length===0){l.innerHTML=`
+            `,T.forEach(e=>{v.innerHTML+=`
+
+                        <option value="${e.id}">
+                            ${e.nom}
+                        </option>
+
+                    `}));let E=e=>{if(e.date?.toDate)return e.date.toDate();if(e.date){let t=new Date(e.date);if(!isNaN(t.getTime()))return t}return new Date(0)},D=e=>{let t=[e.dateTraitement,e.date_traitement,e.traiteLe,e.dateTerminaison,e.dateFin];for(let e of t){if(e?.toDate)return e.toDate();if(e){let t=new Date(e);if(!isNaN(t.getTime()))return t}}return null},O=e=>e===`en_cours`?`En cours`:e===`termine`?`Terminée`:e===`forclos`?`Forclos`:e===`non_termine`?`Non terminée`:`En attente`,k=e=>{if(e.statut!==`termine`||e.evaluation||e.feedbackAutorise!==!0)return!1;let t=D(e);if(!t)return!1;let n=new Date().getTime()-t.getTime();return n>=0&&n<=10080*60*1e3},A=()=>{let e=[...b];if(x){let t=x.toLowerCase().trim();e=e.filter(e=>{let n=O(e.statut);return[e.probleme,e.type,e.localisation,e.chambre,n,e.cause,e.anneeAcademique].filter(Boolean).join(` `).toLowerCase().includes(t)})}if(C!==`tous`&&(e=e.filter(e=>e.type===C)),w!==`tous`&&(e=e.filter(e=>(e.statut||`en_attente`)===w)),e.sort((e,t)=>S===`date_desc`?E(t)-E(e):S===`date_asc`?E(e)-E(t):S===`statut`?O(e.statut).localeCompare(O(t.statut),`fr`):S===`type`?`${e.type||``}`.localeCompare(`${t.type||``}`,`fr`):0),e.length===0){u.innerHTML=`
 
                         <div class="empty-state">
 
@@ -31,13 +37,13 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                             <p>
 
-                                ${_?`Aucune demande ne correspond à votre recherche.`:`Vous n'avez encore formulé aucune demande.`}
+                                ${x?`Aucune demande ne correspond à votre recherche.`:`Aucune demande pour l'année ${p||`sélectionnée`}.`}
 
                             </p>
 
                         </div>
 
-                    `;return}l.innerHTML=``,e.forEach(e=>{let t=e.statut||`en_attente`,n=`En attente`,r=`status-attente`;t===`en_cours`?(n=`En cours`,r=`status-cours`):t===`termine`?(n=`Terminée`,r=`status-termine`):t===`forclos`?(n=`Forclos`,r=`status-forclos`):t===`non_termine`&&(n=`Non terminée`,r=`status-non-termine`);let i=S(e),a=i.getTime()===0?`-`:i.toLocaleDateString(`fr-FR`),o=``;e.cause&&(o=`
+                    `;return}u.innerHTML=``,e.forEach(e=>{let t=e.statut||`en_attente`,n=`En attente`,r=`status-attente`;t===`en_cours`?(n=`En cours`,r=`status-cours`):t===`termine`?(n=`Terminée`,r=`status-termine`):t===`forclos`?(n=`Forclos`,r=`status-forclos`):t===`non_termine`&&(n=`Non terminée`,r=`status-non-termine`);let i=E(e),a=i.getTime()===0?`-`:i.toLocaleDateString(`fr-FR`),o=``;e.cause&&(o=`
 
                                 <div class="demande-cause">
 
@@ -56,9 +62,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
                                     <div class="feedback-result">
 
                                         <div class="feedback-result-title">
-
                                             Votre évaluation
-
                                         </div>
 
 
@@ -87,7 +91,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                                     </div>
 
-                                `:e.feedbackAutorise===!0?`
+                                `:k(e)?`
 
                                     <div
                                         class="feedback-form"
@@ -95,9 +99,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
                                     >
 
                                         <div class="feedback-title">
-
                                             Évaluer cette demande
-
                                         </div>
 
 
@@ -187,9 +189,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
                                             data-id="${e.id}"
                                             disabled
                                         >
-
                                             Valider
-
                                         </button>
 
                                     </div>
@@ -203,7 +203,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
                                             fa-lock
                                         "></i>
 
-                                        Évaluation indisponible
+                                        ${e.feedbackAutorise===!0?`Délai d'évaluation dépassé`:`Évaluation indisponible`}
 
                                     </div>
 
@@ -220,7 +220,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                                 </div>
 
-                            `,l.innerHTML+=`
+                            `,u.innerHTML+=`
 
                             <article class="demande-item">
 
@@ -229,9 +229,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
                                     <div>
 
                                         <h3 class="demande-title">
-
                                             ${e.probleme||`-`}
-
                                         </h3>
 
 
@@ -261,20 +259,15 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                                 <div class="demande-info">
 
-
                                     <div class="info-block">
 
                                         <span class="info-label">
-
                                             Type
-
                                         </span>
 
 
                                         <span class="info-value">
-
                                             ${e.type||`-`}
-
                                         </span>
 
                                     </div>
@@ -283,16 +276,12 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
                                     <div class="info-block">
 
                                         <span class="info-label">
-
                                             Localisation
-
                                         </span>
 
 
                                         <span class="info-value">
-
                                             ${e.localisation||`-`}
-
                                         </span>
 
                                     </div>
@@ -301,16 +290,12 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
                                     <div class="info-block">
 
                                         <span class="info-label">
-
                                             Chambre
-
                                         </span>
 
 
                                         <span class="info-value">
-
                                             ${e.chambre||`-`}
-
                                         </span>
 
                                     </div>
@@ -330,7 +315,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                             </article>
 
-                        `})};f&&f.addEventListener(`input`,()=>{_=f.value,w()}),p&&p.addEventListener(`change`,()=>{v=p.value,w()}),m&&m.addEventListener(`change`,()=>{y=m.value,w()}),h&&h.addEventListener(`change`,()=>{b=h.value,w()}),n(e(t(r,`demandes_etudiants`),o(`matricule`,`==`,u)),e=>{console.log(`📋 Mes demandes :`,e.size),g=[],e.forEach(e=>{g.push({id:e.id,...e.data()})}),w()},e=>{console.error(`❌ Erreur écoute demandes :`,e),l.innerHTML=`
+                        `})};g&&g.addEventListener(`input`,()=>{x=g.value,A()}),_&&_.addEventListener(`change`,()=>{S=_.value,A()}),v&&v.addEventListener(`change`,()=>{C=v.value,A()}),y&&y.addEventListener(`change`,()=>{w=y.value,A()});let j;j=n(s(a,`demandes_etudiants`),o(`matricule`,`==`,d)),r(j,e=>{console.log(`📋 Toutes les demandes du matricule :`,e.size),b=[],e.forEach(e=>{let t=e.data();t.anneeAcademique===p&&b.push({id:e.id,...t})}),console.log(`📋 Demandes pour`,p,`:`,b.length),A()},e=>{console.error(`❌ Erreur écoute demandes :`,e),u.innerHTML=`
 
                     <div class="error-state">
 
@@ -340,15 +325,13 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
                         "></i>
 
                         <p>
-
                             Impossible de charger
                             vos demandes.
-
                         </p>
 
                     </div>
 
-                `}),l.addEventListener(`click`,async e=>{let t=e.target.closest(`.feedback-star`);if(t){let e=t.closest(`.feedback-form`);if(!e)return;let n=Number(t.dataset.note);e.dataset.note=n,e.querySelectorAll(`.feedback-star`).forEach(e=>{let t=Number(e.dataset.note);e.classList.toggle(`selected`,t<=n)});let r=e.querySelector(`.feedback-submit`);r&&e.dataset.avis&&(r.disabled=!1);return}let n=e.target.closest(`.feedback-choice`);if(n){let e=n.closest(`.feedback-form`);if(!e)return;e.dataset.avis=n.dataset.avis,e.querySelectorAll(`.feedback-choice`).forEach(e=>{e.classList.remove(`selected`)}),n.classList.add(`selected`);let t=e.querySelector(`.feedback-submit`);t&&e.dataset.note&&(t.disabled=!1);return}let o=e.target.closest(`.feedback-submit`);if(!o)return;let s=o.closest(`.feedback-form`),c=o.dataset.id;if(!s||!c)return;let l=Number(s.dataset.note),u=s.dataset.avis;if(!(!l||!u||o.disabled)){o.disabled=!0,o.innerHTML=`
+                `}),u.addEventListener(`click`,async n=>{let r=n.target.closest(`.feedback-star`);if(r){let e=r.closest(`.feedback-form`);if(!e)return;let t=Number(r.dataset.note);e.dataset.note=t,e.querySelectorAll(`.feedback-star`).forEach(e=>{let n=Number(e.dataset.note);e.classList.toggle(`selected`,n<=t)});let n=e.querySelector(`.feedback-submit`);n&&e.dataset.avis&&(n.disabled=!1);return}let o=n.target.closest(`.feedback-choice`);if(o){let e=o.closest(`.feedback-form`);if(!e)return;e.dataset.avis=o.dataset.avis,e.querySelectorAll(`.feedback-choice`).forEach(e=>{e.classList.remove(`selected`)}),o.classList.add(`selected`);let t=e.querySelector(`.feedback-submit`);t&&e.dataset.note&&(t.disabled=!1);return}let s=n.target.closest(`.feedback-submit`);if(!s)return;let c=s.closest(`.feedback-form`),l=s.dataset.id;if(!c||!l)return;let u=Number(c.dataset.note),d=c.dataset.avis;if(!(!u||!d||s.disabled)){if((await i())?.lectureSeule===!0){alert(`Cette année académique est en lecture seule.`);return}s.disabled=!0,s.innerHTML=`
 
                     <i class="
                         fa-solid
@@ -358,4 +341,4 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,h as n,
 
                     Enregistrement...
 
-                `;try{await i(a(r,`demandes_etudiants`,c),{evaluation:l,commentaire:u,feedbackAutorise:!1}),console.log(`✅ Feedback enregistré`)}catch(e){console.error(`❌ Erreur feedback :`,e),o.disabled=!1,o.innerHTML=`Valider`,alert(`Impossible d'enregistrer votre évaluation.`)}}})});
+                `;try{let n=b.find(e=>e.id===l);if(!n)throw Error(`DEMANDE_INTRouvable`);if(!k(n))throw Error(`FEEDBACK_EXPIRE`);await e(t(a,`demandes_etudiants`,l),{evaluation:u,commentaire:d,feedbackAutorise:!1}),console.log(`✅ Feedback enregistré`)}catch(e){console.error(`❌ Erreur feedback :`,e),s.disabled=!1,s.innerHTML=`Valider`,e.message===`FEEDBACK_EXPIRE`?alert(`Le délai de 7 jours pour évaluer cette demande est dépassé.`):alert(`Impossible d'enregistrer votre évaluation.`)}}})});

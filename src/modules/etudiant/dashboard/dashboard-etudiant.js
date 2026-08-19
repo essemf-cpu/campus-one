@@ -9,16 +9,38 @@ requireRole("etudiant", async ({ profile }) => {
 
 
     // ==================================================
+    // ANNÉE ACADÉMIQUE DE LA SESSION
+    // ==================================================
+
+    const anneeAcademique =
+        sessionStorage.getItem(
+            "anneeAcademique"
+        );
+
+
+    // ==================================================
     // QR ÉTUDIANT
     // ==================================================
 
-    const qrData = JSON.stringify({
+    const qrActif =
+        profile.statutAcademique === "actif" &&
+        profile.anneeAcademique === anneeAcademique;
 
-        type: "student",
 
-        matricule: profile.matricule
+    const qrData =
+        qrActif
+            ? JSON.stringify({
 
-    });
+                type: "student",
+
+                matricule:
+                    profile.matricule,
+
+                anneeAcademique:
+                    profile.anneeAcademique
+
+            })
+            : null;
 
 
     document.getElementById("dashboard").innerHTML = `
@@ -37,23 +59,29 @@ requireRole("etudiant", async ({ profile }) => {
 
     </div>
 
+
     ${
         profile.avatar
 
         ? `
+
         <img
             id="dashboard-avatar"
             src="${profile.avatar}"
             alt="Avatar">
+
         `
 
         : `
-        <div id="dashboard-avatar"
-             class="avatar-placeholder">
+
+        <div
+            id="dashboard-avatar"
+            class="avatar-placeholder">
 
             ${initials}
 
         </div>
+
         `
     }
 
@@ -73,62 +101,80 @@ requireRole("etudiant", async ({ profile }) => {
 
 <section class="premium-grid">
 
-    <a href="../../../pages/guide/index.html"
-       class="premium-card">
+    <a
+        href="../../../pages/guide/index.html"
+        class="premium-card">
 
         <i class="fa-solid fa-book"></i>
 
-        <span>Guide</span>
+        <span>
+            Guide
+        </span>
 
     </a>
 
 
-    <a href="../../../restaurant/index.html"
-       class="premium-card">
+    <a
+        href="../../../restaurant/index.html"
+        class="premium-card">
 
         <i class="fa-solid fa-utensils"></i>
 
-        <span>Restaurant</span>
+        <span>
+            Restaurant
+        </span>
 
     </a>
 
 
-    <a href="../../../pages/gps/index.html"
-       class="premium-card">
+    <a
+        href="../../../pages/gps/index.html"
+        class="premium-card">
 
         <i class="fa-solid fa-location-dot"></i>
 
-        <span>GPS</span>
+        <span>
+            GPS
+        </span>
 
     </a>
 
 
-    <a href="../../../pages/amis/index.html"
-       class="premium-card">
+    <a
+        href="../../../pages/amis/index.html"
+        class="premium-card">
 
         <i class="fa-solid fa-user-group"></i>
 
-        <span>Amis</span>
+        <span>
+            Amis
+        </span>
 
     </a>
 
 
-    <a href="../../../pages/messages/index.html"
-       class="premium-card">
+    <a
+        href="../../../pages/messages/index.html"
+        class="premium-card">
 
         <i class="fa-solid fa-comments"></i>
 
-        <span>Messages</span>
+        <span>
+            Messages
+        </span>
 
     </a>
 
 
-    <a href="../../../pages/codifier/index.html"
-       class="premium-card">
+    <a
+        href="../../../pages/codifier/index.html"
+        class="premium-card">
 
         <i class="fa-solid fa-id-badge"></i>
 
-        <span>Codifier</span>
+        <span>
+            Codifier
+        </span>
 
     </a>
 
@@ -143,45 +189,85 @@ requireRole("etudiant", async ({ profile }) => {
 
     <div class="section-header">
 
-        <h2>Mon QR Code étudiant</h2>
+        <h2>
+            Mon QR Code étudiant
+        </h2>
 
     </div>
 
 
     <div class="qr-card">
 
-        <div id="student-qrcode">
+        ${
+            qrActif
 
-            <div class="qr-placeholder">
-                QR
+            ?
+
+            `
+
+            <div id="student-qrcode">
+
+                <div class="qr-placeholder">
+                    QR
+                </div>
+
             </div>
 
-        </div>
+
+            <p class="qr-matricule">
+
+                ${profile.matricule}
+
+            </p>
 
 
-        <p class="qr-matricule">
+            <small class="qr-campus">
 
-            ${profile.matricule}
+                Campus One
 
-        </p>
-
-
-        <small class="qr-campus">
-
-            Campus One
-
-        </small>
+            </small>
 
 
-        <button
-            id="open-qr"
-            class="primary-btn">
+            <button
+                id="open-qr"
+                class="primary-btn">
 
-            <i class="fa-solid fa-expand"></i>
+                <i class="fa-solid fa-expand"></i>
 
-            Agrandir
+                Agrandir
 
-        </button>
+            </button>
+
+            `
+
+            :
+
+            `
+
+            <div
+                id="student-qrcode"
+                class="qr-expired">
+
+                <div class="qr-expired-icon">
+
+                    <i class="fa-solid fa-qrcode"></i>
+
+                </div>
+
+                <strong>
+                    QR Code expiré
+                </strong>
+
+                <small>
+                    Ce QR Code n'est plus valide
+                    pour cette année académique.
+                </small>
+
+            </div>
+
+            `
+
+        }
 
     </div>
 
@@ -225,7 +311,9 @@ requireRole("etudiant", async ({ profile }) => {
 
     <div class="section-header">
 
-        <h2>Autres</h2>
+        <h2>
+            Autres
+        </h2>
 
     </div>
 
@@ -282,7 +370,8 @@ requireRole("etudiant", async ({ profile }) => {
         </p>
 
 
-        <button id="close-qr">
+        <button
+            id="close-qr">
 
             Fermer
 
@@ -299,13 +388,20 @@ requireRole("etudiant", async ({ profile }) => {
 
 <nav class="ios-navbar">
 
-    <a href="#" class="active" aria-label="Accueil">
+    <a
+        href="#"
+        class="active"
+        aria-label="Accueil">
 
         <i class="fa-solid fa-house"></i>
 
     </a>
 
-    <a href="../notifications/index.html" class="nav-bell" aria-label="Notifications">
+
+    <a
+        href="../notifications/index.html"
+        class="nav-bell"
+        aria-label="Notifications">
 
         <i class="fa-solid fa-bell"></i>
 
@@ -316,7 +412,10 @@ requireRole("etudiant", async ({ profile }) => {
 
     </a>
 
-    <a href="#" aria-label="Profil">
+
+    <a
+        href="#"
+        aria-label="Profil">
 
         <i class="fa-solid fa-user"></i>
 
@@ -338,21 +437,30 @@ requireRole("etudiant", async ({ profile }) => {
     // GÉNÉRATION DU QR
     // ==================================================
 
-    await genererQRCode();
+    if (qrActif) {
+
+        await genererQRCode();
+
+    }
 
 
     // ==================================================
     // MODAL QR
     // ==================================================
 
-    initialiserModalQR();
+    if (qrActif) {
+
+        initialiserModalQR();
+
+    }
 
 
     // ==================================================
     // BADGE NOTIFICATIONS
     // ==================================================
 
-        afficherBadgeNotifications();
+    afficherBadgeNotifications();
+
 
     // ==================================================
     // FONCTION : GÉNÉRER QR
@@ -365,14 +473,24 @@ requireRole("etudiant", async ({ profile }) => {
                 "student-qrcode"
             );
 
-        if (!zone) return;
+
+        if (
+            !zone ||
+            !qrData
+        ) {
+
+            return;
+
+        }
 
 
         zone.innerHTML = "";
 
 
         const canvas =
-            document.createElement("canvas");
+            document.createElement(
+                "canvas"
+            );
 
 
         await QRCode.toCanvas(
@@ -392,7 +510,9 @@ requireRole("etudiant", async ({ profile }) => {
         );
 
 
-        zone.appendChild(canvas);
+        zone.appendChild(
+            canvas
+        );
 
     }
 
@@ -439,59 +559,78 @@ requireRole("etudiant", async ({ profile }) => {
         }
 
 
+        // ==================================================
         // OUVRIR
+        // ==================================================
 
-        open.onclick = async () => {
+        open.onclick =
+            async () => {
 
-            modal.classList.add("show");
-
-
-            zone.innerHTML = "";
-
-
-            const canvas =
-                document.createElement(
-                    "canvas"
+                modal.classList.add(
+                    "show"
                 );
 
 
-            await QRCode.toCanvas(
+                zone.innerHTML =
+                    "";
 
-                canvas,
 
-                qrData,
+                const canvas =
+                    document.createElement(
+                        "canvas"
+                    );
 
-                {
 
-                    width: 320,
+                await QRCode.toCanvas(
 
-                    margin: 2
+                    canvas,
+
+                    qrData,
+
+                    {
+
+                        width: 320,
+
+                        margin: 2
+
+                    }
+
+                );
+
+
+                zone.appendChild(
+                    canvas
+                );
+
+
+                const matricule =
+                    document.getElementById(
+                        "qr-modal-matricule"
+                    );
+
+
+                if (matricule) {
+
+                    matricule.textContent =
+                        profile.matricule;
 
                 }
 
-            );
+            };
 
 
-            zone.appendChild(canvas);
-
-
-            document.getElementById(
-                "qr-modal-matricule"
-            ).textContent =
-                profile.matricule;
-
-        };
-
-
+        // ==================================================
         // FERMER
+        // ==================================================
 
-        close.onclick = () => {
+        close.onclick =
+            () => {
 
-            modal.classList.remove(
-                "show"
-            );
+                modal.classList.remove(
+                    "show"
+                );
 
-        };
+            };
 
     }
 

@@ -1,4 +1,4 @@
-import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u as r,y as i}from"../../authService-CdYSz198.js";import{t as a}from"../../authGuard-BeXI_65M.js";a(`etudiant`,async({profile:a})=>{let o=document.getElementById(`codifier-content`),s=a.matricule;if(!s){o.innerHTML=`
+import"../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,u as n,v as r,y as i}from"../../authService-eWRmw6sD.js";import{t as a}from"../../authGuard-Bjwicrlv.js";a(`etudiant`,async({profile:a,lectureSeule:o,mode:s,anneeAcademique:c})=>{let l=document.getElementById(`codifier-content`),u=a.matricule;if(!u){l.innerHTML=`
 
                 <div
                     class="service-indisponible"
@@ -29,7 +29,7 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u a
 
                 </div>
 
-            `;return}try{let c=await n(e(t(r,`hebergements`),i(`matricule`,`==`,s)));if(c.empty){o.innerHTML=`
+            `;return}try{let s=await e(t(i(n,`hebergements`),r(`matricule`,`==`,u),r(`anneeAcademique`,`==`,c)));if(s.empty){l.innerHTML=`
 
                     <div
                         class="
@@ -62,7 +62,7 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u a
 
                     </div>
 
-                `;return}let l=c.docs[0].data();o.innerHTML=`
+                `;return}let d=s.docs[0].data();l.innerHTML=`
 
                 <div
                     class="
@@ -76,6 +76,10 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u a
 
                     <p>
                         Informations
+                    </p>
+
+                    <p>
+                      ${c}
                     </p>
 
                 </div>
@@ -149,7 +153,7 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u a
                                     hebergement-value
                                 "
                             >
-                                ${l.site||`-`}
+                                ${d.site||`-`}
                             </span>
 
                         </div>
@@ -174,7 +178,7 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u a
                                     hebergement-value
                                 "
                             >
-                                ${l.pavillon||`-`}
+                                ${d.pavillon||`-`}
                             </span>
 
                         </div>
@@ -199,7 +203,7 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u a
                                     hebergement-value
                                 "
                             >
-                                ${l.chambre||`-`}
+                                ${d.chambre||`-`}
                             </span>
 
                         </div>
@@ -224,7 +228,7 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u a
                                     hebergement-value
                                 "
                             >
-                                ${l.lit||`-`}
+                                ${d.lit||`-`}
                             </span>
 
                         </div>
@@ -233,57 +237,59 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,p as n,u a
 
 
                     <div
+    class="
+        codifier-actions
+    "
+>
+
+    ${o?``:`
+                <button
+                    id="faire-reclamation-btn"
+                    class="
+                        codifier-button
+                        codifier-button-primary
+                    "
+                    type="button"
+                >
+
+                    <i
                         class="
-                            codifier-actions
+                            fa-solid
+                            fa-screwdriver-wrench
                         "
-                    >
+                    ></i>
 
-                        <button
-    id="faire-reclamation-btn"
-    class="
-        codifier-button
-        codifier-button-primary
-    "
-    type="button"
->
+                    Faire une demande de réclamation
 
-                            <i
-                                class="
-                                    fa-solid
-                                    fa-screwdriver-wrench
-                                "
-                            ></i>
-
-                            Faire une demande de réclamation
-
-                        </button>
+                </button>
+            `}
 
 
-                        <button
-    id="voir-demandes-btn"
-    class="
-        codifier-button
-        codifier-button-secondary
-    "
-    type="button"
->
+    <button
+        id="voir-demandes-btn"
+        class="
+            codifier-button
+            codifier-button-secondary
+        "
+        type="button"
+    >
 
-                            <i
-                                class="
-                                    fa-solid
-                                    fa-clock-rotate-left
-                                "
-                            ></i>
+        <i
+            class="
+                fa-solid
+                fa-clock-rotate-left
+            "
+        ></i>
 
-                            Voir mes demandes
+        Voir mes demandes
 
-                        </button>
+    </button>
 
-                    </div>
+</div>
 
                 </div>
 
-            `;let u=document.getElementById(`faire-reclamation-btn`);u&&u.addEventListener(`click`,()=>{window.location.href=`./reclamation/index.html`});let d=document.getElementById(`voir-demandes-btn`);d&&d.addEventListener(`click`,()=>{window.location.href=`./mes-demandes/index.html`})}catch(e){console.error(`❌ Erreur récupération hébergement :`,e),o.innerHTML=`
+            `;let f=document.getElementById(`faire-reclamation-btn`);f&&f.addEventListener(`click`,()=>{window.location.href=`./reclamation/index.html`});let p=document.getElementById(`voir-demandes-btn`);p&&p.addEventListener(`click`,()=>{window.location.href=`./mes-demandes/index.html`})}catch(e){console.error(`❌ Erreur récupération hébergement :`,e),l.innerHTML=`
 
                 <div
                     class="

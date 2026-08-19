@@ -17,13 +17,18 @@ import {
 
 import { clearSession } from "./sessionManager.js";
 
+
 /* ===========================
    AUTHENTIFICATION
 =========================== */
 
 let currentUserCache = null;
 
-export async function login(email, password) {
+
+export async function login(
+    email,
+    password
+) {
 
     return signInWithEmailAndPassword(
         auth,
@@ -33,13 +38,19 @@ export async function login(email, password) {
 
 }
 
+
 export async function logout() {
+
+    currentUserCache = null;
 
     return signOut(auth);
 
 }
 
-export async function forgotPassword(email) {
+
+export async function forgotPassword(
+    email
+) {
 
     return sendPasswordResetEmail(
         auth,
@@ -48,9 +59,10 @@ export async function forgotPassword(email) {
 
 }
 
-// =====================================================
-// AFFECTATION ACTIVE DE L'AGENT
-// =====================================================
+
+/* =====================================================
+   AFFECTATION ACTIVE DE L'AGENT
+===================================================== */
 
 async function getAffectationActive(
     agentMatricule
@@ -98,10 +110,6 @@ async function getAffectationActive(
             .filter(
                 affectation => {
 
-                    // -----------------------------------------
-                    // L'affectation doit être active
-                    // -----------------------------------------
-
                     if (
                         affectation.statut !==
                         "active"
@@ -111,10 +119,6 @@ async function getAffectationActive(
 
                     }
 
-
-                    // -----------------------------------------
-                    // Date de début
-                    // -----------------------------------------
 
                     const dateDebut =
                         affectation.dateDebut
@@ -134,10 +138,6 @@ async function getAffectationActive(
 
                     }
 
-
-                    // -----------------------------------------
-                    // Date de fin
-                    // -----------------------------------------
 
                     if (
                         affectation.dateFin
@@ -170,10 +170,6 @@ async function getAffectationActive(
             );
 
 
-    // =====================================================
-    // UNE SEULE AFFECTATION ACTIVE ATTENDUE
-    // =====================================================
-
     if (
         affectationsActives.length === 0
     ) {
@@ -182,11 +178,6 @@ async function getAffectationActive(
 
     }
 
-
-    // =====================================================
-    // SI PLUSIEURS AFFECTATIONS SONT
-    // ACTIVES PAR ERREUR
-    // =====================================================
 
     affectationsActives.sort(
         (a, b) => {
@@ -222,14 +213,25 @@ async function getAffectationActive(
 
 }
 
-// =====================================================
-// AFFECTATION D'UN AGENT POUR UNE ANNÉE ACADÉMIQUE
-// =====================================================
+
+/* =====================================================
+   AFFECTATION AGENT POUR UNE ANNÉE
+===================================================== */
 
 async function getAffectationPourAnnee(
     agentMatricule,
     anneeAcademique
 ) {
+
+    if (
+        !agentMatricule ||
+        !anneeAcademique
+    ) {
+
+        return null;
+
+    }
+
 
     const snapshot =
         await getDocs(
@@ -258,16 +260,14 @@ async function getAffectationPourAnnee(
         );
 
 
-    if (snapshot.empty) {
+    if (
+        snapshot.empty
+    ) {
 
         return null;
 
     }
 
-
-    // =================================================
-    // ON RÉCUPÈRE LES AFFECTATIONS DE CETTE ANNÉE
-    // =================================================
 
     const affectations =
         snapshot.docs.map(
@@ -281,10 +281,6 @@ async function getAffectationPourAnnee(
             })
         );
 
-
-    // =================================================
-    // ON PREND L'AFFECTATION LA PLUS RÉCENTE
-    // =================================================
 
     affectations.sort(
         (a, b) => {
@@ -305,7 +301,10 @@ async function getAffectationPourAnnee(
                     );
 
 
-            return dateB - dateA;
+            return (
+                dateB -
+                dateA
+            );
 
         }
     );
@@ -315,11 +314,141 @@ async function getAffectationPourAnnee(
 
 }
 
-/* ===========================
-   UTILISATEURS
-=========================== */
 
-export async function getCurrentUser(uid) {
+/* =====================================================
+   ANNÉE ACADÉMIQUE ACTUELLE DU SYSTÈME
+===================================================== */
+
+async function getAnneeAcademiqueCourante() {
+
+    const snapshot =
+        await getDocs(
+            collection(
+                db,
+                "anneesAcademiques"
+            )
+        );
+
+
+    const anneesActives =
+        snapshot.docs
+
+            .map(
+                document => ({
+
+                    id:
+                        document.id,
+
+                    ...document.data()
+
+                })
+            )
+
+            .filter(
+                annee =>
+                    annee.active === true
+            )
+
+            .sort(
+                (a, b) =>
+                    (b.ordre || 0) -
+                    (a.ordre || 0)
+            );
+
+
+    return (
+        anneesActives[0]?.libelle ||
+        null
+    );
+
+}
+
+
+/* =====================================================
+   ANNÉES ACADÉMIQUES DE L'ÉTUDIANT
+=====================================================
+
+   IMPORTANT :
+
+   L'accès historique d'un étudiant ne dépend PAS
+   de la collection "hebergements".
+
+   Une année appartient à l'étudiant si elle existe
+   dans "situationsAcademiques".
+
+===================================================== */
+
+async function getAnneesAcademiquesEtudiant(
+    matricule
+) {
+
+    if (
+        !matricule
+    ) {
+
+        return [];
+
+    }
+
+
+    const snapshot =
+        await getDocs(
+
+            query(
+
+                collection(
+                    db,
+                    "situationsAcademiques"
+                ),
+
+                where(
+                    "matricule",
+                    "==",
+                    matricule
+                )
+
+            )
+
+        );
+
+
+    const annees =
+        snapshot.docs
+
+            .map(
+                document =>
+                    document.data()
+                        ?.anneeAcademique
+            )
+
+            .filter(Boolean);
+
+
+    return [
+        ...new Set(
+            annees
+        )
+    ];
+
+}
+
+
+/* =====================================================
+   UTILISATEURS
+===================================================== */
+
+export async function getCurrentUser(
+    uid
+) {
+
+    if (
+        currentUserCache
+    ) {
+
+        return currentUserCache;
+
+    }
+
 
     const accountRef =
         doc(
@@ -327,6 +456,7 @@ export async function getCurrentUser(uid) {
             "users",
             uid
         );
+
 
     const accountSnap =
         await getDoc(
@@ -377,12 +507,14 @@ export async function getCurrentUser(uid) {
         profileSnap.data();
 
 
-    console.time("PROFILE");
+    console.time(
+        "PROFILE"
+    );
 
 
-    // =====================================================
-    // ANNÉE ACADÉMIQUE CHOISIE
-    // =====================================================
+    /* =================================================
+       ANNÉE CHOISIE À LA CONNEXION
+    ================================================= */
 
     const anneeChoisie =
         sessionStorage.getItem(
@@ -396,44 +528,40 @@ export async function getCurrentUser(uid) {
     );
 
 
-    // =====================================================
-    // VARIABLES COMMUNES
-    // =====================================================
+    /* =================================================
+       VARIABLES COMMUNES
+    ================================================= */
 
-    let affectationActive = null;
+    let affectationActive =
+        null;
 
-    let affectationPourAnnee = null;
+    let affectationPourAnnee =
+        null;
 
-    let mode = "normal";
+    let mode =
+        "normal";
 
-    let lectureSeule = false;
+    let lectureSeule =
+        false;
 
-    let permissions = {};
+    let permissions =
+        {};
 
 
-
-    // =====================================================
-    // AGENT
-    // =====================================================
+    /* =================================================
+       AGENT
+    ================================================= */
 
     if (
         account.role ===
         "agent"
     ) {
 
-        // -------------------------------------------------
-        // AFFECTATION ACTUELLE
-        // -------------------------------------------------
-
         affectationActive =
             await getAffectationActive(
                 profile.matricule
             );
 
-
-        // -------------------------------------------------
-        // AFFECTATION DE L'ANNÉE CHOISIE
-        // -------------------------------------------------
 
         if (
             anneeChoisie
@@ -449,7 +577,7 @@ export async function getCurrentUser(uid) {
 
 
         console.log(
-            "📚 AFFECTATION POUR CETTE ANNÉE =",
+            "📚 AFFECTATION POUR L'ANNÉE =",
             affectationPourAnnee
         );
 
@@ -460,9 +588,9 @@ export async function getCurrentUser(uid) {
         );
 
 
-        // -------------------------------------------------
-        // AUCUNE AFFECTATION
-        // -------------------------------------------------
+        /* ---------------------------------------------
+           AUCUNE AFFECTATION POUR CETTE ANNÉE
+        --------------------------------------------- */
 
         if (
             anneeChoisie &&
@@ -476,9 +604,9 @@ export async function getCurrentUser(uid) {
         }
 
 
-        // -------------------------------------------------
-        // ANNÉE COURANTE DE L'AGENT
-        // -------------------------------------------------
+        /* ---------------------------------------------
+           ANNÉE HISTORIQUE AGENT
+        --------------------------------------------- */
 
         if (
             affectationPourAnnee &&
@@ -494,15 +622,15 @@ export async function getCurrentUser(uid) {
 
 
             console.log(
-                "🔒 MODE LECTURE SEULE"
+                "🔒 AGENT — MODE LECTURE SEULE"
             );
 
         }
 
 
-        // -------------------------------------------------
-        // PERMISSIONS DU POSTE
-        // -------------------------------------------------
+        /* ---------------------------------------------
+           PERMISSIONS
+        --------------------------------------------- */
 
         const posteId =
             affectationPourAnnee?.posteId ||
@@ -535,7 +663,8 @@ export async function getCurrentUser(uid) {
                 permissions =
                     permissionsSnap
                         .data()
-                        .permissions || {};
+                        .permissions ||
+                    {};
 
             }
 
@@ -544,10 +673,9 @@ export async function getCurrentUser(uid) {
     }
 
 
-
-    // =====================================================
-    // ÉTUDIANT
-    // =====================================================
+    /* =================================================
+       ÉTUDIANT
+    ================================================= */
 
     else if (
         account.role ===
@@ -559,137 +687,95 @@ export async function getCurrentUser(uid) {
         );
 
 
-        // -------------------------------------------------
-        // RÉCUPÉRER L'HISTORIQUE D'HÉBERGEMENT
-        // -------------------------------------------------
+        /* ---------------------------------------------
+           ANNÉE D'INSCRIPTION ACTUELLE
+        --------------------------------------------- */
 
-        const hebergementsQuery =
-            query(
-
-                collection(
-                    db,
-                    "hebergements"
-                ),
-
-                where(
-                    "matricule",
-                    "==",
-                    profile.matricule
-                )
-
-            );
-
-
-        const hebergementsSnapshot =
-            await getDocs(
-                hebergementsQuery
-            );
-
-
-        const hebergements =
-            hebergementsSnapshot.docs.map(
-                document => ({
-
-                    id:
-                        document.id,
-
-                    ...document.data()
-
-                })
-            );
+        const anneeAcademiqueEtudiant =
+            profile.anneeAcademique ||
+            null;
 
 
         console.log(
-            "🏠 HISTORIQUE HÉBERGEMENT =",
-            hebergements
+            "🎓 ANNÉE ÉTUDIANT =",
+            anneeAcademiqueEtudiant
         );
 
 
-        // -------------------------------------------------
-        // ANNÉES DANS LESQUELLES L'ÉTUDIANT EXISTE
-        // -------------------------------------------------
-
-        const anneesEtudiant =
-            [
-                ...new Set(
-
-                    hebergements
-
-                        .map(
-                            hebergement =>
-                                hebergement.anneeAcademique
-                        )
-
-                        .filter(Boolean)
-
-                )
-            ];
-
-
-        console.log(
-            "🎓 ANNÉES AUTORISÉES ÉTUDIANT =",
-            anneesEtudiant
-        );
-
-
-        // -------------------------------------------------
-        // DÉTERMINER L'ANNÉE COURANTE
-        // -------------------------------------------------
-
-        const anneesSnapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "anneesAcademiques"
-                )
-            );
-
-
-        const anneesActives =
-            anneesSnapshot.docs
-
-                .map(
-                    document => ({
-
-                        id:
-                            document.id,
-
-                        ...document.data()
-
-                    })
-                )
-
-                .filter(
-                    annee =>
-                        annee.active === true
-                )
-
-                .sort(
-                    (a, b) =>
-                        (b.ordre || 0) -
-                        (a.ordre || 0)
-                );
-
+        /* ---------------------------------------------
+           ANNÉE COURANTE DU SYSTÈME
+        --------------------------------------------- */
 
         const anneeCourante =
-            anneesActives[0]
-                ?.libelle || null;
+            await getAnneeAcademiqueCourante();
 
 
         console.log(
-            "📅 ANNÉE COURANTE =",
+            "📅 ANNÉE COURANTE DU SYSTÈME =",
             anneeCourante
         );
 
 
-        // -------------------------------------------------
-        // ANNÉE NON AUTORISÉE
-        // -------------------------------------------------
+        /* ---------------------------------------------
+           HISTORIQUE ACADÉMIQUE
+        --------------------------------------------- */
+
+        const anneesEtudiant =
+            await getAnneesAcademiquesEtudiant(
+                profile.matricule
+            );
+
+
+        console.log(
+            "🎓 ANNÉES ACADÉMIQUES DE L'ÉTUDIANT =",
+            anneesEtudiant
+        );
+
+
+        /* ---------------------------------------------
+           AJOUT DE L'ANNÉE ACTUELLE DU PROFIL
+           
+           Cela permet à un étudiant nouvellement
+           créé avec seulement anneeAcademique de
+           fonctionner immédiatement, même si le seed
+           situationsAcademiques n'a pas encore été
+           généré pour lui.
+        --------------------------------------------- */
 
         if (
-            anneeChoisie &&
-            anneeChoisie !==
-                anneeCourante &&
+            anneeAcademiqueEtudiant &&
+            !anneesEtudiant.includes(
+                anneeAcademiqueEtudiant
+            )
+        ) {
+
+            anneesEtudiant.push(
+                anneeAcademiqueEtudiant
+            );
+
+        }
+
+
+        /* ---------------------------------------------
+           AUCUNE ANNÉE CHOISIE
+        --------------------------------------------- */
+
+        if (
+            !anneeChoisie
+        ) {
+
+            throw new Error(
+                "ANNEE_NON_AUTORISEE"
+            );
+
+        }
+
+
+        /* ---------------------------------------------
+           ANNÉE NON AUTORISÉE
+        --------------------------------------------- */
+
+        if (
             !anneesEtudiant.includes(
                 anneeChoisie
             )
@@ -702,14 +788,13 @@ export async function getCurrentUser(uid) {
         }
 
 
-        // -------------------------------------------------
-        // ANNÉE HISTORIQUE
-        // -------------------------------------------------
+        /* ---------------------------------------------
+           ANNÉE HISTORIQUE
+        --------------------------------------------- */
 
         if (
-            anneeChoisie &&
             anneeChoisie !==
-                anneeCourante
+            anneeAcademiqueEtudiant
         ) {
 
             mode =
@@ -720,15 +805,15 @@ export async function getCurrentUser(uid) {
 
 
             console.log(
-                "🔒 ÉTUDIANT EN MODE LECTURE SEULE"
+                "🔒 ÉTUDIANT — ANNÉE HISTORIQUE"
             );
 
         }
 
 
-        // -------------------------------------------------
-        // ANNÉE COURANTE
-        // -------------------------------------------------
+        /* ---------------------------------------------
+           ANNÉE ACTUELLE
+        --------------------------------------------- */
 
         else {
 
@@ -740,7 +825,7 @@ export async function getCurrentUser(uid) {
 
 
             console.log(
-                "🔓 ÉTUDIANT EN MODE NORMAL"
+                "🔓 ÉTUDIANT — ANNÉE ACTUELLE"
             );
 
         }
@@ -748,10 +833,9 @@ export async function getCurrentUser(uid) {
     }
 
 
-
-    // =====================================================
-    // UTILISATEUR INCONNU
-    // =====================================================
+    /* =================================================
+       RÔLE INCONNU
+    ================================================= */
 
     else {
 
@@ -762,12 +846,14 @@ export async function getCurrentUser(uid) {
     }
 
 
-    console.timeEnd("PROFILE");
+    console.timeEnd(
+        "PROFILE"
+    );
 
 
-    // =====================================================
-    // UTILISATEUR COURANT
-    // =====================================================
+    /* =================================================
+       UTILISATEUR COURANT
+    ================================================= */
 
     currentUserCache = {
 
@@ -805,90 +891,155 @@ export async function getCurrentUser(uid) {
 
 }
 
+
+/* =====================================================
+   CACHE
+===================================================== */
+
 export function clearCurrentUserCache() {
 
-    currentUserCache = null;
+    currentUserCache =
+        null;
 
     clearSession();
 
 }
 
+
+/* =====================================================
+   RECHERCHE UTILISATEUR
+===================================================== */
+
 /**
- * Recherche un utilisateur par matricule
+ * Recherche un utilisateur par matricule.
  */
-export async function findUserByMatricule(matricule) {
 
-    // Recherche chez les agents
-    let snapshot = await getDocs(
-        query(
-            collection(db, "agents"),
-            where("matricule", "==", matricule)
-        )
-    );
+export async function findUserByMatricule(
+    matricule
+) {
 
-    if (!snapshot.empty) {
+    let snapshot =
+        await getDocs(
+
+            query(
+
+                collection(
+                    db,
+                    "agents"
+                ),
+
+                where(
+                    "matricule",
+                    "==",
+                    matricule
+                )
+
+            )
+
+        );
+
+
+    if (
+        !snapshot.empty
+    ) {
 
         return snapshot.docs[0].data();
 
     }
 
-    // Recherche chez les étudiants
-    snapshot = await getDocs(
-        query(
-            collection(db, "etudiants"),
-            where("matricule", "==", matricule)
-        )
-    );
 
-    if (!snapshot.empty) {
+    snapshot =
+        await getDocs(
+
+            query(
+
+                collection(
+                    db,
+                    "etudiants"
+                ),
+
+                where(
+                    "matricule",
+                    "==",
+                    matricule
+                )
+
+            )
+
+        );
+
+
+    if (
+        !snapshot.empty
+    ) {
 
         return snapshot.docs[0].data();
 
     }
 
-    throw new Error("USER_NOT_FOUND");
+
+    throw new Error(
+        "USER_NOT_FOUND"
+    );
 
 }
 
-/**
- * Vérifie si un matricule existe
- * chez les agents ou les étudiants.
- */
-export async function checkMatricule(matricule) {
 
-    console.log("Recherche :", matricule);
+/* =====================================================
+   VÉRIFICATION MATRICULE
+===================================================== */
+
+export async function checkMatricule(
+    matricule
+) {
+
+    console.log(
+        "Recherche :",
+        matricule
+    );
+
 
     const collections = [
         "agents",
         "etudiants"
     ];
 
-    for (const collectionName of collections) {
 
-        const snapshot = await getDocs(
+    for (
+        const collectionName
+        of collections
+    ) {
 
-            
+        const snapshot =
+            await getDocs(
+
+                query(
+
+                    collection(
+                        db,
+                        collectionName
+                    ),
+
+                    where(
+                        "matricule",
+                        "==",
+                        matricule
+                    )
+
+                )
+
+            );
 
 
-            query(
-
-                collection(db, collectionName),
-
-                where("matricule", "==", matricule)
-
-            )
-
+        console.log(
+            collectionName,
+            snapshot.size
         );
-        const all = await getDocs(collection(db, collectionName));
-        all.forEach(doc => {
 
-    console.log(doc.id, doc.data());
 
-});
-
-        console.log(collectionName, snapshot.size);
-
-        if (!snapshot.empty) {
+        if (
+            !snapshot.empty
+        ) {
 
             return true;
 
@@ -896,81 +1047,135 @@ export async function checkMatricule(matricule) {
 
     }
 
+
     return false;
 
 }
 
-/* ===========================
+
+/* =====================================================
    ACTIVATION
-=========================== */
+===================================================== */
 
-function maskEmail(email) {
+function maskEmail(
+    email
+) {
 
-    const [nom, domaine] = email.split("@");
+    const [nom, domaine] =
+        email.split("@");
+
 
     return (
         nom.substring(0, 2) +
-        "*".repeat(Math.max(1, nom.length - 2)) +
+        "*".repeat(
+            Math.max(
+                1,
+                nom.length - 2
+            )
+        ) +
         "@" +
         domaine
     );
 
 }
 
-function maskPhone(phone) {
 
-    const numero = phone.toString();
+function maskPhone(
+    phone
+) {
+
+    const numero =
+        phone.toString();
+
 
     return (
         numero.substring(0, 2) +
         " *** ** " +
-        numero.substring(numero.length - 2)
+        numero.substring(
+            numero.length - 2
+        )
     );
 
 }
 
-export async function getActivationInfos(matricule) {
 
-    const user = await findUserByMatricule(matricule);
+export async function getActivationInfos(
+    matricule
+) {
+
+    const user =
+        await findUserByMatricule(
+            matricule
+        );
+
 
     return {
 
-        email: maskEmail(user.email),
+        email:
+            maskEmail(
+                user.email
+            ),
 
-        phone: maskPhone(user.telephone)
+        phone:
+            maskPhone(
+                user.telephone
+            )
 
     };
 
 }
 
-export async function findUser(matricule) {
+
+/* =====================================================
+   RECHERCHE UTILISATEUR POUR LOGIN
+===================================================== */
+
+export async function findUser(
+    matricule
+) {
 
     const collections = [
         "agents",
         "etudiants"
     ];
 
-    for (const collectionName of collections) {
 
-        const snapshot = await getDocs(
+    for (
+        const collectionName
+        of collections
+    ) {
 
-            query(
+        const snapshot =
+            await getDocs(
 
-                collection(db, collectionName),
+                query(
 
-                where("matricule", "==", matricule)
+                    collection(
+                        db,
+                        collectionName
+                    ),
 
-            )
+                    where(
+                        "matricule",
+                        "==",
+                        matricule
+                    )
 
-        );
+                )
 
-        if (!snapshot.empty) {
+            );
+
+
+        if (
+            !snapshot.empty
+        ) {
 
             return {
 
                 ...snapshot.docs[0].data(),
 
-                collection: collectionName
+                collection:
+                    collectionName
 
             };
 
@@ -978,6 +1183,9 @@ export async function findUser(matricule) {
 
     }
 
-    throw new Error("USER_NOT_FOUND");
+
+    throw new Error(
+        "USER_NOT_FOUND"
+    );
 
 }

@@ -1,6 +1,10 @@
 import { requireRole } from "../../../auth/authGuard.js";
 
 import {
+    getSession
+} from "../../../auth/sessionManager.js";
+
+import {
     getTypesTravaux
 } from "../../../services/referentielService.js";
 
@@ -18,10 +22,7 @@ import { db } from "../../../firebase/firebase.js";
 
 requireRole(
     "etudiant",
-    async ({
-        profile,
-        anneeAcademique
-    }) => {
+    async ({ profile }) => {
 
         const container =
             document.getElementById(
@@ -42,30 +43,6 @@ requireRole(
 
         const matricule =
             profile.matricule;
-
-            if (!anneeAcademique) {
-
-    container.innerHTML = `
-
-        <div class="error-state">
-
-            <i class="
-                fa-solid
-                fa-triangle-exclamation
-            "></i>
-
-            <p>
-                Impossible de déterminer
-                l'année académique.
-            </p>
-
-        </div>
-
-    `;
-
-    return;
-
-}
 
 
         if (!matricule) {
@@ -94,6 +71,37 @@ requireRole(
 
 
         // ==========================================
+        // SESSION
+        // ==========================================
+
+        const session =
+            await getSession();
+
+
+        const anneeAcademique =
+            session?.anneeAcademique ||
+            sessionStorage.getItem(
+                "anneeAcademique"
+            );
+
+
+        const lectureSeule =
+            session?.lectureSeule === true;
+
+
+        console.log(
+            "📅 Année académique =",
+            anneeAcademique
+        );
+
+
+        console.log(
+            "🔒 Lecture seule =",
+            lectureSeule
+        );
+
+
+        // ==========================================
         // RETOUR
         // ==========================================
 
@@ -119,95 +127,104 @@ requireRole(
 
 
         // ==========================================
-// RECHERCHE ET FILTRES
-// ==========================================
+        // RECHERCHE ET FILTRES
+        // ==========================================
 
-const searchInput =
-    document.getElementById(
-        "demandes-search"
-    );
-
-
-const sortSelect =
-    document.getElementById(
-        "demandes-sort-select"
-    );
+        const searchInput =
+            document.getElementById(
+                "demandes-search"
+            );
 
 
-const typeSelect =
-    document.getElementById(
-        "demandes-type-select"
-    );
+        const sortSelect =
+            document.getElementById(
+                "demandes-sort-select"
+            );
 
 
-const statutSelect =
-    document.getElementById(
-        "demandes-statut-select"
-    );
+        const typeSelect =
+            document.getElementById(
+                "demandes-type-select"
+            );
 
 
-let demandes =
-    [];
+        const statutSelect =
+            document.getElementById(
+                "demandes-statut-select"
+            );
 
 
-let termeRecherche =
-    "";
+        let demandes = [];
 
 
-let modeTri =
-    "date_desc";
+        let termeRecherche = "";
 
 
-let typeSelectionne =
-    "tous";
+        let modeTri =
+            "date_desc";
 
 
-let statutSelectionne =
-    "tous";
-
-    // ==========================================
-// RÉFÉRENTIEL DES TYPES
-// ==========================================
-
-let typesTravaux = [];
+        let typeSelectionne =
+            "tous";
 
 
-try {
-
-    typesTravaux =
-        await getTypesTravaux();
-
-} catch (error) {
-
-    console.error(
-        "❌ Erreur récupération types de travaux :",
-        error
-    );
-
-}
+        let statutSelectionne =
+            "tous";
 
 
-// ==========================================
-// REMPLIR LE FILTRE TYPE
-// ==========================================
+        // ==========================================
+        // RÉFÉRENTIEL DES TYPES
+        // ==========================================
 
-if (typeSelect) {
+        let typesTravaux = [];
 
-    typesTravaux.forEach(
-        (type) => {
 
-            typeSelect.innerHTML += `
+        try {
 
-                <option value="${type.id}">
-                    ${type.nom}
+            typesTravaux =
+                await getTypesTravaux();
+
+        } catch (error) {
+
+            console.error(
+                "❌ Erreur récupération types de travaux :",
+                error
+            );
+
+        }
+
+
+        // ==========================================
+        // FILTRE TYPE
+        // ==========================================
+
+        if (typeSelect) {
+
+            typeSelect.innerHTML = `
+
+                <option value="tous">
+                    Tous les types
                 </option>
 
             `;
 
-        }
-    );
 
-}
+            typesTravaux.forEach(
+                (type) => {
+
+                    typeSelect.innerHTML += `
+
+                        <option value="${type.id}">
+                            ${type.nom}
+                        </option>
+
+                    `;
+
+                }
+            );
+
+        }
+
 
         // ==========================================
         // OUTILS
@@ -249,6 +266,67 @@ if (typeSelect) {
 
 
                 return new Date(0);
+
+            };
+
+
+        const obtenirDateTraitement =
+            (demande) => {
+
+                const champs = [
+
+                    demande.dateTraitement,
+
+                    demande.date_traitement,
+
+                    demande.traiteLe,
+
+                    demande.dateTerminaison,
+
+                    demande.dateFin
+
+                ];
+
+
+                for (
+                    const valeur of champs
+                ) {
+
+                    if (
+                        valeur?.toDate
+                    ) {
+
+                        return valeur.toDate();
+
+                    }
+
+
+                    if (
+                        valeur
+                    ) {
+
+                        const date =
+                            new Date(
+                                valeur
+                            );
+
+
+                        if (
+                            !isNaN(
+                                date.getTime()
+                            )
+                        ) {
+
+                            return date;
+
+                        }
+
+                    }
+
+                }
+
+
+                return null;
 
             };
 
@@ -302,6 +380,80 @@ if (typeSelect) {
 
 
         // ==========================================
+        // FEEDBACK DISPONIBLE 7 JOURS
+        // ==========================================
+
+        const feedbackEncoreValide =
+            (demande) => {
+
+                if (
+                    demande.statut !==
+                    "termine"
+                ) {
+
+                    return false;
+
+                }
+
+
+                if (
+                    demande.evaluation
+                ) {
+
+                    return false;
+
+                }
+
+
+                if (
+                    demande.feedbackAutorise !==
+                    true
+                ) {
+
+                    return false;
+
+                }
+
+
+                const dateTraitement =
+                    obtenirDateTraitement(
+                        demande
+                    );
+
+
+                if (!dateTraitement) {
+
+                    return false;
+
+                }
+
+
+                const maintenant =
+                    new Date();
+
+
+                const difference =
+                    maintenant.getTime() -
+                    dateTraitement.getTime();
+
+
+                const septJours =
+                    7 *
+                    24 *
+                    60 *
+                    60 *
+                    1000;
+
+
+                return (
+                    difference >= 0 &&
+                    difference <= septJours
+                );
+
+            };
+
+
+        // ==========================================
         // AFFICHAGE
         // ==========================================
 
@@ -348,7 +500,9 @@ if (typeSelect) {
 
                                     statut,
 
-                                    demande.cause
+                                    demande.cause,
+
+                                    demande.anneeAcademique
 
                                 ]
                                     .filter(Boolean)
@@ -365,55 +519,56 @@ if (typeSelect) {
 
                 }
 
+
                 // ------------------------------------------
-// FILTRE TYPE
-// ------------------------------------------
+                // FILTRE TYPE
+                // ------------------------------------------
 
-if (
-    typeSelectionne !==
-    "tous"
-) {
+                if (
+                    typeSelectionne !==
+                    "tous"
+                ) {
 
-    demandesAffichees =
-        demandesAffichees.filter(
-            (demande) => {
+                    demandesAffichees =
+                        demandesAffichees.filter(
+                            (demande) => {
 
-                return (
-                    demande.type ===
-                    typeSelectionne
-                );
+                                return (
+                                    demande.type ===
+                                    typeSelectionne
+                                );
 
-            }
-        );
+                            }
+                        );
 
-}
+                }
 
 
-// ------------------------------------------
-// FILTRE STATUT
-// ------------------------------------------
+                // ------------------------------------------
+                // FILTRE STATUT
+                // ------------------------------------------
 
-if (
-    statutSelectionne !==
-    "tous"
-) {
+                if (
+                    statutSelectionne !==
+                    "tous"
+                ) {
 
-    demandesAffichees =
-        demandesAffichees.filter(
-            (demande) => {
+                    demandesAffichees =
+                        demandesAffichees.filter(
+                            (demande) => {
 
-                return (
-                    (
-                        demande.statut ||
-                        "en_attente"
-                    ) ===
-                    statutSelectionne
-                );
+                                return (
+                                    (
+                                        demande.statut ||
+                                        "en_attente"
+                                    ) ===
+                                    statutSelectionne
+                                );
 
-            }
-        );
+                            }
+                        );
 
-}
+                }
 
 
                 // ------------------------------------------
@@ -514,7 +669,7 @@ if (
                                         ?
                                         "Aucune demande ne correspond à votre recherche."
                                         :
-                                        "Vous n'avez encore formulé aucune demande."
+                                        `Aucune demande pour l'année ${anneeAcademique || "sélectionnée"}.`
                                 }
 
                             </p>
@@ -683,9 +838,7 @@ if (
                                     <div class="feedback-result">
 
                                         <div class="feedback-result-title">
-
                                             Votre évaluation
-
                                         </div>
 
 
@@ -761,8 +914,9 @@ if (
                             // --------------------------------
 
                             else if (
-                                demande.feedbackAutorise ===
-                                true
+                                feedbackEncoreValide(
+                                    demande
+                                )
                             ) {
 
                                 feedbackHTML = `
@@ -773,9 +927,7 @@ if (
                                     >
 
                                         <div class="feedback-title">
-
                                             Évaluer cette demande
-
                                         </div>
 
 
@@ -865,9 +1017,7 @@ if (
                                             data-id="${demande.id}"
                                             disabled
                                         >
-
                                             Valider
-
                                         </button>
 
                                     </div>
@@ -887,7 +1037,13 @@ if (
                                             fa-lock
                                         "></i>
 
-                                        Évaluation indisponible
+                                        ${
+                                            demande.feedbackAutorise === true
+                                                ?
+                                                "Délai d'évaluation dépassé"
+                                                :
+                                                "Évaluation indisponible"
+                                        }
 
                                     </div>
 
@@ -930,9 +1086,7 @@ if (
                                     <div>
 
                                         <h3 class="demande-title">
-
                                             ${demande.probleme || "-"}
-
                                         </h3>
 
 
@@ -962,20 +1116,15 @@ if (
 
                                 <div class="demande-info">
 
-
                                     <div class="info-block">
 
                                         <span class="info-label">
-
                                             Type
-
                                         </span>
 
 
                                         <span class="info-value">
-
                                             ${demande.type || "-"}
-
                                         </span>
 
                                     </div>
@@ -984,16 +1133,12 @@ if (
                                     <div class="info-block">
 
                                         <span class="info-label">
-
                                             Localisation
-
                                         </span>
 
 
                                         <span class="info-value">
-
                                             ${demande.localisation || "-"}
-
                                         </span>
 
                                     </div>
@@ -1002,16 +1147,12 @@ if (
                                     <div class="info-block">
 
                                         <span class="info-label">
-
                                             Chambre
-
                                         </span>
 
 
                                         <span class="info-value">
-
                                             ${demande.chambre || "-"}
-
                                         </span>
 
                                     </div>
@@ -1084,77 +1225,85 @@ if (
 
         }
 
+
         // ==========================================
-// TYPE
-// ==========================================
+        // TYPE
+        // ==========================================
 
-if (
-    typeSelect
-) {
+        if (
+            typeSelect
+        ) {
 
-    typeSelect.addEventListener(
-        "change",
-        () => {
+            typeSelect.addEventListener(
+                "change",
+                () => {
 
-            typeSelectionne =
-                typeSelect.value;
+                    typeSelectionne =
+                        typeSelect.value;
 
-            afficherDemandes();
+                    afficherDemandes();
 
-        }
-    );
-
-}
-
-
-// ==========================================
-// STATUT
-// ==========================================
-
-if (
-    statutSelect
-) {
-
-    statutSelect.addEventListener(
-        "change",
-        () => {
-
-            statutSelectionne =
-                statutSelect.value;
-
-            afficherDemandes();
+                }
+            );
 
         }
-    );
 
-}
+
+        // ==========================================
+        // STATUT
+        // ==========================================
+
+        if (
+            statutSelect
+        ) {
+
+            statutSelect.addEventListener(
+                "change",
+                () => {
+
+                    statutSelectionne =
+                        statutSelect.value;
+
+                    afficherDemandes();
+
+                }
+            );
+
+        }
 
 
         // ==========================================
         // FIRESTORE
         // ==========================================
 
-        const demandesQuery =
-    query(
+        let demandesQuery;
 
-        collection(
-            db,
-            "demandes_etudiants"
-        ),
 
-        where(
-            "matricule",
-            "==",
-            matricule
-        ),
+        /*
+         * Les nouvelles demandes possèdent désormais
+         * anneeAcademique.
+         *
+         * Pour éviter de casser les anciennes données
+         * qui ne possèdent pas encore ce champ, on récupère
+         * les demandes du matricule puis on filtre l'année
+         * côté application.
+         */
 
-        where(
-            "anneeAcademique",
-            "==",
-            anneeAcademique
-        )
+        demandesQuery =
+            query(
 
-    );
+                collection(
+                    db,
+                    "demandes_etudiants"
+                ),
+
+                where(
+                    "matricule",
+                    "==",
+                    matricule
+                )
+
+            );
 
 
         // ==========================================
@@ -1168,7 +1317,7 @@ if (
             (snapshot) => {
 
                 console.log(
-                    "📋 Mes demandes :",
+                    "📋 Toutes les demandes du matricule :",
                     snapshot.size
                 );
 
@@ -1179,16 +1328,47 @@ if (
                 snapshot.forEach(
                     (document) => {
 
+                        const data =
+                            document.data();
+
+
+                        /*
+                         * UNE DEMANDE APPARTIENT À UNE ANNÉE.
+                         *
+                         * Les anciennes demandes créées avant
+                         * l'ajout du champ anneeAcademique sont
+                         * conservées, mais ne sont pas mélangées
+                         * avec l'année actuelle.
+                         */
+
+                        if (
+                            data.anneeAcademique !==
+                            anneeAcademique
+                        ) {
+
+                            return;
+
+                        }
+
+
                         demandes.push({
 
                             id:
                                 document.id,
 
-                            ...document.data()
+                            ...data
 
                         });
 
                     }
+                );
+
+
+                console.log(
+                    "📋 Demandes pour",
+                    anneeAcademique,
+                    ":",
+                    demandes.length
                 );
 
 
@@ -1215,10 +1395,8 @@ if (
                         "></i>
 
                         <p>
-
                             Impossible de charger
                             vos demandes.
-
                         </p>
 
                     </div>
@@ -1436,6 +1614,27 @@ if (
                 }
 
 
+                // =====================================
+                // VÉRIFICATION ANNÉE / LECTURE SEULE
+                // =====================================
+
+                const sessionActuelle =
+                    await getSession();
+
+
+                if (
+                    sessionActuelle?.lectureSeule === true
+                ) {
+
+                    alert(
+                        "Cette année académique est en lecture seule."
+                    );
+
+                    return;
+
+                }
+
+
                 submit.disabled =
                     true;
 
@@ -1454,6 +1653,41 @@ if (
 
 
                 try {
+
+                    // =================================
+                    // REVÉRIFICATION DES 7 JOURS
+                    // =================================
+
+                    const demandeActuelle =
+                        demandes.find(
+                            (demande) =>
+                                demande.id === id
+                        );
+
+
+                    if (
+                        !demandeActuelle
+                    ) {
+
+                        throw new Error(
+                            "DEMANDE_INTRouvable"
+                        );
+
+                    }
+
+
+                    if (
+                        !feedbackEncoreValide(
+                            demandeActuelle
+                        )
+                    ) {
+
+                        throw new Error(
+                            "FEEDBACK_EXPIRE"
+                        );
+
+                    }
+
 
                     await updateDoc(
                         doc(
@@ -1497,9 +1731,24 @@ if (
                         "Valider";
 
 
-                    alert(
-                        "Impossible d'enregistrer votre évaluation."
-                    );
+                    if (
+                        error.message ===
+                        "FEEDBACK_EXPIRE"
+                    ) {
+
+                        alert(
+                            "Le délai de 7 jours pour évaluer cette demande est dépassé."
+                        );
+
+                    }
+
+                    else {
+
+                        alert(
+                            "Impossible d'enregistrer votre évaluation."
+                        );
+
+                    }
 
                 }
 
