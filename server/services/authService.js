@@ -153,3 +153,116 @@ export async function createUserAccount(matricule, password) {
 
     };
 }
+
+// =====================================================
+// UTILISATEUR POUR ACTIVATION
+// =====================================================
+
+export async function findActivationUser(
+    matricule
+) {
+
+    if (!matricule) {
+
+        return null;
+
+    }
+
+
+    // =================================================
+    // AGENTS
+    // =================================================
+
+    let document =
+        await db
+            .collection("agents")
+            .doc(matricule)
+            .get();
+
+
+    let collectionName =
+        "agents";
+
+    let role =
+        "agent";
+
+
+    // =================================================
+    // ÉTUDIANTS
+    // =================================================
+
+    if (
+        !document.exists
+    ) {
+
+        document =
+            await db
+                .collection("etudiants")
+                .doc(matricule)
+                .get();
+
+
+        collectionName =
+            "etudiants";
+
+        role =
+            "etudiant";
+
+    }
+
+
+    // =================================================
+    // INTROUVABLE
+    // =================================================
+
+    if (
+        !document.exists
+    ) {
+
+        return null;
+
+    }
+
+
+    const data =
+        document.data();
+
+
+    // =================================================
+    // RETOUR
+    // =================================================
+
+    return {
+
+        matricule:
+            data.matricule ||
+            matricule,
+
+        prenom:
+            data.prenom ||
+            "",
+
+        nom:
+            data.nom ||
+            "",
+
+        email:
+            data.email ||
+            "",
+
+        telephone:
+            data.telephone ||
+            "",
+
+        uid:
+            data.uid ||
+            null,
+
+        role,
+
+        collection:
+            collectionName
+
+    };
+
+}

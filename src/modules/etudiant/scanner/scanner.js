@@ -229,28 +229,34 @@ requireRole("etudiant", async ({ profile, anneeAcademique }) => {
             // =============================================
 
             const demandesQuery =
-                query(
+    query(
 
-                    collection(
-                        db,
-                        "friendRequests"
-                    ),
+        collection(
+            db,
+            "friendRequests"
+        ),
 
-                    where(
-                        "from",
-                        "==",
-                        profile.matricule
-                    ),
+        where(
+            "from",
+            "==",
+            profile.matricule
+        ),
 
-                    where(
-                        "to",
-                        "==",
-                        ami.matricule
-                    ),
+        where(
+            "to",
+            "==",
+            ami.matricule
+        ),
 
-                    limit(1)
+        where(
+            "anneeAcademique",
+            "==",
+            anneeAcademique
+        ),
 
-                );
+        limit(1)
+
+    );
 
 
             const existing =

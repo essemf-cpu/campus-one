@@ -914,73 +914,75 @@ export function clearCurrentUserCache() {
  * Recherche un utilisateur par matricule.
  */
 
+/* =====================================================
+   API ACTIVATION
+===================================================== */
+
+const API_URL =
+    "http://192.168.1.10:3000/api/auth";
+
+
+/* =====================================================
+   RECHERCHE UTILISATEUR POUR ACTIVATION
+===================================================== */
+
 export async function findUserByMatricule(
     matricule
 ) {
 
-    let snapshot =
-        await getDocs(
+    if (!matricule) {
 
-            query(
-
-                collection(
-                    db,
-                    "agents"
-                ),
-
-                where(
-                    "matricule",
-                    "==",
-                    matricule
-                )
-
-            )
-
+        throw new Error(
+            "USER_NOT_FOUND"
         );
-
-
-    if (
-        !snapshot.empty
-    ) {
-
-        return snapshot.docs[0].data();
 
     }
 
 
-    snapshot =
-        await getDocs(
+    const response =
+        await fetch(
+            `${API_URL}/activation-user`,
+            {
 
-            query(
+                method:
+                    "POST",
 
-                collection(
-                    db,
-                    "etudiants"
-                ),
+                headers: {
 
-                where(
-                    "matricule",
-                    "==",
-                    matricule
-                )
+                    "Content-Type":
+                        "application/json"
 
-            )
+                },
 
+                body:
+                    JSON.stringify({
+
+                        matricule
+
+                    })
+
+            }
         );
 
 
+    const result =
+        await response.json();
+
+
     if (
-        !snapshot.empty
+        !response.ok ||
+        !result.success ||
+        !result.user
     ) {
 
-        return snapshot.docs[0].data();
+        throw new Error(
+            "USER_NOT_FOUND"
+        );
 
     }
 
 
-    throw new Error(
-        "USER_NOT_FOUND"
-    );
+    return result.user;
 
 }
 
@@ -993,62 +995,82 @@ export async function checkMatricule(
     matricule
 ) {
 
-    console.log(
-        "Recherche :",
-        matricule
-    );
+    if (!matricule) {
 
-
-    const collections = [
-        "agents",
-        "etudiants"
-    ];
-
-
-    for (
-        const collectionName
-        of collections
-    ) {
-
-        const snapshot =
-            await getDocs(
-
-                query(
-
-                    collection(
-                        db,
-                        collectionName
-                    ),
-
-                    where(
-                        "matricule",
-                        "==",
-                        matricule
-                    )
-
-                )
-
-            );
-
-
-        console.log(
-            collectionName,
-            snapshot.size
-        );
-
-
-        if (
-            !snapshot.empty
-        ) {
-
-            return true;
-
-        }
+        return false;
 
     }
 
 
-    return false;
+    console.log(
+        "Recherche activation :",
+        matricule
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_URL}/check-matricule`,
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            matricule
+
+                        })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "Résultat activation :",
+            result
+        );
+
+
+        if (
+            !response.ok
+        ) {
+
+            return false;
+
+        }
+
+
+        return (
+            result.exists === true
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Erreur vérification matricule :",
+            error
+        );
+
+
+        return false;
+
+    }
 
 }
 
@@ -1061,20 +1083,57 @@ function maskEmail(
     email
 ) {
 
-    const [nom, domaine] =
+    if (!email) {
+
+        return "";
+
+    }
+
+
+    const parts =
         email.split("@");
 
 
+    if (
+        parts.length !== 2
+    ) {
+
+        return email;
+
+    }
+
+
+    const nom =
+        parts[0];
+
+    const domaine =
+        parts[1];
+
+
     return (
-        nom.substring(0, 2) +
+
+        nom.substring(
+            0,
+            2
+        )
+
+        +
+
         "*".repeat(
             Math.max(
                 1,
                 nom.length - 2
             )
-        ) +
-        "@" +
+        )
+
+        +
+
+        "@"
+
+        +
+
         domaine
+
     );
 
 }
@@ -1084,16 +1143,47 @@ function maskPhone(
     phone
 ) {
 
+    if (
+        phone === undefined ||
+        phone === null ||
+        phone === ""
+    ) {
+
+        return "";
+
+    }
+
+
     const numero =
-        phone.toString();
+        String(phone);
+
+
+    if (
+        numero.length < 4
+    ) {
+
+        return numero;
+
+    }
 
 
     return (
-        numero.substring(0, 2) +
-        " *** ** " +
+
+        numero.substring(
+            0,
+            2
+        )
+
+        +
+
+        " *** ** "
+
+        +
+
         numero.substring(
             numero.length - 2
         )
+
     );
 
 }
@@ -1125,67 +1215,62 @@ export async function getActivationInfos(
 
 }
 
-
 /* =====================================================
    RECHERCHE UTILISATEUR POUR LOGIN
 ===================================================== */
 
-export async function findUser(
-    matricule
-) {
+export async function findUser(matricule) {
 
-    const collections = [
-        "agents",
-        "etudiants"
-    ];
-
-
-    for (
-        const collectionName
-        of collections
-    ) {
-
-        const snapshot =
-            await getDocs(
-
-                query(
-
-                    collection(
-                        db,
-                        collectionName
-                    ),
-
-                    where(
-                        "matricule",
-                        "==",
-                        matricule
-                    )
-
-                )
-
-            );
-
-
-        if (
-            !snapshot.empty
-        ) {
-
-            return {
-
-                ...snapshot.docs[0].data(),
-
-                collection:
-                    collectionName
-
-            };
-
-        }
-
+    if (!matricule) {
+        throw new Error("USER_NOT_FOUND");
     }
 
+    try {
 
-    throw new Error(
-        "USER_NOT_FOUND"
-    );
+        const response = await fetch(
+            `${API_URL}/activation-user`,
+            {
+                method: "POST",
 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    matricule
+                })
+            }
+        );
+
+        const result = await response.json();
+
+        if (
+            !response.ok ||
+            !result.success ||
+            !result.user
+        ) {
+            throw new Error("USER_NOT_FOUND");
+        }
+
+        return result.user;
+
+    } catch (error) {
+
+        console.error(
+            "❌ Recherche utilisateur :",
+            error
+        );
+
+        if (
+            error.message ===
+            "USER_NOT_FOUND"
+        ) {
+            throw error;
+        }
+
+        throw new Error(
+            "USER_NOT_FOUND"
+        );
+
+    }
 }

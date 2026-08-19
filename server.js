@@ -16,6 +16,14 @@ app.get("/", (req, res) => {
 
 const PORT = 3000;
 
-app.listen(PORT, () => {
-    console.log(`✅ API démarrée sur http://localhost:${PORT}`);
-});
+app.listen(
+    PORT,
+    "0.0.0.0",
+    () => {
+
+        console.log(
+            `✅ API démarrée sur http://192.168.1.10:${PORT}`
+        );
+
+    }
+);
