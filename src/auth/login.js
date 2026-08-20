@@ -7,7 +7,11 @@ import { db } from "../firebase/firebase.js";
 import {
     setAnneeAcademique
 } from "./sessionManager.js";
-import { findUser, login } from "./authService.js";
+import {
+    findUser,
+    login,
+    getCurrentUser
+} from "./authService.js";
 import t from "../i18n/index.js";
 
 
@@ -47,182 +51,89 @@ const anneeAcademique =
 async function chargerAnneesAcademiques() {
 
     if (!anneeAcademique) {
-
-        console.error(
-            "❌ Élément #anneeAcademique introuvable."
-        );
-
         return;
-
     }
 
-
-    // État initial
-
     anneeAcademique.innerHTML = `
-
         <option value="">
             Chargement...
         </option>
-
     `;
-
 
     try {
 
-        console.log(
-            "📚 Chargement des années académiques..."
-        );
-
-
-        // -------------------------------------------------
-        // RÉCUPÉRATION DE LA COLLECTION
-        // -------------------------------------------------
-
         const snapshot =
-            await getDocs(
-                collection(
-                    db,
-                    "anneesAcademiques"
-                )
+    await getDocs(
+        collection(
+            db,
+            "anneesAcademiques"
+        )
+    );
+
+console.log("ANNEES FIRESTORE :", snapshot.size);
+
+        const annees = snapshot.docs
+            .map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }))
+            .filter(
+                annee =>
+                    annee.active === true
+            )
+            .sort(
+                (a, b) =>
+                    (b.ordre || 0) -
+                    (a.ordre || 0)
             );
 
+        anneeAcademique.innerHTML = `
+            <option value="">
+                Choisir l'année académique
+            </option>
+        `;
 
-        console.log(
-            "📚 Nombre de documents trouvés :",
-            snapshot.size
-        );
+        annees.forEach(annee => {
 
+            const option =
+                document.createElement("option");
 
-        // -------------------------------------------------
-        // LECTURE DES DOCUMENTS
-        // -------------------------------------------------
+            option.value =
+                annee.libelle;
 
-        snapshot.forEach((doc) => {
+            option.textContent =
+                annee.libelle;
 
-            console.log(
-                "📅 Année :",
-                doc.id,
-                doc.data()
+            anneeAcademique.appendChild(
+                option
             );
 
         });
 
-
-        // -------------------------------------------------
-        // ON GARDE UNIQUEMENT LES ANNÉES ACTIVES
-        // -------------------------------------------------
-
-        const annees =
-            snapshot.docs
-
-                .map(
-                    (doc) => ({
-                        id: doc.id,
-                        ...doc.data()
-                    })
-                )
-
-                .filter(
-                    (annee) =>
-                        annee.active === true
-                )
-
-                .sort(
-                    (a, b) =>
-                        (b.ordre || 0) -
-                        (a.ordre || 0)
-                );
-
-
-        console.log(
-            "📅 Années académiques actives :",
-            annees
-        );
-
-
-        // -------------------------------------------------
-        // RÉINITIALISATION DU SELECT
-        // -------------------------------------------------
-
-        anneeAcademique.innerHTML = `
-
-            <option value="">
-                Choisir l'année académique
-            </option>
-
-        `;
-
-
-        // -------------------------------------------------
-        // AJOUT DES ANNÉES
-        // -------------------------------------------------
-
-        annees.forEach(
-            (annee) => {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    annee.libelle;
-
-
-                option.textContent =
-                    annee.libelle;
-
-
-                anneeAcademique.appendChild(
-                    option
-                );
-
-            }
-        );
-
-
-        // -------------------------------------------------
-        // AUCUNE ANNÉE DISPONIBLE
-        // -------------------------------------------------
-
-        if (
-            annees.length === 0
-        ) {
+        if (!annees.length) {
 
             anneeAcademique.innerHTML = `
-
                 <option value="">
                     Aucune année disponible
                 </option>
-
             `;
-
-            console.warn(
-                "⚠️ Aucune année académique active."
-            );
 
         }
 
     } catch (error) {
 
         console.error(
-            "❌ Erreur chargement années académiques :",
+            "ERREUR FIRESTORE :",
             error
         );
 
-
         anneeAcademique.innerHTML = `
-
             <option value="">
-                Impossible de charger les années
+                Erreur Firestore
             </option>
-
         `;
 
     }
-
 }
 
 
@@ -302,38 +213,25 @@ form.addEventListener(
             // ---------------------------------------------
 
             const user =
-                await findUser(
-                    matricule
-                );
-
-
-            // ---------------------------------------------
-// ANNÉE ACADÉMIQUE CHOISIE
-// ---------------------------------------------
+    await findUser(
+        matricule
+    );
 
 setAnneeAcademique(
     anneeChoisie
 );
-
-
-// ---------------------------------------------
-// CONNEXION FIREBASE
-// ---------------------------------------------
 
 await login(
     user.email,
     mdp
 );
 
+console.log("🔥 FIREBASE AUTH OK");
 
-            // ---------------------------------------------
-            // UTILISATEUR
-            // ---------------------------------------------
-
-            sessionStorage.setItem(
-                "user",
-                JSON.stringify(user)
-            );
+sessionStorage.setItem(
+    "user",
+    JSON.stringify(user)
+);
 
 
             console.log(
@@ -358,34 +256,30 @@ await login(
             // ---------------------------------------------
             // REDIRECTION
             // ---------------------------------------------
+switch (
+    user.collection
+) {
 
-            switch (
-                user.collection
-            ) {
+    case "agents":
 
-                case "agents":
+        window.location.href =
+            "../dashboards/agent/dashboard.html";
 
-                    window.location.href =
-                        "../dashboards/agent/dashboard.html";
+        break;
 
-                    break;
+    case "etudiants":
 
+        window.location.href =
+            "../dashboards/etudiant/dashboard.html";
 
-                case "etudiants":
+        break;
 
-                    window.location.href =
-                        "../dashboards/etudiant/dashboard.html";
+    default:
 
-                    break;
-
-
-                default:
-
-                    throw new Error(
-                        "UNKNOWN_ROLE"
-                    );
-
-            }
+        throw new Error(
+            "UNKNOWN_ROLE"
+        );
+}
 
         } catch (error) {
 

@@ -3,7 +3,10 @@ import express from "express";
 import {
     createAccount,
     checkActivationMatricule,
-    getActivationUser
+    getActivationUser,
+    getLoginUser,
+    acceptFriendRequest,
+    rejectFriendRequest
 } from "../controllers/authController.js";
 
 
@@ -12,7 +15,7 @@ const router =
 
 
 // =====================================================
-// CRÉATION DE COMPTE
+// AUTHENTIFICATION / ACTIVATION
 // =====================================================
 
 router.post(
@@ -20,24 +23,33 @@ router.post(
     createAccount
 );
 
-
-// =====================================================
-// VÉRIFICATION DU MATRICULE
-// =====================================================
-
 router.post(
     "/check-matricule",
     checkActivationMatricule
 );
 
-
-// =====================================================
-// INFORMATIONS D'ACTIVATION
-// =====================================================
-
 router.post(
     "/activation-user",
     getActivationUser
+);
+
+router.post(
+    "/login-user",
+    getLoginUser
+);
+
+// =====================================================
+// AMIS
+// =====================================================
+
+router.post(
+    "/friend-request/accept",
+    acceptFriendRequest
+);
+
+router.post(
+    "/friend-request/reject",
+    rejectFriendRequest
 );
 
 

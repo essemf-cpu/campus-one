@@ -11,6 +11,9 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../../../firebase/firebase.js";
+import {
+    createBon
+} from "../../../services/bonsService.js";
 
 import {
     getTypesTravaux
@@ -247,6 +250,8 @@ const typesTravauxMap =
 // ÉCOUTE TEMPS RÉEL DES DEMANDES
 // =====================================================
 
+let demandesCache = new Map();
+
 onSnapshot(
     demandesQuery,
 
@@ -273,6 +278,11 @@ onSnapshot(
 
                 const demande =
                     document.data();
+
+                    demandesCache.set(
+                        document.id,
+                        demande
+                    );
 
 
                 // =================================================
@@ -305,82 +315,98 @@ onSnapshot(
                 let actions = "";
 
 
-                // =============================================
-                // EN ATTENTE
-                // =============================================
+// =============================================
+// EN ATTENTE
+// =============================================
 
-                if (
+if (
     !lectureSeule &&
-    (demande.statut || "en_attente") ===
-    "en_attente"
+    (demande.statut || "en_attente") === "en_attente"
 ) {
 
-                    actions = `
+    actions = `
 
-                        <div class="demande-actions">
+        <div class="demande-actions">
 
-                            <button
-                                type="button"
-                                class="demande-action-btn demande-action-encours"
-                                data-id="${document.id}"
-                                data-action="encours"
-                            >
-                                En cours
-                            </button>
+            <button
+                type="button"
+                class="demande-action-btn demande-action-encours"
+                data-id="${document.id}"
+                data-action="encours"
+            >
+                En cours
+            </button>
 
-                            <button
-                                type="button"
-                                class="demande-action-btn demande-action-forclos"
-                                data-id="${document.id}"
-                                data-action="forclos"
-                            >
-                                Forclos
-                            </button>
+            <button
+                type="button"
+                class="demande-action-btn demande-action-forclos"
+                data-id="${document.id}"
+                data-action="forclos"
+            >
+                Forclos
+            </button>
 
-                        </div>
+            <button
+                type="button"
+                class="demande-action-btn demande-action-bon"
+                data-id="${document.id}"
+                data-action="bon"
+            >
+                Rédiger un bon
+            </button>
 
-                    `;
+        </div>
 
-                }
+    `;
+
+}
 
 
-                // =============================================
-                // EN COURS
-                // =============================================
+// =============================================
+// EN COURS
+// =============================================
 
-                else if (
+else if (
     !lectureSeule &&
-    demande.statut ===
-    "en_cours"
+    demande.statut === "en_cours"
 ) {
 
-                    actions = `
+    actions = `
 
-                        <div class="demande-actions">
+        <div class="demande-actions">
 
-                            <button
-                                type="button"
-                                class="demande-action-btn demande-action-termine"
-                                data-id="${document.id}"
-                                data-action="termine"
-                            >
-                                Terminée
-                            </button>
+            <button
+                type="button"
+                class="demande-action-btn demande-action-termine"
+                data-id="${document.id}"
+                data-action="termine"
+            >
+                Terminée
+            </button>
 
-                            <button
-                                type="button"
-                                class="demande-action-btn demande-action-nontermine"
-                                data-id="${document.id}"
-                                data-action="nontermine"
-                            >
-                                Non terminée
-                            </button>
+            <button
+                type="button"
+                class="demande-action-btn demande-action-nontermine"
+                data-id="${document.id}"
+                data-action="nontermine"
+            >
+                Non terminée
+            </button>
 
-                        </div>
+            <button
+                type="button"
+                class="demande-action-btn demande-action-bon"
+                data-id="${document.id}"
+                data-action="bon"
+            >
+                Rédiger un bon
+            </button>
 
-                    `;
+        </div>
 
-                }
+    `;
+
+}
 
 
                 // =================================================
@@ -512,6 +538,121 @@ onSnapshot(
 
 );
 
+// =====================================================
+// FORMULAIRE NOUVEAU BON
+// =====================================================
+
+const bonForm =
+    document.getElementById("bonForm");
+
+
+bonForm?.addEventListener(
+    "submit",
+    async (event) => {
+
+        event.preventDefault();
+
+
+        if (lectureSeule) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const date =
+                document.getElementById("date")
+                    ?.value;
+
+            const type =
+                document.getElementById("type")
+                    ?.value;
+
+            const description =
+                document.getElementById("description")
+                    ?.value
+                    .trim();
+
+            const chambre =
+                document.getElementById("chambre")
+                    ?.value
+                    .trim();
+
+            const toilette =
+                document.getElementById("toilette")
+                    ?.value
+                    .trim();
+
+
+            // =========================================
+            // CRÉATION DU BON
+            // =========================================
+
+            await createBon({
+
+                date,
+
+                site:
+                    profile.site,
+
+                pavillon:
+                    profile.affectation
+                        ?.replace(
+                            /^Pavillon\s+/i,
+                            ""
+                        )
+                        .trim(),
+
+                type,
+
+                description,
+
+                chambre,
+
+                toilette,
+
+                demandeId:
+                    bonForm.dataset.demandeId ||
+                    null,
+
+                agentMatricule:
+                    profile.matricule,
+
+                agentNom:
+                    `${profile.prenom || ""} ${profile.nom || ""}`
+                        .trim()
+
+            });
+
+
+            alert(
+                "Bon envoyé avec succès."
+            );
+
+
+            bonForm.reset();
+
+            delete bonForm.dataset.demandeId;
+
+
+        } catch (error) {
+
+            console.error(
+                "❌ Création du bon :",
+                error
+            );
+
+
+            alert(
+                "Impossible de créer le bon."
+            );
+
+        }
+
+    }
+);
 
 // =====================================================
 // ACTIONS DES DEMANDES ÉTUDIANTS
@@ -548,6 +689,115 @@ demandesBody.addEventListener(
 
         const action =
             button.dataset.action;
+
+            // =========================================
+// RÉDIGER UN BON
+// =========================================
+
+if (action === "bon") {
+
+    const demande =
+        demandesCache.get(id);
+
+
+    if (!demande) {
+
+        alert(
+            "Impossible de retrouver la demande."
+        );
+
+        return;
+
+    }
+
+
+    // =====================================
+    // REMPLIR LE FORMULAIRE
+    // =====================================
+
+    const dateInput =
+        document.getElementById("date");
+
+    const typeInput =
+        document.getElementById("type");
+
+    const descriptionInput =
+        document.getElementById("description");
+
+    const chambreInput =
+        document.getElementById("chambre");
+
+
+    if (dateInput) {
+
+        dateInput.value =
+            new Date()
+                .toISOString()
+                .split("T")[0];
+
+    }
+
+
+    if (typeInput) {
+
+        typeInput.value =
+            demande.type || "";
+
+    }
+
+
+    if (descriptionInput) {
+
+        descriptionInput.value =
+            demande.probleme || "";
+
+    }
+
+
+    if (chambreInput) {
+
+        chambreInput.value =
+            demande.chambre || "";
+
+    }
+
+
+    // =====================================
+    // LIER LE FUTUR BON À LA DEMANDE
+    // =====================================
+
+    const bonForm =
+        document.getElementById("bonForm");
+
+
+    if (bonForm) {
+
+        bonForm.dataset.demandeId =
+            id;
+
+    }
+
+
+    // =====================================
+    // ALLER AU FORMULAIRE
+    // =====================================
+
+    document
+        .querySelector(".nouveau-card")
+        ?.scrollIntoView({
+
+            behavior:
+                "smooth",
+
+            block:
+                "start"
+
+        });
+
+
+    return;
+
+}
 
 
         if (

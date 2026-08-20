@@ -1,0 +1,511 @@
+rules_version = '2';
+
+service cloud.firestore {
+
+    match /databases/{database}/documents {
+
+
+        // =====================================================
+        // FONCTIONS COMMUNES
+        // =====================================================
+
+        function connecte() {
+
+            return request.auth != null;
+
+        }
+
+
+        function compteExiste() {
+
+            return connecte()
+                && exists(
+                    /databases/$(database)/documents/users/$(request.auth.uid)
+                );
+
+        }
+
+
+        function compte() {
+
+            return get(
+                /databases/$(database)/documents/users/$(request.auth.uid)
+            );
+
+        }
+
+
+        function role(role) {
+
+            return compteExiste()
+                && compte().data.role == role;
+
+        }
+
+
+        function etudiant() {
+
+            return role("etudiant");
+
+        }
+
+
+        function agent() {
+
+            return role("agent");
+
+        }
+
+
+        function admin() {
+
+            return role("admin");
+
+        }
+
+
+        function monMatricule() {
+
+            return compte().data.matricule;
+
+        }
+
+
+        function monProfil() {
+
+            return compte().data.profile;
+
+        }
+
+
+        // =====================================================
+        // USERS
+        // =====================================================
+
+        match /users/{uid} {
+
+            // Un utilisateur authentifié peut uniquement
+            // consulter son propre compte.
+            allow get:
+                if connecte()
+                && request.auth.uid == uid;
+
+            allow list:
+                if false;
+
+            // Le compte est créé par le serveur / processus
+            // d'administration.
+            allow create, update, delete:
+                if false;
+        }
+
+
+        // =====================================================
+// ETUDIANTS
+// =====================================================
+
+match /etudiants/{documentId} {
+
+    allow read:
+        if admin()
+        || (
+            etudiant()
+            && documentId == monMatricule()
+        );
+
+    allow create, update, delete:
+        if false;
+}
+
+
+// =====================================================
+// AGENTS
+// =====================================================
+
+match /agents/{documentId} {
+
+    allow read:
+        if admin()
+        || (
+            agent()
+            && documentId == monMatricule()
+        );
+
+    allow create, update, delete:
+        if false;
+}
+
+
+        // =====================================================
+        // HEBERGEMENTS
+        // =====================================================
+
+        match /hebergements/{documentId} {
+
+            // Etudiant :
+            // uniquement ses propres hébergements.
+            allow get, list:
+                if etudiant()
+                && resource.data.matricule ==
+                    monMatricule();
+
+            // Aucun étudiant ne peut modifier son hébergement.
+            allow create, update, delete:
+                if false;
+
+
+            // Agent :
+            // lecture autorisée pour le fonctionnement
+            // administratif actuel.
+            allow read:
+                if agent() || admin();
+
+            allow write:
+                if admin();
+        }
+
+
+        // =====================================================
+        // DEMANDES ETUDIANTS
+        // =====================================================
+
+        match /demandes_etudiants/{documentId} {
+
+            // L'étudiant ne voit que ses propres demandes.
+            allow get, list:
+                if etudiant()
+                && resource.data.matricule ==
+                    monMatricule();
+
+            // Création uniquement pour son propre matricule
+            // et avec son année académique.
+            allow create:
+                if etudiant()
+                && request.resource.data.matricule ==
+                    monMatricule()
+                && request.resource.data.anneeAcademique is string;
+
+            // Un étudiant ne peut pas modifier/supprimer
+            // une demande existante.
+            allow update, delete:
+                if false;
+
+
+            allow read:
+                if agent() || admin();
+
+            allow update, delete:
+                if agent() || admin();
+        }
+
+
+        // =====================================================
+        // FRIEND REQUESTS
+        // =====================================================
+
+        match /friendRequests/{documentId} {
+
+            // Réception
+            allow get, list:
+                if etudiant()
+                && resource.data.to ==
+                    monMatricule();
+
+            // Création par l'expéditeur.
+            allow create:
+                if etudiant()
+                && request.resource.data.from ==
+                    monMatricule()
+                && request.resource.data.anneeAcademique is string;
+
+            // Mise à jour uniquement par le destinataire
+            // pour accepter/refuser sa demande.
+            allow update:
+                if etudiant()
+                && resource.data.to ==
+                    monMatricule()
+                && request.resource.data.to ==
+                    resource.data.to
+                && request.resource.data.from ==
+                    resource.data.from
+                && request.resource.data.anneeAcademique ==
+                    resource.data.anneeAcademique;
+
+            allow delete:
+                if false;
+        }
+
+
+        // =====================================================
+        // FRIENDS
+        // =====================================================
+
+        match /friends/{documentId} {
+
+            allow get, list:
+                if etudiant()
+                && resource.data.userCarte ==
+                    monMatricule();
+
+            allow create:
+                if etudiant()
+                && request.resource.data.userCarte ==
+                    monMatricule();
+
+            allow update, delete:
+                if etudiant()
+                && resource.data.userCarte ==
+                    monMatricule();
+        }
+
+
+        // =====================================================
+        // NOTIFICATIONS
+        // =====================================================
+
+        match /notifications/{documentId} {
+
+            allow get, list:
+                if etudiant()
+                && resource.data.to ==
+                    monMatricule();
+
+            // Une notification n'est normalement pas créée
+            // directement par l'étudiant.
+            allow create:
+                if false;
+
+            // Marquage comme lue.
+            allow update:
+                if etudiant()
+                && resource.data.to ==
+                    monMatricule()
+                && request.resource.data.to ==
+                    resource.data.to
+                && request.resource.data.anneeAcademique ==
+                    resource.data.anneeAcademique;
+
+            allow delete:
+                if false;
+        }
+
+
+        // =====================================================
+        // NOTIFICATIONS RESTAURANT
+        // =====================================================
+
+        match /restaurantNotifications/{documentId} {
+
+            allow get, list:
+                if etudiant()
+                && resource.data.to ==
+                    monMatricule();
+
+            allow create:
+                if false;
+
+            allow update:
+                if etudiant()
+                && resource.data.to ==
+                    monMatricule()
+                && request.resource.data.to ==
+                    resource.data.to
+                && request.resource.data.anneeAcademique ==
+                    resource.data.anneeAcademique;
+
+            allow delete:
+                if false;
+        }
+
+
+        // =====================================================
+        // ANNEES ACADEMIQUES
+        // =====================================================
+
+        match /anneesAcademiques/{documentId} {
+
+    allow read:
+        if true;
+
+    allow write:
+        if admin();
+}
+
+
+        // =====================================================
+        // COLLECTIONS DE REFERENCE
+        // =====================================================
+
+        match /sites/{documentId} {
+
+            allow read:
+                if connecte();
+
+            allow write:
+                if admin();
+        }
+
+
+        match /pavillons/{documentId} {
+
+            allow read:
+                if connecte();
+
+            allow write:
+                if admin();
+        }
+
+
+        match /services/{documentId} {
+
+            allow read:
+                if connecte();
+
+            allow write:
+                if admin();
+        }
+
+
+        match /departements/{documentId} {
+
+            allow read:
+                if connecte();
+
+            allow write:
+                if admin();
+        }
+
+
+        match /ateliers/{documentId} {
+
+            allow read:
+                if connecte();
+
+            allow write:
+                if admin();
+        }
+
+
+        match /typesTravaux/{documentId} {
+
+            allow read:
+                if connecte();
+
+            allow write:
+                if admin();
+        }
+
+
+        // =====================================================
+        // POSTES / PERMISSIONS
+        // =====================================================
+
+        match /postes/{documentId} {
+
+            allow read:
+                if agent() || admin();
+
+            allow write:
+                if admin();
+        }
+
+
+        match /permissionsPostes/{documentId} {
+
+            allow read:
+                if agent() || admin();
+
+            allow write:
+                if admin();
+        }
+
+
+        // =====================================================
+        // AFFECTATIONS AGENTS
+        // =====================================================
+
+        match /affectationsAgents/{documentId} {
+
+            allow read:
+                if agent() || admin();
+
+            allow write:
+                if admin();
+        }
+
+
+        // =====================================================
+        // RATTACHEMENTS
+        // =====================================================
+
+        match /rattachements/{documentId} {
+
+            allow read:
+                if agent() || admin();
+
+            allow write:
+                if admin();
+        }
+
+
+        // =====================================================
+        // SITUATIONS ACADEMIQUES
+        // =====================================================
+
+        match /situationsAcademiques/{documentId} {
+
+    allow get, list:
+        if etudiant()
+        && resource.data.matricule == monMatricule();
+
+    allow read:
+        if agent() || admin();
+
+    allow write:
+        if agent() || admin();
+}
+
+// =====================================================
+// BONS DE TRAVAIL
+// =====================================================
+
+match /bons/{documentId} {
+
+    // Agent et admin peuvent consulter les bons.
+    allow read:
+        if agent()
+        || admin();
+
+
+    // Création uniquement par un agent ou admin.
+    allow create:
+        if agent()
+        || admin();
+
+
+    // Modification d'un bon.
+    allow update:
+        if agent()
+        || admin();
+
+
+    // Suppression physique interdite.
+    // On utilise supprime=true.
+    allow delete:
+        if false;
+
+}
+      
+
+        // =====================================================
+        // TOUT LE RESTE : REFUSÉ
+        // =====================================================
+
+        match /{document=**} {
+
+            allow read, write:
+                if false;
+        }
+
+    }
+}

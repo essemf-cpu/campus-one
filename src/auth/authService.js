@@ -437,18 +437,17 @@ async function getAnneesAcademiquesEtudiant(
    UTILISATEURS
 ===================================================== */
 
-export async function getCurrentUser(
-    uid
-) {
+export async function getCurrentUser(uid) {
 
-    if (
-        currentUserCache
-    ) {
-
+    if (currentUserCache) {
         return currentUserCache;
-
     }
 
+    console.log("🔎 GET CURRENT USER — UID =", uid);
+
+    // =====================================================
+    // COMPTE USERS
+    // =====================================================
 
     const accountRef =
         doc(
@@ -457,16 +456,20 @@ export async function getCurrentUser(
             uid
         );
 
+    console.log(
+        "🔎 Lecture users/" + uid
+    );
 
     const accountSnap =
         await getDoc(
             accountRef
         );
 
+    console.log(
+        "✅ USERS OK"
+    );
 
-    if (
-        !accountSnap.exists()
-    ) {
+    if (!accountSnap.exists()) {
 
         throw new Error(
             "USER_NOT_FOUND"
@@ -474,10 +477,18 @@ export async function getCurrentUser(
 
     }
 
-
     const account =
         accountSnap.data();
 
+    console.log(
+        "👤 ACCOUNT =",
+        account
+    );
+
+
+    // =====================================================
+    // PROFIL AGENT / ÉTUDIANT
+    // =====================================================
 
     const profileRef =
         doc(
@@ -485,16 +496,21 @@ export async function getCurrentUser(
             account.profile
         );
 
+    console.log(
+        "🔎 Lecture profil =",
+        account.profile
+    );
 
     const profileSnap =
         await getDoc(
             profileRef
         );
 
+    console.log(
+        "✅ PROFILE OK"
+    );
 
-    if (
-        !profileSnap.exists()
-    ) {
+    if (!profileSnap.exists()) {
 
         throw new Error(
             "PROFILE_NOT_FOUND"
@@ -502,9 +518,13 @@ export async function getCurrentUser(
 
     }
 
-
     const profile =
         profileSnap.data();
+
+    console.log(
+        "👤 PROFILE =",
+        profile
+    );
 
 
     console.time(
@@ -512,15 +532,14 @@ export async function getCurrentUser(
     );
 
 
-    /* =================================================
-       ANNÉE CHOISIE À LA CONNEXION
-    ================================================= */
+    // =====================================================
+    // ANNÉE CHOISIE
+    // =====================================================
 
     const anneeChoisie =
         sessionStorage.getItem(
             "anneeAcademique"
         );
-
 
     console.log(
         "📚 ANNÉE CHOISIE =",
@@ -528,9 +547,9 @@ export async function getCurrentUser(
     );
 
 
-    /* =================================================
-       VARIABLES COMMUNES
-    ================================================= */
+    // =====================================================
+    // VARIABLES COMMUNES
+    // =====================================================
 
     let affectationActive =
         null;
@@ -548,30 +567,61 @@ export async function getCurrentUser(
         {};
 
 
-    /* =================================================
-       AGENT
-    ================================================= */
+    // =====================================================
+    // AGENT
+    // =====================================================
 
     if (
         account.role ===
         "agent"
     ) {
 
+        console.log(
+            "👔 UTILISATEUR = AGENT"
+        );
+
+
+        // =================================================
+        // AFFECTATION ACTIVE
+        // =================================================
+
+        console.log(
+            "🔎 Lecture affectation active..."
+        );
+
         affectationActive =
             await getAffectationActive(
                 profile.matricule
             );
 
+        console.log(
+            "✅ AFFECTATION ACTIVE OK",
+            affectationActive
+        );
+
+
+        // =================================================
+        // AFFECTATION POUR L'ANNÉE
+        // =================================================
 
         if (
             anneeChoisie
         ) {
+
+            console.log(
+                "🔎 Lecture affectation année..."
+            );
 
             affectationPourAnnee =
                 await getAffectationPourAnnee(
                     profile.matricule,
                     anneeChoisie
                 );
+
+            console.log(
+                "✅ AFFECTATION ANNÉE OK",
+                affectationPourAnnee
+            );
 
         }
 
@@ -581,16 +631,15 @@ export async function getCurrentUser(
             affectationPourAnnee
         );
 
-
         console.log(
             "📍 AFFECTATION ACTIVE =",
             affectationActive
         );
 
 
-        /* ---------------------------------------------
-           AUCUNE AFFECTATION POUR CETTE ANNÉE
-        --------------------------------------------- */
+        // =================================================
+        // AUCUNE AFFECTATION POUR CETTE ANNÉE
+        // =================================================
 
         if (
             anneeChoisie &&
@@ -604,9 +653,9 @@ export async function getCurrentUser(
         }
 
 
-        /* ---------------------------------------------
-           ANNÉE HISTORIQUE AGENT
-        --------------------------------------------- */
+        // =================================================
+        // ANNÉE HISTORIQUE
+        // =================================================
 
         if (
             affectationPourAnnee &&
@@ -620,7 +669,6 @@ export async function getCurrentUser(
             lectureSeule =
                 true;
 
-
             console.log(
                 "🔒 AGENT — MODE LECTURE SEULE"
             );
@@ -628,9 +676,9 @@ export async function getCurrentUser(
         }
 
 
-        /* ---------------------------------------------
-           PERMISSIONS
-        --------------------------------------------- */
+        // =================================================
+        // POSTE / PERMISSIONS
+        // =================================================
 
         const posteId =
             affectationPourAnnee?.posteId ||
@@ -638,9 +686,20 @@ export async function getCurrentUser(
             null;
 
 
+        console.log(
+            "🪪 POSTE ID =",
+            posteId
+        );
+
+
         if (
             posteId
         ) {
+
+            console.log(
+                "🔎 Lecture permissionsPostes/" +
+                posteId
+            );
 
             const permissionsRef =
                 doc(
@@ -649,12 +708,14 @@ export async function getCurrentUser(
                     posteId
                 );
 
-
             const permissionsSnap =
                 await getDoc(
                     permissionsRef
                 );
 
+            console.log(
+                "✅ PERMISSIONS POSTE OK"
+            );
 
             if (
                 permissionsSnap.exists()
@@ -668,14 +729,19 @@ export async function getCurrentUser(
 
             }
 
+            console.log(
+                "🔐 PERMISSIONS =",
+                permissions
+            );
+
         }
 
     }
 
 
-    /* =================================================
-       ÉTUDIANT
-    ================================================= */
+    // =====================================================
+    // ÉTUDIANT
+    // =====================================================
 
     else if (
         account.role ===
@@ -683,18 +749,12 @@ export async function getCurrentUser(
     ) {
 
         console.log(
-            "🎓 CONTRÔLE ANNÉE ÉTUDIANT"
+            "🎓 UTILISATEUR = ÉTUDIANT"
         );
-
-
-        /* ---------------------------------------------
-           ANNÉE D'INSCRIPTION ACTUELLE
-        --------------------------------------------- */
 
         const anneeAcademiqueEtudiant =
             profile.anneeAcademique ||
             null;
-
 
         console.log(
             "🎓 ANNÉE ÉTUDIANT =",
@@ -702,13 +762,8 @@ export async function getCurrentUser(
         );
 
 
-        /* ---------------------------------------------
-           ANNÉE COURANTE DU SYSTÈME
-        --------------------------------------------- */
-
         const anneeCourante =
             await getAnneeAcademiqueCourante();
-
 
         console.log(
             "📅 ANNÉE COURANTE DU SYSTÈME =",
@@ -716,31 +771,16 @@ export async function getCurrentUser(
         );
 
 
-        /* ---------------------------------------------
-           HISTORIQUE ACADÉMIQUE
-        --------------------------------------------- */
-
         const anneesEtudiant =
             await getAnneesAcademiquesEtudiant(
                 profile.matricule
             );
-
 
         console.log(
             "🎓 ANNÉES ACADÉMIQUES DE L'ÉTUDIANT =",
             anneesEtudiant
         );
 
-
-        /* ---------------------------------------------
-           AJOUT DE L'ANNÉE ACTUELLE DU PROFIL
-           
-           Cela permet à un étudiant nouvellement
-           créé avec seulement anneeAcademique de
-           fonctionner immédiatement, même si le seed
-           situationsAcademiques n'a pas encore été
-           généré pour lui.
-        --------------------------------------------- */
 
         if (
             anneeAcademiqueEtudiant &&
@@ -756,10 +796,6 @@ export async function getCurrentUser(
         }
 
 
-        /* ---------------------------------------------
-           AUCUNE ANNÉE CHOISIE
-        --------------------------------------------- */
-
         if (
             !anneeChoisie
         ) {
@@ -770,10 +806,6 @@ export async function getCurrentUser(
 
         }
 
-
-        /* ---------------------------------------------
-           ANNÉE NON AUTORISÉE
-        --------------------------------------------- */
 
         if (
             !anneesEtudiant.includes(
@@ -788,10 +820,6 @@ export async function getCurrentUser(
         }
 
 
-        /* ---------------------------------------------
-           ANNÉE HISTORIQUE
-        --------------------------------------------- */
-
         if (
             anneeChoisie !==
             anneeAcademiqueEtudiant
@@ -803,26 +831,17 @@ export async function getCurrentUser(
             lectureSeule =
                 true;
 
-
             console.log(
                 "🔒 ÉTUDIANT — ANNÉE HISTORIQUE"
             );
 
-        }
-
-
-        /* ---------------------------------------------
-           ANNÉE ACTUELLE
-        --------------------------------------------- */
-
-        else {
+        } else {
 
             mode =
                 "normal";
 
             lectureSeule =
                 false;
-
 
             console.log(
                 "🔓 ÉTUDIANT — ANNÉE ACTUELLE"
@@ -833,9 +852,9 @@ export async function getCurrentUser(
     }
 
 
-    /* =================================================
-       RÔLE INCONNU
-    ================================================= */
+    // =====================================================
+    // RÔLE INCONNU
+    // =====================================================
 
     else {
 
@@ -851,9 +870,9 @@ export async function getCurrentUser(
     );
 
 
-    /* =================================================
-       UTILISATEUR COURANT
-    ================================================= */
+    // =====================================================
+    // UTILISATEUR COURANT
+    // =====================================================
 
     currentUserCache = {
 
@@ -885,6 +904,12 @@ export async function getCurrentUser(
             anneeChoisie
 
     };
+
+
+    console.log(
+        "✅ CURRENT USER FINAL =",
+        currentUserCache
+    );
 
 
     return currentUserCache;
@@ -919,7 +944,7 @@ export function clearCurrentUserCache() {
 ===================================================== */
 
 const API_URL =
-    "http://192.168.1.10:3000/api/auth";
+    "http://192.168.1.6:3000/api/auth";
 
 
 /* =====================================================
@@ -1222,55 +1247,52 @@ export async function getActivationInfos(
 export async function findUser(matricule) {
 
     if (!matricule) {
-        throw new Error("USER_NOT_FOUND");
-    }
-
-    try {
-
-        const response = await fetch(
-            `${API_URL}/activation-user`,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    matricule
-                })
-            }
-        );
-
-        const result = await response.json();
-
-        if (
-            !response.ok ||
-            !result.success ||
-            !result.user
-        ) {
-            throw new Error("USER_NOT_FOUND");
-        }
-
-        return result.user;
-
-    } catch (error) {
-
-        console.error(
-            "❌ Recherche utilisateur :",
-            error
-        );
-
-        if (
-            error.message ===
-            "USER_NOT_FOUND"
-        ) {
-            throw error;
-        }
 
         throw new Error(
             "USER_NOT_FOUND"
         );
 
     }
+
+    const response =
+        await fetch(
+            `${API_URL}/login-user`,
+            {
+
+                method:
+                    "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body:
+                    JSON.stringify({
+
+                        matricule
+
+                    })
+
+            }
+        );
+
+    const result =
+        await response.json();
+
+    if (
+        !response.ok ||
+        !result.success ||
+        !result.user
+    ) {
+
+        throw new Error(
+            "USER_NOT_FOUND"
+        );
+
+    }
+
+    return result.user;
 }

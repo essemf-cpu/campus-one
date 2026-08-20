@@ -4,17 +4,43 @@ import authRoutes from "./server/routes/authRoutes.js";
 
 const app = express();
 
+// =====================================================
+// MIDDLEWARES
+// =====================================================
+
 app.use(cors());
+
 app.use(express.json());
+
+// =====================================================
+// API
+// =====================================================
+
 app.use("/api/auth", authRoutes);
 
+// =====================================================
+// TEST
+// =====================================================
+
 app.get("/", (req, res) => {
+
     res.json({
+        success: true,
         message: "🚀 Campus One API opérationnelle"
     });
+
 });
 
-const PORT = 3000;
+// =====================================================
+// SERVEUR
+// =====================================================
+
+// Cloud Run fournit automatiquement PORT.
+// En local, on utilise 3000.
+
+const PORT =
+    process.env.PORT ||
+    3000;
 
 app.listen(
     PORT,
@@ -22,7 +48,7 @@ app.listen(
     () => {
 
         console.log(
-            `✅ API démarrée sur http://192.168.1.10:${PORT}`
+            `✅ Campus One API démarrée sur le port ${PORT}`
         );
 
     }

@@ -32,10 +32,14 @@ onAuthStateChanged(
                 // RÉCUPÉRER L'UTILISATEUR
                 // =========================================
 
-                const currentUser =
-                    await getCurrentUser(
-                        firebaseUser.uid
-                    );
+                console.log("🔥 UID AUTH =", firebaseUser.uid);
+
+const currentUser =
+    await getCurrentUser(
+        firebaseUser.uid
+    );
+
+console.log("✅ CURRENT USER FIRESTORE =", currentUser);
 
                    // =========================================
 // ANNÉE ACADÉMIQUE SÉLECTIONNÉE
@@ -74,6 +78,11 @@ let droits = {
 // =========================================
 // DROITS SPÉCIFIQUES DE L'AGENT
 // =========================================
+
+console.log("👤 CURRENT USER =", currentUser);
+console.log("🎭 ROLE =", currentUser.account?.role);
+console.log("🪪 MATRICULE =", currentUser.profile?.matricule);
+console.log("📅 ANNÉE =", anneeAcademique);
 
 if (
     currentUser.account?.role ===

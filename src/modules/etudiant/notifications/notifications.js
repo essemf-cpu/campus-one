@@ -728,7 +728,8 @@ export function afficherNotifications() {
                                 async () => {
 
                                     await refuserDemande(
-                                        button
+                                        button,
+                                        profile
                                     );
 
                                 }
@@ -745,356 +746,114 @@ export function afficherNotifications() {
             // =====================================================
 
             async function accepterDemande(
-                button,
-                profile,
-                anneeAcademique
-            ) {
+    button,
+    profile
+) {
 
-                const requestId =
-                    button.dataset.id;
+    const requestId =
+        button.dataset.id;
 
-                const amiMatricule =
-                    button.dataset.matricule;
 
-                const amiNom =
-                    button.dataset.nom;
+    if (!requestId) {
 
-                const amiAvatar =
-                    button.dataset.avatar;
+        return;
 
-
-                if (
-                    !requestId
-                ) return;
-
-
-                button.disabled =
-                    true;
-
-
-                button.innerHTML = `
-
-                    <i
-                        class="
-                            fa-solid
-                            fa-spinner
-                            fa-spin
-                        ">
-                    </i>
-
-                    Acceptation...
-
-                `;
-
-
-                try {
-
-                    // =============================================
-                    // RÉFÉRENCE DE LA DEMANDE
-                    // =============================================
-
-                    const requestRef =
-                        doc(
-                            db,
-                            "friendRequests",
-                            requestId
-                        );
-
-
-                    // =============================================
-                    // VÉRIFIER LA DEMANDE
-                    // =============================================
-
-                    const requestSnapshot =
-                        await getDocs(
-                            query(
-                                collection(
-                                    db,
-                                    "friendRequests"
-                                ),
-                                where(
-                                    "__name__",
-                                    "==",
-                                    requestId
-                                )
-                            )
-                        );
-
-
-                    if (
-                        requestSnapshot.empty
-                    ) {
-
-                        throw new Error(
-                            "Demande introuvable."
-                        );
-
-                    }
-
-
-                    const requestData =
-                        requestSnapshot
-                            .docs[0]
-                            .data();
-
-
-                    if (
-                        requestData.status !==
-                        "pending"
-                    ) {
-
-                        throw new Error(
-                            "Cette demande n'est plus en attente."
-                        );
-
-                    }
-
-
-                    // =============================================
-                    // VÉRIFIER SI DÉJÀ AMIS
-                    // =============================================
-
-                    const existingFriendQuery =
-                        query(
-
-                            collection(
-                                db,
-                                "friends"
-                            ),
-
-                            where(
-                                "userCarte",
-                                "==",
-                                profile.matricule
-                            ),
-
-                            where(
-                                "friendCarte",
-                                "==",
-                                amiMatricule
-                            )
-
-                        );
-
-
-                    const existingFriend =
-                        await getDocs(
-                            existingFriendQuery
-                        );
-
-
-                    if (
-                        existingFriend.empty
-                    ) {
-
-                        // =========================================
-                        // AJOUT POUR L'UTILISATEUR CONNECTÉ
-                        // =========================================
-
-                        await addDoc(
-
-                            collection(
-                                db,
-                                "friends"
-                            ),
-
-                            {
-
-                                userCarte:
-                                    profile.matricule,
-
-                                userNom:
-                                    `${profile.prenom} ${profile.nom}`,
-
-                                friendCarte:
-                                    amiMatricule,
-
-                                friendNom:
-                                    amiNom,
-
-                                friendAvatar:
-                                    amiAvatar ||
-                                    "assets/default-user.png"
-
-                            }
-
-                        );
-
-
-                        // =========================================
-                        // AJOUT POUR L'AUTRE UTILISATEUR
-                        // =========================================
-
-                        await addDoc(
-
-                            collection(
-                                db,
-                                "friends"
-                            ),
-
-                            {
-
-                                userCarte:
-                                    amiMatricule,
-
-                                userNom:
-                                    amiNom,
-
-                                friendCarte:
-                                    profile.matricule,
-
-                                friendNom:
-                                    `${profile.prenom} ${profile.nom}`,
-
-                                friendAvatar:
-                                    profile.avatar ||
-                                    "assets/default-user.png"
-
-                            }
-
-                        );
-
-                    }
-
-
-                    // =============================================
-                    // ACCEPTER LA DEMANDE
-                    // =============================================
-
-                    await updateDoc(
-                        requestRef,
-                        {
-
-                            status:
-                                "accepted",
-
-                            seen:
-                                true,
-
-                            message:
-                                `${profile.prenom} ${profile.nom} a accepté votre demande d'ami.`,
-
-                            date:
-                                Date.now()
-
-                        }
-                    );
-
-
-                    // =============================================
-                    // NOTIFICATION POUR LE DEMANDEUR
-                    // =============================================
-
-                    await addDoc(
-    collection(db, "notifications"),
-    {
-        to: amiMatricule,
-
-        anneeAcademique:
-    anneeAcademique,
-
-        type: "amis",
-
-        title: "Demande acceptée",
-
-        text:
-            `${profile.prenom} ${profile.nom} a accepté votre demande d'ami.`,
-
-        // Personne ayant accepté
-        from:
-            profile.matricule,
-
-        fromNom:
-            `${profile.prenom} ${profile.nom}`,
-
-        fromAvatar:
-            profile.avatar ||
-            "",
-
-        date:
-            Date.now(),
-
-        seen: false
     }
-);
 
 
-                    console.log(
-                        "✅ Demande acceptée."
-                    );
+    button.disabled =
+        true;
 
 
-                    // =============================================
-                    // MESSAGE TEMPORAIRE
-                    // =============================================
+    button.innerHTML = `
 
-                    const card =
-                        button.closest(
-                            ".friend-request-card"
-                        );
+        <i
+            class="
+                fa-solid
+                fa-spinner
+                fa-spin
+            ">
+        </i>
 
+        Acceptation...
 
-                    if (card) {
-
-                        card.innerHTML = `
-
-                            <div
-                                class="
-                                    friend-request-accepted
-                                "
-                            >
-
-                                <div
-                                    class="
-                                        accepted-icon
-                                    "
-                                >
-
-                                    <i
-                                        class="
-                                            fa-solid
-                                            fa-check
-                                        ">
-                                    </i>
-
-                                </div>
+    `;
 
 
-                                <div>
+    try {
 
-                                    <strong>
-                                        Vous êtes maintenant amis
-                                    </strong>
+        const response =
+            await fetch(
+                "http://192.168.1.10:3000/api/auth/friend-request/accept",
+                {
 
-                                    <p>
-                                        ${escapeHtml(
-                                            amiNom
-                                        )}
-                                        a été ajouté à vos amis.
-                                    </p>
+                    method:
+                        "POST",
 
-                                </div>
+                    headers: {
 
-                            </div>
+                        "Content-Type":
+                            "application/json"
 
-                        `;
+                    },
 
-                    }
+                    body:
+                        JSON.stringify({
 
+                            requestId,
 
-                } catch (error) {
+                            matricule:
+                                profile.matricule
 
-                    console.error(
-                        "❌ Erreur acceptation :",
-                        error
-                    );
+                        })
 
-
-                    button.disabled =
-                        false;
+                }
+            );
 
 
-                    button.innerHTML = `
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Impossible d'accepter la demande."
+            );
+
+        }
+
+
+        console.log(
+            "✅ Demande acceptée."
+        );
+
+
+        const card =
+            button.closest(
+                ".friend-request-card"
+            );
+
+
+        if (card) {
+
+            card.innerHTML = `
+
+                <div
+                    class="
+                        friend-request-accepted
+                    "
+                >
+
+                    <div
+                        class="
+                            accepted-icon
+                        "
+                    >
 
                         <i
                             class="
@@ -1103,120 +862,202 @@ export function afficherNotifications() {
                             ">
                         </i>
 
-                        Accepter
-
-                    `;
+                    </div>
 
 
-                    alert(
-                        "Impossible d'accepter la demande."
-                    );
+                    <div>
 
-                }
+                        <strong>
+                            Vous êtes maintenant amis
+                        </strong>
 
-            }
+                        <p>
+                            La demande a été acceptée.
+                        </p>
 
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Erreur acceptation :",
+            error
+        );
+
+
+        button.disabled =
+            false;
+
+
+        button.innerHTML = `
+
+            <i
+                class="
+                    fa-solid
+                    fa-check
+                ">
+            </i>
+
+            Accepter
+
+        `;
+
+
+        alert(
+            error.message ||
+            "Impossible d'accepter la demande."
+        );
+
+    }
+
+}
 
             // =====================================================
             // REFUSER UNE DEMANDE
             // =====================================================
 
             async function refuserDemande(
-                button
-            ) {
+    button,
+    profile
+) {
 
-                const requestId =
-                    button.dataset.id;
-
-
-                if (
-                    !requestId
-                ) return;
+    const requestId =
+        button.dataset.id;
 
 
-                button.disabled =
-                    true;
+    if (!requestId) {
+
+        return;
+
+    }
 
 
-                button.innerHTML = `
-
-                    <i
-                        class="
-                            fa-solid
-                            fa-spinner
-                            fa-spin
-                        ">
-                    </i>
-
-                    Refus...
-
-                `;
+    button.disabled =
+        true;
 
 
-                try {
+    button.innerHTML = `
 
-                    await updateDoc(
+        <i
+            class="
+                fa-solid
+                fa-spinner
+                fa-spin
+            ">
+        </i>
 
-                        doc(
-                            db,
-                            "friendRequests",
-                            requestId
-                        ),
+        Refus...
 
-                        {
-
-                            status:
-                                "rejected",
-
-                            seen:
-                                true,
-
-                            date:
-                                Date.now()
-
-                        }
-
-                    );
+    `;
 
 
-                    console.log(
-                        "✅ Demande refusée."
-                    );
+    try {
 
+        const response =
+            await fetch(
+                "http://192.168.1.10:3000/api/auth/friend-request/reject",
+                {
 
-                } catch (error) {
+                    method:
+                        "POST",
 
-                    console.error(
-                        "❌ Erreur refus :",
-                        error
-                    );
+                    headers: {
 
+                        "Content-Type":
+                            "application/json"
 
-                    button.disabled =
-                        false;
+                    },
 
+                    body:
+                        JSON.stringify({
 
-                    button.innerHTML = `
+                            requestId,
 
-                        <i
-                            class="
-                                fa-solid
-                                fa-xmark
-                            ">
-                        </i>
+                            matricule:
+    profile.matricule
 
-                        Refuser
-
-                    `;
-
-
-                    alert(
-                        "Impossible de refuser la demande."
-                    );
+                        })
 
                 }
+            );
 
-            }
+
+        const result =
+            await response.json();
+
+
+        if (
+            !response.ok ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result.message ||
+                "Impossible de refuser la demande."
+            );
+
+        }
+
+
+        console.log(
+            "✅ Demande refusée."
+        );
+
+
+        const card =
+            button.closest(
+                ".friend-request-card"
+            );
+
+
+        if (card) {
+
+            card.remove();
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Erreur refus :",
+            error
+        );
+
+
+        button.disabled =
+            false;
+
+
+        button.innerHTML = `
+
+            <i
+                class="
+                    fa-solid
+                    fa-xmark
+                ">
+            </i>
+
+            Refuser
+
+        `;
+
+
+        alert(
+            error.message ||
+            "Impossible de refuser la demande."
+        );
+
+    }
+
+}
 
 
             // =====================================================

@@ -1,4 +1,4 @@
-import"../../../modulepreload-polyfill-Dezn_h7o.js";import{d as e,f as t,g as n,s as r,u as i,v as a,y as o}from"../../../authService-BFXktNCZ.js";import{t as s}from"../../../authGuard-PwbLRTEo.js";s(`etudiant`,async({profile:s})=>{let c=document.getElementById(`reclamation-content`),l=await r(),u=l?.anneeAcademique||sessionStorage.getItem(`anneeAcademique`);if(console.log(`📅 Année académique réclamation =`,u),console.log(`🔐 Mode session =`,l?.mode),console.log(`🔒 Lecture seule =`,l?.lectureSeule),l?.lectureSeule===!0){c.innerHTML=`
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{d as e,f as t,g as n,s as r,u as i,v as a,y as o}from"../../../authService-DlvHUxoR.js";import{t as s}from"../../../authGuard-CR_v3-ld.js";s(`etudiant`,async({profile:s})=>{let c=document.getElementById(`reclamation-content`),l=await r(),u=l?.anneeAcademique||sessionStorage.getItem(`anneeAcademique`);if(console.log(`📅 Année académique réclamation =`,u),console.log(`🔐 Mode session =`,l?.mode),console.log(`🔒 Lecture seule =`,l?.lectureSeule),l?.lectureSeule===!0){c.innerHTML=`
 
                 <div
                     class="reclamation-unavailable"
