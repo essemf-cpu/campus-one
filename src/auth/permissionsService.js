@@ -7,6 +7,14 @@ import {
 
 import { db } from "../firebase/firebase.js";
 
+// =====================================================
+// CACHE
+// =====================================================
+
+const affectationsAnneeCache = new Map();
+const affectationsActuellesCache = new Map();
+const permissionsPostesCache = new Map();
+
 
 // =====================================================
 // RÉCUPÉRER L'AFFECTATION D'UNE ANNÉE
@@ -23,6 +31,23 @@ export async function getAffectationPourAnnee(
     ) {
 
         return null;
+
+    }
+
+
+    const cacheKey =
+        `${agentMatricule}_${anneeAcademique}`;
+
+
+    if (
+        affectationsAnneeCache.has(
+            cacheKey
+        )
+    ) {
+
+        return affectationsAnneeCache.get(
+            cacheKey
+        );
 
     }
 
@@ -58,19 +83,69 @@ export async function getAffectationPourAnnee(
         snapshot.empty
     ) {
 
+        affectationsAnneeCache.set(
+            cacheKey,
+            null
+        );
+
         return null;
 
     }
 
 
-    return {
+    const affectations =
+        snapshot.docs.map(
+            document => ({
 
-        id:
-            snapshot.docs[0].id,
+                id:
+                    document.id,
 
-        ...snapshot.docs[0].data()
+                ...document.data()
 
-    };
+            })
+        );
+
+
+    affectations.sort(
+        (a, b) => {
+
+            const dateA =
+                a.dateDebut?.toDate
+                    ? a.dateDebut.toDate()
+                    : a.dateDebut
+                        ? new Date(
+                            a.dateDebut
+                        )
+                        : new Date(0);
+
+
+            const dateB =
+                b.dateDebut?.toDate
+                    ? b.dateDebut.toDate()
+                    : b.dateDebut
+                        ? new Date(
+                            b.dateDebut
+                        )
+                        : new Date(0);
+
+
+            return dateB - dateA;
+
+        }
+    );
+
+
+    const affectation =
+        affectations[0] || null;
+
+
+    affectationsAnneeCache.set(
+        cacheKey,
+        affectation
+    );
+
+
+    return affectation;
 
 }
 
@@ -83,9 +158,24 @@ export async function getAffectationActuelle(
     agentMatricule
 ) {
 
-    if (!agentMatricule) {
+    if (
+        !agentMatricule
+    ) {
 
         return null;
+
+    }
+
+
+    if (
+        affectationsActuellesCache.has(
+            agentMatricule
+        )
+    ) {
+
+        return affectationsActuellesCache.get(
+            agentMatricule
+        );
 
     }
 
@@ -121,19 +211,126 @@ export async function getAffectationActuelle(
         snapshot.empty
     ) {
 
+        affectationsActuellesCache.set(
+            agentMatricule,
+            null
+        );
+
         return null;
 
     }
 
 
-    return {
+    const affectations =
+        snapshot.docs.map(
+            document => ({
 
-        id:
-            snapshot.docs[0].id,
+                id:
+                    document.id,
 
-        ...snapshot.docs[0].data()
+                ...document.data()
 
-    };
+            })
+        );
+
+
+    const maintenant =
+        new Date();
+
+
+    const affectationsValides =
+        affectations.filter(
+            affectation => {
+
+                const dateDebut =
+                    affectation.dateDebut?.toDate
+                        ? affectation.dateDebut.toDate()
+                        : affectation.dateDebut
+                            ? new Date(
+                                affectation.dateDebut
+                            )
+                            : null;
+
+
+                if (
+                    dateDebut &&
+                    dateDebut > maintenant
+                ) {
+
+                    return false;
+
+                }
+
+
+                if (
+                    affectation.dateFin
+                ) {
+
+                    const dateFin =
+                        affectation.dateFin?.toDate
+                            ? affectation.dateFin.toDate()
+                            : new Date(
+                                affectation.dateFin
+                            );
+
+
+                    if (
+                        dateFin < maintenant
+                    ) {
+
+                        return false;
+
+                    }
+
+                }
+
+
+                return true;
+
+            }
+        );
+
+
+    affectationsValides.sort(
+        (a, b) => {
+
+            const dateA =
+                a.dateDebut?.toDate
+                    ? a.dateDebut.toDate()
+                    : a.dateDebut
+                        ? new Date(
+                            a.dateDebut
+                        )
+                        : new Date(0);
+
+
+            const dateB =
+                b.dateDebut?.toDate
+                    ? b.dateDebut.toDate()
+                    : b.dateDebut
+                        ? new Date(
+                            b.dateDebut
+                        )
+                        : new Date(0);
+
+
+            return dateB - dateA;
+
+        }
+    );
+
+
+    const affectation =
+        affectationsValides[0] || null;
+
+
+    affectationsActuellesCache.set(
+        agentMatricule,
+        affectation
+    );
+
+
+    return affectation;
 
 }
 
@@ -146,9 +343,24 @@ export async function getPermissionsPoste(
     posteId
 ) {
 
-    if (!posteId) {
+    if (
+        !posteId
+    ) {
 
         return {};
+
+    }
+
+
+    if (
+        permissionsPostesCache.has(
+            posteId
+        )
+    ) {
+
+        return permissionsPostesCache.get(
+            posteId
+        );
 
     }
 
@@ -184,6 +396,11 @@ export async function getPermissionsPoste(
         snapshot.empty
     ) {
 
+        permissionsPostesCache.set(
+            posteId,
+            {}
+        );
+
         return {};
 
     }
@@ -193,27 +410,30 @@ export async function getPermissionsPoste(
         snapshot.docs[0].data();
 
 
-    return (
+    const permissions =
         permission.permissions ||
-        {}
+        {};
+
+
+    permissionsPostesCache.set(
+        posteId,
+        permissions
     );
+
+
+    return permissions;
 
 }
 
 
 // =====================================================
 // RÉSOUDRE LES DROITS DE L'AGENT
-// POUR UNE ANNÉE DONNÉE
 // =====================================================
 
 export async function getAgentPermissions(
     agentMatricule,
     anneeAcademique
 ) {
-
-    // =================================================
-    // AFFECTATION POUR L'ANNÉE CHOISIE
-    // =================================================
 
     const affectation =
         await getAffectationPourAnnee(
@@ -222,44 +442,31 @@ export async function getAgentPermissions(
         );
 
 
-    console.log(
-        "📅 ANNÉE CHOISIE =",
-        anneeAcademique
-    );
-
-
-    console.log(
-        "📌 AFFECTATION POUR CETTE ANNÉE =",
-        affectation
-    );
-
-
-    // =================================================
-    // AUCUNE AFFECTATION
-    // =================================================
-
-    if (!affectation) {
+    if (
+        !affectation
+    ) {
 
         return {
 
-            affectation: null,
+            affectation:
+                null,
 
-            posteId: null,
+            posteId:
+                null,
 
-            permissions: {},
+            permissions:
+                {},
 
-            mode: "bloque",
+            mode:
+                "bloque",
 
-            lectureSeule: false
+            lectureSeule:
+                false
 
         };
 
     }
 
-
-    // =================================================
-    // AFFECTATION ACTIVE
-    // =================================================
 
     const affectationActuelle =
         await getAffectationActuelle(
@@ -273,12 +480,9 @@ export async function getAgentPermissions(
             affectation.id;
 
 
-    // =================================================
-    // POSTE
-    // =================================================
-
     const posteId =
-        affectation.posteId || null;
+        affectation.posteId ||
+        null;
 
 
     let permissions =
@@ -286,15 +490,6 @@ export async function getAgentPermissions(
             posteId
         );
 
-
-    // =================================================
-    // ANCIENNE AFFECTATION
-    // =================================================
-    //
-    // Une ancienne affectation peut être consultée,
-    // mais jamais utilisée pour effectuer des actions.
-    //
-    // =================================================
 
     if (
         !estAffectationActuelle
@@ -304,7 +499,6 @@ export async function getAgentPermissions(
 
             ...permissions,
 
-            // Consultation autorisée
             voirResidents:
                 permissions.voirResidents === true,
 
@@ -317,11 +511,9 @@ export async function getAgentPermissions(
             suivreBons:
                 permissions.suivreBons === true,
 
-            // Données sensibles masquées
             voirDonneesResidents:
                 false,
 
-            // Toutes les actions sont interdites
             gererBons:
                 false,
 
@@ -329,11 +521,6 @@ export async function getAgentPermissions(
                 false
 
         };
-
-
-        console.log(
-            "🔒 MODE LECTURE SEULE"
-        );
 
 
         return {
@@ -344,22 +531,15 @@ export async function getAgentPermissions(
 
             permissions,
 
-            mode: "lecture",
+            mode:
+                "lecture",
 
-            lectureSeule: true
+            lectureSeule:
+                true
 
         };
 
     }
-
-
-    // =================================================
-    // AFFECTATION ACTUELLE
-    // =================================================
-
-    console.log(
-        "🔓 MODE NORMAL"
-    );
 
 
     return {
@@ -370,10 +550,27 @@ export async function getAgentPermissions(
 
         permissions,
 
-        mode: "normal",
+        mode:
+            "normal",
 
-        lectureSeule: false
+        lectureSeule:
+            false
 
     };
+
+}
+
+
+// =====================================================
+// VIDER LE CACHE
+// =====================================================
+
+export function clearPermissionsCache() {
+
+    affectationsAnneeCache.clear();
+
+    affectationsActuellesCache.clear();
+
+    permissionsPostesCache.clear();
 
 }

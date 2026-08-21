@@ -1,6 +1,7 @@
 import { createIcons, icons } from "lucide";
 import { signOut } from "firebase/auth";
-import { auth } from "../../../firebase/firebase.js";
+
+import { auth, db } from "../../../firebase/firebase.js";
 import { clearCurrentUserCache } from "../../../auth/authService.js";
 
 import {
@@ -10,25 +11,35 @@ import {
     onSnapshot
 } from "firebase/firestore";
 
-import { db } from "../../../firebase/firebase.js";
-
 import logo from "../../../assets/logo coud.png";
 
 
+// =====================================================
+// LISTENER NOTIFICATION UNIQUE
+// =====================================================
 
+let notificationsUnsubscribe = null;
+
+
+// =====================================================
+// CHARGEMENT SIDEBAR
+// =====================================================
 
 export async function loadSidebar(profile) {
 
     const container =
-        document.getElementById(
-            "sidebar-container"
-        );
+        document.getElementById("sidebar-container");
+
+    if (!container) {
+        return;
+    }
 
 
-    if (
-        container &&
-        container.innerHTML.trim() === ""
-    ) {
+    // =================================================
+    // CRÉER LA SIDEBAR UNE SEULE FOIS
+    // =================================================
+
+    if (!container.dataset.loaded) {
 
         container.innerHTML = `
 
@@ -50,7 +61,6 @@ export async function loadSidebar(profile) {
     class="logo"
     id="sidebar-logo"
 >
-
 
 <button class="notif-btn">
 
@@ -81,16 +91,12 @@ export async function loadSidebar(profile) {
 
 <h4>VOIR AUSSI</h4>
 
-
 <a
     id="menu-lingerie"
     href="../lingerie/index.html"
 >
-
 <i data-lucide="shirt"></i>
-
 <span>Lingerie</span>
-
 </a>
 
 
@@ -98,11 +104,8 @@ export async function loadSidebar(profile) {
     id="menu-residents"
     href="../residents/index.html"
 >
-
 <i data-lucide="users"></i>
-
 <span>Résidents</span>
-
 </a>
 
 
@@ -110,11 +113,8 @@ export async function loadSidebar(profile) {
     id="menu-recouvrement"
     href="../recouvrement/index.html"
 >
-
 <i data-lucide="wallet"></i>
-
 <span>Recouvrement</span>
-
 </a>
 
 </div>
@@ -124,16 +124,12 @@ export async function loadSidebar(profile) {
 
 <h4>BON DE TRAVAIL</h4>
 
-
 <a
     id="menu-demandes"
     href="../demandes/index.html"
 >
-
 <i data-lucide="clipboard-list"></i>
-
 <span>Demandes</span>
-
 </a>
 
 
@@ -141,11 +137,8 @@ export async function loadSidebar(profile) {
     id="menu-suivi"
     href="../demandes/index.html#suivi"
 >
-
 <i data-lucide="clipboard-check"></i>
-
 <span>Suivi</span>
-
 </a>
 
 
@@ -153,11 +146,8 @@ export async function loadSidebar(profile) {
     id="menu-anciens"
     href="../anciens-bons/index.html"
 >
-
 <i data-lucide="archive"></i>
-
 <span>Anciens bons</span>
-
 </a>
 
 
@@ -165,11 +155,8 @@ export async function loadSidebar(profile) {
     id="menu-historique"
     href="../historique-demandes/index.html"
 >
-
 <i data-lucide="history"></i>
-
 <span>Historique des demandes</span>
-
 </a>
 
 </div>
@@ -179,16 +166,12 @@ export async function loadSidebar(profile) {
 
 <h4>GESTION</h4>
 
-
 <a
     id="menu-dashboard"
     href="../tableau-de-bord/index.html"
 >
-
 <i data-lucide="layout-dashboard"></i>
-
 <span>Mon tableau de bord</span>
-
 </a>
 
 </div>
@@ -202,20 +185,15 @@ export async function loadSidebar(profile) {
     href="#"
     id="logout-btn"
 >
-
 <i data-lucide="log-out"></i>
-
 <span>Déconnexion</span>
-
 </a>
 
 
 <div class="agent-card">
 
 <div class="agent-avatar">
-
 <i data-lucide="user"></i>
-
 </div>
 
 
@@ -226,7 +204,6 @@ export async function loadSidebar(profile) {
     id="sidebar-nom"
 ></strong>
 
-
 <small
     class="agent-site"
     id="sidebar-site"
@@ -236,9 +213,7 @@ export async function loadSidebar(profile) {
 
 
 <button class="agent-menu">
-
 <i data-lucide="chevron-down"></i>
-
 </button>
 
 </div>
@@ -246,252 +221,296 @@ export async function loadSidebar(profile) {
 </div>
 
 </aside>
-
 `;
+
+        container.dataset.loaded = "true";
+
+
+        // Les icônes ne sont créées qu'une seule fois
+        createIcons({
+            icons
+        });
 
     }
 
-    console.log(
-    "🔐 PERMISSIONS SIDEBAR =",
-    profile.permissions
-);
 
-    // =====================================================
-// PERMISSIONS — SIDEBAR
-// =====================================================
+    // =================================================
+    // PERMISSIONS
+    // =================================================
 
-const permissions =
-    profile.permissions || {};
+    const permissions =
+        profile?.permissions || {};
 
 
-// Résidents
-if (!permissions.voirResidents) {
+    const menus = {
 
-    document
-        .getElementById("menu-residents")
-        ?.remove();
+        "menu-residents":
+            permissions.voirResidents,
 
-}
+        "menu-recouvrement":
+            permissions.voirRecouvrement,
 
+        "menu-demandes":
+            permissions.voirDemandes,
 
-// Recouvrement
-if (!permissions.voirRecouvrement) {
+        "menu-suivi":
+            permissions.suivreBons,
 
-    document
-        .getElementById("menu-recouvrement")
-        ?.remove();
+        "menu-anciens":
+            permissions.voirAnciensBons,
 
-}
+        "menu-historique":
+            permissions.suivreBons,
 
+        "menu-dashboard":
+            permissions.voirTableauDeBord
 
-// Demandes
-if (!permissions.voirDemandes) {
-
-    document
-        .getElementById("menu-demandes")
-        ?.remove();
-
-}
+    };
 
 
-// Suivi
-if (!permissions.suivreBons) {
+    for (
+        const [id, autorise]
+        of Object.entries(menus)
+    ) {
 
-    document
-        .getElementById("menu-suivi")
-        ?.remove();
+        const element =
+            document.getElementById(id);
 
-}
+        if (!element) {
+            continue;
+        }
 
+        element.style.display =
+            autorise ? "" : "none";
 
-// Anciens bons
-if (!permissions.voirAnciensBons) {
-
-    document
-        .getElementById("menu-anciens")
-        ?.remove();
-
-}
+    }
 
 
-// Historique des demandes
-if (!permissions.suivreBons) {
-
-    document
-        .getElementById("menu-historique")
-        ?.remove();
-
-}
-
-
-// Tableau de bord
-if (!permissions.voirTableauDeBord) {
-
-    document
-        .getElementById("menu-dashboard")
-        ?.remove();
-
-}
-
-
-
-    // =====================================================
+    // =================================================
     // PAGE ACTIVE
-    // =====================================================
-
-    document
-        .querySelectorAll(".section a")
-        .forEach(
-            link => {
-
-                link.classList.remove(
-                    "active"
-                );
-
-            }
-        );
-
+    // =================================================
 
     const page =
         window.location.pathname;
 
 
+    const pages = [
 
-    // =====================================================
-    // DEMANDES
-    // =====================================================
+        ["/demandes/", "menu-demandes"],
 
-    if (
-        page.includes(
-            "/demandes/"
-        )
+        ["/tableau-de-bord/", "menu-dashboard"],
+
+        ["/anciens-bons/", "menu-anciens"],
+
+        ["/historique-demandes/", "menu-historique"],
+
+        ["/residents/", "menu-residents"]
+
+    ];
+
+
+    document
+        .querySelectorAll(".section a")
+        .forEach(
+            link =>
+                link.classList.remove("active")
+        );
+
+
+    for (
+        const [fragment, id]
+        of pages
     ) {
 
-        document
-            .getElementById(
-                "menu-demandes"
-            )
-            ?.classList.add(
-                "active"
-            );
+        if (
+            page.includes(fragment)
+        ) {
+
+            document
+                .getElementById(id)
+                ?.classList.add("active");
+
+        }
 
     }
 
 
+    // =================================================
+    // INFORMATIONS AGENT
+    // =================================================
 
-    // =====================================================
-    // TABLEAU DE BORD
-    // =====================================================
+    const affectation =
+        document.getElementById(
+            "sidebar-affectation"
+        );
+
+    const fonction =
+        document.getElementById(
+            "sidebar-fonction"
+        );
+
+    const nom =
+        document.getElementById(
+            "sidebar-nom"
+        );
+
+    const site =
+        document.getElementById(
+            "sidebar-site"
+        );
+
+
+    if (affectation) {
+        affectation.textContent =
+            profile.affectation || "";
+    }
+
+
+    if (fonction) {
+        fonction.textContent =
+            profile.fonction || "";
+    }
+
+
+    if (nom) {
+        nom.textContent =
+            `${profile.prenom || ""} ${profile.nom || ""}`.trim();
+    }
+
+
+    if (site) {
+        site.textContent =
+            profile.site || "";
+    }
+
+
+    // =================================================
+    // ÉVÉNEMENTS
+    // =================================================
+
+    const sidebar =
+        document.querySelector(".sidebar");
+
+    const menuBtn =
+        document.querySelector(".menu-btn");
+
+    const mobileMenuBtn =
+        document.getElementById("mobile-menu-btn");
+
+
+    // -------------------------------------------------
+    // MENU SIDEBAR
+    // -------------------------------------------------
 
     if (
-        page.includes(
-            "/tableau-de-bord/"
-        )
+        menuBtn &&
+        !menuBtn.dataset.binded
     ) {
 
-        document
-            .getElementById(
-                "menu-dashboard"
-            )
-            ?.classList.add(
-                "active"
-            );
+        menuBtn.dataset.binded =
+            "true";
+
+        menuBtn.onclick = () => {
+
+            if (
+                window.innerWidth <= 768
+            ) {
+
+                sidebar?.classList.toggle(
+                    "open"
+                );
+
+            } else {
+
+                sidebar?.classList.toggle(
+                    "collapsed"
+                );
+
+            }
+
+        };
 
     }
 
 
-
-    // =====================================================
-    // SUIVI
-    // =====================================================
+    // -------------------------------------------------
+    // MENU MOBILE
+    // -------------------------------------------------
 
     if (
-        page.includes(
-            "/suivi/"
-        )
+        mobileMenuBtn &&
+        !mobileMenuBtn.dataset.binded
     ) {
 
-        document
-            .getElementById(
-                "menu-suivi"
-            )
-            ?.classList.add(
-                "active"
+        mobileMenuBtn.dataset.binded =
+            "true";
+
+        mobileMenuBtn.onclick = (event) => {
+
+            event.stopPropagation();
+
+            sidebar?.classList.toggle(
+                "open"
             );
+
+        };
 
     }
 
 
-
-    // =====================================================
-    // ANCIENS BONS
-    // =====================================================
+    // -------------------------------------------------
+    // CLIC EXTÉRIEUR MOBILE
+    // -------------------------------------------------
 
     if (
-        page.includes(
-            "/anciens-bons/"
-        )
+        !document.body.dataset.sidebarClickBound
     ) {
 
-        document
-            .getElementById(
-                "menu-anciens"
-            )
-            ?.classList.add(
-                "active"
-            );
+        document.body.dataset.sidebarClickBound =
+            "true";
+
+        document.addEventListener(
+            "click",
+            (event) => {
+
+                if (
+                    window.innerWidth > 768
+                ) {
+                    return;
+                }
+
+                const currentSidebar =
+                    document.querySelector(
+                        ".sidebar"
+                    );
+
+                const currentMobileButton =
+                    document.getElementById(
+                        "mobile-menu-btn"
+                    );
+
+                if (
+                    currentSidebar &&
+                    currentSidebar.classList.contains("open") &&
+                    !currentSidebar.contains(event.target) &&
+                    event.target !== currentMobileButton
+                ) {
+
+                    currentSidebar.classList.remove(
+                        "open"
+                    );
+
+                }
+
+            }
+        );
 
     }
 
 
-
-    // =====================================================
-    // HISTORIQUE
-    // =====================================================
-
-    if (
-        page.includes(
-            "/historique-demandes/"
-        )
-    ) {
-
-        document
-            .getElementById(
-                "menu-historique"
-            )
-            ?.classList.add(
-                "active"
-            );
-
-    }
-
-
-
-    // =====================================================
-    // RÉSIDENTS
-    // =====================================================
-
-    if (
-        page.includes(
-            "/residents/"
-        )
-    ) {
-
-        document
-            .getElementById(
-                "menu-residents"
-            )
-            ?.classList.add(
-                "active"
-            );
-
-    }
-
-
-
-    // =====================================================
-    // SUIVI — CLIC DEPUIS DEMANDES
-    // =====================================================
+    // =================================================
+    // SUIVI DEPUIS DEMANDES
+    // =================================================
 
     const suiviLink =
         document.getElementById(
@@ -507,91 +526,33 @@ if (!permissions.voirTableauDeBord) {
         suiviLink.dataset.binded =
             "true";
 
+        suiviLink.onclick = (event) => {
 
-        suiviLink.onclick =
-            (e) => {
+            if (
+                window.location.pathname.includes(
+                    "/demandes/"
+                )
+            ) {
 
-                if (
-                    page.includes(
-                        "/demandes/"
-                    )
-                ) {
+                event.preventDefault();
 
-                    e.preventDefault();
+                document
+                    .getElementById("suivi")
+                    ?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
 
+            }
 
-                    document
-                        .getElementById(
-                            "suivi"
-                        )
-                        ?.scrollIntoView({
-
-                            behavior:
-                                "smooth",
-
-                            block:
-                                "start"
-
-                        });
-
-                }
-
-            };
+        };
 
     }
 
 
-
-    // =====================================================
-    // INFORMATIONS AGENT
-    // =====================================================
-
-    document
-        .getElementById(
-            "sidebar-affectation"
-        )
-        .textContent =
-            profile.affectation;
-
-
-    document
-        .getElementById(
-            "sidebar-fonction"
-        )
-        .textContent =
-            profile.fonction;
-
-
-    document
-        .getElementById(
-            "sidebar-nom"
-        )
-        .textContent =
-            `${profile.prenom} ${profile.nom}`;
-
-
-    document
-        .getElementById(
-            "sidebar-site"
-        )
-        .textContent =
-            profile.site;
-
-
-
-    // =====================================================
-    // ICÔNES
-    // =====================================================
-
-    createIcons({
-        icons
-    });
-
-
-
-    // =====================================================
+    // =================================================
     // DÉCONNEXION
-    // =====================================================
+    // =================================================
 
     const logout =
         document.getElementById(
@@ -607,20 +568,25 @@ if (!permissions.voirTableauDeBord) {
         logout.dataset.binded =
             "true";
 
-
         logout.onclick =
-            async (e) => {
+            async (event) => {
 
-                e.preventDefault();
+                event.preventDefault();
 
+                if (
+                    notificationsUnsubscribe
+                ) {
+
+                    notificationsUnsubscribe();
+
+                    notificationsUnsubscribe =
+                        null;
+
+                }
 
                 clearCurrentUserCache();
 
-
-                await signOut(
-                    auth
-                );
-
+                await signOut(auth);
 
                 window.location.href =
                     "../../../auth/login.html";
@@ -630,135 +596,9 @@ if (!permissions.voirTableauDeBord) {
     }
 
 
-
-    // =====================================================
-    // MENU
-    // =====================================================
-
-    const sidebar =
-        document.querySelector(
-            ".sidebar"
-        );
-
-
-    const menuBtn =
-        document.querySelector(
-            ".menu-btn"
-        );
-
-
-    const mobileMenuBtn =
-        document.getElementById(
-            "mobile-menu-btn"
-        );
-
-
-
-    // =====================================================
-    // BOUTON SIDEBAR PC
-    // =====================================================
-
-    if (
-        menuBtn
-    ) {
-
-        menuBtn.onclick =
-            () => {
-
-                if (
-                    window.innerWidth <=
-                    768
-                ) {
-
-                    sidebar.classList.toggle(
-                        "open"
-                    );
-
-                } else {
-
-                    sidebar.classList.toggle(
-                        "collapsed"
-                    );
-
-                }
-
-            };
-
-    }
-
-
-
-    // =====================================================
-    // BOUTON HEADER MOBILE
-    // =====================================================
-
-    if (
-        mobileMenuBtn
-    ) {
-
-        mobileMenuBtn.onclick =
-            (e) => {
-
-                e.stopPropagation();
-
-
-                sidebar.classList.toggle(
-                    "open"
-                );
-
-            };
-
-    }
-
-
-
-    // =====================================================
-    // FERMER EN CLIQUANT À CÔTÉ
-    // =====================================================
-
-    document.addEventListener(
-        "click",
-        (e) => {
-
-            if (
-                window.innerWidth >
-                768
-            ) {
-
-                return;
-
-            }
-
-
-            if (
-
-                sidebar.classList.contains(
-                    "open"
-                ) &&
-
-                !sidebar.contains(
-                    e.target
-                ) &&
-
-                e.target !==
-                mobileMenuBtn
-
-            ) {
-
-                sidebar.classList.remove(
-                    "open"
-                );
-
-            }
-
-        }
-    );
-
-
-
-    // =====================================================
-    // NOTIFICATIONS — DEMANDES ÉTUDIANTES
-    // =====================================================
+    // =================================================
+    // NOTIFICATIONS
+    // =================================================
 
     const notifCount =
         document.getElementById(
@@ -767,7 +607,8 @@ if (!permissions.voirTableauDeBord) {
 
 
     if (
-        notifCount
+        notifCount &&
+        permissions.voirDemandes
     ) {
 
         const siteAgent =
@@ -788,15 +629,20 @@ if (!permissions.voirTableauDeBord) {
             pavillonAgent
         ) {
 
-            console.log(
-                "🔔 Notification agent :",
-                {
-                    siteAgent,
-                    pavillonAgent,
-                    affectationOriginale:
-                        profile.affectation
-                }
-            );
+            // -----------------------------------------
+            // ÉVITER LES DOUBLES LISTENERS
+            // -----------------------------------------
+
+            if (
+                notificationsUnsubscribe
+            ) {
+
+                notificationsUnsubscribe();
+
+                notificationsUnsubscribe =
+                    null;
+
+            }
 
 
             const notificationsQuery =
@@ -828,41 +674,47 @@ if (!permissions.voirTableauDeBord) {
                 );
 
 
-            onSnapshot(
+            notificationsUnsubscribe =
+                onSnapshot(
 
-                notificationsQuery,
+                    notificationsQuery,
 
-                (snapshot) => {
+                    (snapshot) => {
 
-                    console.log(
-                        "🔔 Demandes non vues :",
-                        snapshot.size
-                    );
-
-
-                    const nombre =
-                        snapshot.size;
+                        const nombre =
+                            snapshot.size;
 
 
-                    if (
-                        nombre > 0
-                    ) {
+                        if (
+                            nombre > 0
+                        ) {
 
-                        notifCount.textContent =
-                            nombre > 99
-                                ? "99+"
-                                : nombre;
+                            notifCount.textContent =
+                                nombre > 99
+                                    ? "99+"
+                                    : String(nombre);
 
+                            notifCount.classList.remove(
+                                "hidden"
+                            );
 
-                        notifCount.classList.remove(
-                            "hidden"
-                        );
+                        } else {
 
-                    } else {
+                            notifCount.textContent =
+                                "";
+
+                            notifCount.classList.add(
+                                "hidden"
+                            );
+
+                        }
+
+                    },
+
+                    () => {
 
                         notifCount.textContent =
                             "";
-
 
                         notifCount.classList.add(
                             "hidden"
@@ -870,30 +722,17 @@ if (!permissions.voirTableauDeBord) {
 
                     }
 
-                },
-
-
-                (error) => {
-
-                    console.error(
-                        "❌ Erreur compteur notifications :",
-                        error
-                    );
-
-
-                    notifCount.textContent =
-                        "";
-
-
-                    notifCount.classList.add(
-                        "hidden"
-                    );
-
-                }
-
-            );
+                );
 
         }
+
+    } else if (notifCount) {
+
+        notifCount.textContent = "";
+
+        notifCount.classList.add(
+            "hidden"
+        );
 
     }
 

@@ -8,242 +8,483 @@
 
     <title>Hébergement</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <script type="module" crossorigin src="/assets/modules/hebergement/demandes/index-DG7_n7TY.js"></script>
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+  <script type="module" crossorigin src="/assets/modules/hebergement/demandes/index-CaCKVXrq.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-Dezn_h7o.js">
-  <link rel="modulepreload" crossorigin href="/assets/authService-DlvHUxoR.js">
-  <link rel="modulepreload" crossorigin href="/assets/authGuard-CR_v3-ld.js">
+  <link rel="modulepreload" crossorigin href="/assets/authService-DVXfzcTf.js">
+  <link rel="modulepreload" crossorigin href="/assets/sessionManager-DFkkBU6L.js">
+  <link rel="modulepreload" crossorigin href="/assets/authGuard-CFyE0oYo.js">
   <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-QTnfLwEv.js">
-  <link rel="modulepreload" crossorigin href="/assets/sidebar-CvJdERsX.js">
-  <link rel="modulepreload" crossorigin href="/assets/referentielService-DNYTMZbL.js">
+  <link rel="modulepreload" crossorigin href="/assets/sidebar-W_Wm9AxL.js">
+  <link rel="modulepreload" crossorigin href="/assets/referentielService-8I8cp3Ra.js">
+  <link rel="modulepreload" crossorigin href="/assets/bonsService-DzY9579a.js">
   <link rel="stylesheet" crossorigin href="/assets/sidebar-C77Ai2pi.css">
   <link rel="stylesheet" crossorigin href="/assets/index-DJRRICSP.css">
 </head>
 
+
 <body>
+
+
+    <!-- =====================================================
+         HEADER MOBILE
+    ====================================================== -->
 
     <header class="mobile-header">
 
-    <button id="mobile-menu-btn">
+        <button id="mobile-menu-btn">
+            ☰
+        </button>
 
-        ☰
+        <h2 id="mobile-title">
+            Hébergement
+        </h2>
 
-    </button>
+    </header>
 
-    <h2 id="mobile-title">
 
-        Hébergement
+    <!-- =====================================================
+         LOADER
+    ====================================================== -->
 
-    </h2>
+    <div id="app-loader">
 
-</header>
+        <img
+            src="/assets/logo%20coud-BWhvgonx.png"
+            alt="Campus One"
+        >
 
-<div id="app-loader">
+        <h2>
+            Campus One
+        </h2>
 
-    <img src="/assets/logo%20coud-BWhvgonx.png" alt="Campus One">
+        <p>
+            Chargement de votre espace...
+        </p>
 
-    <h2>Campus One</h2>
+    </div>
 
-    <p>Chargement de votre espace...</p>
 
-</div>
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
 
-<div id="sidebar-container"></div>
+    <div id="sidebar-container"></div>
+
+
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
 
     <main id="content">
 
+
+        <!-- =================================================
+             TITRE
+        ================================================== -->
+
         <section class="page-title">
 
-    <h1>Bon de travail - <span id="page-title"></span></h1>
+            <h1>
+                Bon de travail -
+                <span id="page-title"></span>
+            </h1>
 
-</section>
+        </section>
 
-    <!-- =========================
-         DEMANDES ETUDIANTS
-    ========================== -->
 
-    <section class="card demandes-card">
+        <!-- =================================================
+             DEMANDES ÉTUDIANTS
+        ================================================== -->
 
-        <div class="card-header">
+        <section class="card demandes-card">
 
-            <h2>Demandes étudiants</h2>
+            <div class="card-header">
 
-        </div>
-
-        <table class="table">
-
-            <thead>
-    <tr>
-        <th>Étudiant</th>
-        <th>Carte</th>
-        <th>Chambre</th>
-        <th>Type</th>
-        <th>Localisation</th>
-        <th>Problème</th>
-        <th>Action</th>
-    </tr>
-</thead>
-
-            <tbody id="demandes-body">
-
-<tr class="empty-row">
-
-<td colspan="7">
-
-Aucune demande pour le moment
-
-</td>
-
-</tr>
-
-</tbody>
-
-        </table>
-
-    </section>
-
-    <!-- =========================
-         NOUVEAU BON
-    ========================== -->
-
-    <section class="card nouveau-card">
-
-        <div class="card-header">
-
-            <h2>Nouveau bon</h2>
-
-        </div>
-
-        <form id="bonForm">
-
-            <div class="grid">
-
-                <div>
-
-                    <label>Date</label>
-
-                    <input
-                        type="date"
-                        id="date">
-
-                </div>
-
-                <div>
-
-                    <label>Type</label>
-
-                    <select id="type">
-
-                    </select>
-
-                </div>
-
-                <div class="full">
-
-                    <label>Description</label>
-
-                    <textarea
-                        id="description"
-                        rows="4">
-                    </textarea>
-
-                </div>
-
-                <div>
-
-                    <label>Chambre</label>
-
-                    <input
-                        id="chambre">
-
-                </div>
-
-                <div>
-
-                    <label>Toilette</label>
-
-                    <input
-                        id="toilette">
-
-                </div>
+                <h2>
+                    Demandes étudiants
+                </h2>
 
             </div>
 
-            <button
-                class="primary-btn"
-                type="submit">
 
-                Envoyer
+            <table class="table">
 
-            </button>
+    <thead>
 
-        </form>
+        <tr>
 
-    </section>
+            <th>
+                Étudiant
+            </th>
 
-    <!-- =========================
-         SUIVI
-    ========================== -->
+            <th>
+                Carte
+            </th>
 
-    <section id="suivi" class="card suivi-card">
+            <th>
+                Chambre
+            </th>
 
-        <div class="card-header">
+            <th>
+                Type
+            </th>
 
-            <h2>Suivi (bons du jour)</h2>
+            <th>
+                Localisation
+            </th>
 
-        </div>
+            <th>
+                Niveau
+            </th>
 
-        <table class="table">
+            <th>
+                Côté
+            </th>
 
-            <thead>
+            <th>
+                Problème
+            </th>
 
-                <tr>
+            <th>
+                Action
+            </th>
 
-                    <th>ID</th>
+        </tr>
 
-                    <th>Date</th>
+    </thead>
 
-                    <th>Type</th>
 
-                    <th>Description</th>
+    <tbody id="demandes-body">
 
-                    <th>Chambre</th>
+        <tr class="empty-row">
 
-                    <th>Toilette</th>
+            <td colspan="9">
 
-                    <th>Supprimer</th>
+                Aucune demande pour le moment
 
-                    <th>Statut</th>
+            </td>
 
-                    <th>Cause</th>
+        </tr>
 
-                </tr>
+    </tbody>
 
-            </thead>
+</table>
 
-            <tbody id="bons-body">
+        </section>
 
-<tr class="empty-row">
 
-<td colspan="9">
+        <!-- =================================================
+             NOUVEAU BON
+        ================================================== -->
 
-Aucun bon aujourd'hui
+        <section class="card nouveau-card">
 
-</td>
+            <div class="card-header">
 
-</tr>
+                <h2>
+                    Nouveau bon
+                </h2>
 
-</tbody>
+            </div>
 
-        </table>
 
-    </section>
+            <form id="bonForm">
 
-</main>
+
+                <div class="grid">
+
+
+                    <!-- =====================================
+                         DATE
+                    ====================================== -->
+
+                    <div>
+
+                        <label for="date">
+                            Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="date"
+                        >
+
+                    </div>
+
+
+                    <!-- =====================================
+                         TYPE
+                    ====================================== -->
+
+                    <div>
+
+                        <label for="type">
+                            Type
+                        </label>
+
+                        <select id="type">
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- =====================================
+                         LOCALISATION
+                    ====================================== -->
+
+                    <div>
+
+                        <label for="localisation">
+                            Localisation
+                        </label>
+
+                        <input
+                            id="localisation"
+                            type="text"
+                            placeholder="Ex. Couloir, toilettes, douche..."
+                        >
+
+                    </div>
+
+
+                    <!-- =====================================
+                         NIVEAU / ÉTAGE
+                    ====================================== -->
+
+                    <div>
+
+                        <label for="niveau">
+                            Niveau / étage
+                        </label>
+
+                        <input
+                            id="niveau"
+                            type="text"
+                            placeholder="Ex. 1er étage"
+                        >
+
+                    </div>
+
+
+                    <!-- =====================================
+                         CÔTÉ
+                    ====================================== -->
+
+                    <div>
+
+                        <label for="cote">
+                            Côté
+                        </label>
+
+                        <input
+                            id="cote"
+                            type="text"
+                            placeholder="Ex. gauche / droite"
+                        >
+
+                    </div>
+
+
+                    <!-- =====================================
+                         CHAMBRE
+                    ====================================== -->
+
+                    <div>
+
+                        <label for="chambre">
+                            Chambre
+                        </label>
+
+                        <input
+                            id="chambre"
+                            type="text"
+                        >
+
+                    </div>
+
+
+                    <!-- =====================================
+                         TOILETTE
+                         COMPATIBILITÉ ANCIEN SYSTÈME
+                    ====================================== -->
+
+                    <div>
+
+                        <label for="toilette">
+                            Toilette
+                        </label>
+
+                        <input
+                            id="toilette"
+                            type="text"
+                        >
+
+                    </div>
+
+
+                    <!-- =====================================
+                         DESCRIPTION
+                    ====================================== -->
+
+                    <div class="full">
+
+                        <label for="description">
+                            Description
+                        </label>
+
+                        <textarea
+                            id="description"
+                            rows="4"
+                        ></textarea>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- =========================================
+                     ENVOI
+                ========================================== -->
+
+                <button
+                    class="primary-btn"
+                    type="submit"
+                >
+
+                    Envoyer
+
+                </button>
+
+
+            </form>
+
+        </section>
+
+
+        <!-- =================================================
+     SUIVI
+================================================== -->
+
+<section
+    id="suivi"
+    class="card suivi-card"
+>
+
+    <div class="card-header">
+
+        <h2>
+            Suivi (bons du jour)
+        </h2>
+
+    </div>
+
+
+    <table class="table">
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    ID
+                </th>
+
+                <th>
+                    Date
+                </th>
+
+                <th>
+                    Type
+                </th>
+
+                <th>
+                    Localisation
+                </th>
+
+                <th>
+                    Niveau
+                </th>
+
+                <th>
+                    Côté
+                </th>
+
+                <th>
+                    Chambre
+                </th>
+
+                <th>
+                    Toilette
+                </th>
+
+                <th>
+                    Description
+                </th>
+
+                <th>
+                    Supprimer
+                </th>
+
+                <th>
+                    Statut
+                </th>
+
+                <th>
+                    Cause
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody id="bons-body">
+
+            <tr class="empty-row">
+
+                <td colspan="12">
+
+                    Aucun bon aujourd'hui
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         SCRIPT
+    ====================================================== -->
 
+
 
 </body>
 

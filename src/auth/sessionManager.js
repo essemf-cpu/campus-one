@@ -1,12 +1,10 @@
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase/firebase.js";
 import { getCurrentUser } from "./authService.js";
-import { getAgentPermissions } from "./permissionsService.js";
 
 let session = null;
 let initialized = false;
 let waiting = [];
-
 
 // =====================================================
 // AUTHENTIFICATION FIREBASE
@@ -18,146 +16,47 @@ onAuthStateChanged(
 
         try {
 
-            // =============================================
-            // AUCUN UTILISATEUR CONNECTÉ
-            // =============================================
-
             if (!firebaseUser) {
 
                 session = null;
 
             } else {
 
-                // =========================================
-                // RÉCUPÉRER L'UTILISATEUR
-                // =========================================
+                const currentUser =
+                    await getCurrentUser(
+                        firebaseUser.uid
+                    );
 
-                console.log("🔥 UID AUTH =", firebaseUser.uid);
+                // getCurrentUser() a déjà résolu
+                // l'affectation et les permissions.
+                session = {
 
-const currentUser =
-    await getCurrentUser(
-        firebaseUser.uid
-    );
+                    firebaseUser,
 
-console.log("✅ CURRENT USER FIRESTORE =", currentUser);
+                    account:
+                        currentUser.account,
 
-                   // =========================================
-// ANNÉE ACADÉMIQUE SÉLECTIONNÉE
-// =========================================
+                    profile:
+                        currentUser.profile,
 
-const anneeAcademique =
-    sessionStorage.getItem(
-        "anneeAcademique"
-    );
+                    anneeAcademique:
+                        currentUser.anneeAcademique || null,
 
+                    affectation:
+                        currentUser.affectation || null,
 
-// =========================================
-// DROITS DE L'UTILISATEUR
-// =========================================
+                    posteId:
+                        currentUser.profile?.posteId || null,
 
-let droits = {
+                    permissions:
+                        currentUser.profile?.permissions || {},
 
-    affectation:
-        currentUser.affectation || null,
+                    mode:
+                        currentUser.mode || "normal",
 
-    posteId:
-        currentUser.profile?.posteId || null,
-
-    permissions:
-        currentUser.profile?.permissions || {},
-
-    mode:
-        currentUser.mode || "normal",
-
-    lectureSeule:
-        currentUser.lectureSeule === true
-
-};
-
-
-// =========================================
-// DROITS SPÉCIFIQUES DE L'AGENT
-// =========================================
-
-console.log("👤 CURRENT USER =", currentUser);
-console.log("🎭 ROLE =", currentUser.account?.role);
-console.log("🪪 MATRICULE =", currentUser.profile?.matricule);
-console.log("📅 ANNÉE =", anneeAcademique);
-
-if (
-    currentUser.account?.role ===
-    "agent"
-) {
-
-    droits =
-        await getAgentPermissions(
-            currentUser.profile?.matricule,
-            anneeAcademique
-        );
-
-}
-
-
-// =========================================
-// CONSTRUIRE LA SESSION
-// =========================================
-
-session = {
-
-    firebaseUser,
-
-    account:
-        currentUser.account,
-
-    profile:
-        currentUser.profile,
-
-    anneeAcademique:
-        anneeAcademique || null,
-
-    affectation:
-    droits.affectation,
-
-posteId:
-    droits.posteId,
-
-permissions:
-    droits.permissions,
-
-mode:
-    droits.mode,
-
-lectureSeule:
-    droits.lectureSeule
-
-};
-
-
-console.log(
-    "🔐 DROITS SESSION =",
-    {
-
-        anneeAcademique:
-            session.anneeAcademique,
-
-        affectation:
-            session.affectation,
-
-        posteId:
-            session.posteId,
-
-        mode:
-            session.mode,
-
-        lectureSeule:
-            session.lectureSeule,
-
-        permissions:
-            session.permissions
-
-    }
-);
-
+                    lectureSeule:
+                        currentUser.lectureSeule === true
+                };
             }
 
         } catch (error) {
@@ -168,28 +67,17 @@ console.log(
             );
 
             session = null;
-
         }
-
-
-        // =============================================
-        // SESSION INITIALISÉE
-        // =============================================
 
         initialized = true;
 
-
         waiting.forEach(
-            resolve =>
-                resolve(session)
+            resolve => resolve(session)
         );
 
-
         waiting = [];
-
     }
 );
-
 
 // =====================================================
 // RÉCUPÉRER LA SESSION
@@ -198,27 +86,18 @@ console.log(
 export async function getSession() {
 
     if (initialized) {
-
         return session;
-
     }
-
 
     return new Promise(
         resolve => {
-
-            waiting.push(
-                resolve
-            );
-
+            waiting.push(resolve);
         }
     );
-
 }
 
-
 // =====================================================
-// RÉCUPÉRER L'ANNÉE ACADÉMIQUE COURANTE
+// RÉCUPÉRER L'ANNÉE ACADÉMIQUE
 // =====================================================
 
 export async function getAnneeAcademique() {
@@ -226,21 +105,12 @@ export async function getAnneeAcademique() {
     const currentSession =
         await getSession();
 
-
     if (!currentSession) {
-
         return null;
-
     }
 
-
-    return (
-        currentSession.anneeAcademique ||
-        null
-    );
-
+    return currentSession.anneeAcademique || null;
 }
-
 
 // =====================================================
 // DÉFINIR L'ANNÉE ACADÉMIQUE
@@ -257,32 +127,22 @@ export function setAnneeAcademique(
         );
 
         if (session) {
-
-            session.anneeAcademique =
-                null;
-
+            session.anneeAcademique = null;
         }
 
         return;
-
     }
-
 
     sessionStorage.setItem(
         "anneeAcademique",
         anneeAcademique
     );
 
-
     if (session) {
-
         session.anneeAcademique =
             anneeAcademique;
-
     }
-
 }
-
 
 // =====================================================
 // EFFACER LA SESSION
@@ -291,9 +151,6 @@ export function setAnneeAcademique(
 export function clearSession() {
 
     session = null;
-
     initialized = false;
-
     waiting = [];
-
 }

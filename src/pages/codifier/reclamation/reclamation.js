@@ -49,12 +49,10 @@ requireRole(
             anneeAcademique
         );
 
-
         console.log(
             "🔐 Mode session =",
             session?.mode
         );
-
 
         console.log(
             "🔒 Lecture seule =",
@@ -114,7 +112,6 @@ requireRole(
             `;
 
             return;
-
         }
 
 
@@ -151,7 +148,6 @@ requireRole(
             `;
 
             return;
-
         }
 
 
@@ -221,7 +217,6 @@ requireRole(
             `;
 
             return;
-
         }
 
 
@@ -258,7 +253,6 @@ requireRole(
             `;
 
             return;
-
         }
 
 
@@ -299,6 +293,10 @@ requireRole(
                         Problème rencontré
                     </h2>
 
+
+                    <!-- =========================================
+                         TYPE DE PROBLÈME
+                    ========================================== -->
 
                     <div class="form-group">
 
@@ -343,6 +341,10 @@ requireRole(
                     </div>
 
 
+                    <!-- =========================================
+                         LOCALISATION
+                    ========================================== -->
+
                     <div
                         class="form-group"
                         id="localisation-group"
@@ -365,6 +367,72 @@ requireRole(
 
                     </div>
 
+
+                    <!-- =========================================
+                         NIVEAU / ÉTAGE
+                    ========================================== -->
+
+                    <div
+                        class="form-group"
+                        id="niveau-group"
+                        style="display: none;"
+                    >
+
+                        <label for="niveau">
+                            Niveau / étage
+                        </label>
+
+                        <select
+                            id="niveau"
+                        >
+
+                            <option value="">
+                                Sélectionner le niveau
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         CÔTÉ
+                    ========================================== -->
+
+                    <div
+                        class="form-group"
+                        id="cote-group"
+                        style="display: none;"
+                    >
+
+                        <label for="cote">
+                            Côté
+                        </label>
+
+                        <select
+                            id="cote"
+                        >
+
+                            <option value="">
+                                Sélectionner un côté
+                            </option>
+
+                            <option value="Gauche">
+                                Gauche
+                            </option>
+
+                            <option value="Droite">
+                                Droite
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- =========================================
+                         PROBLÈME
+                    ========================================== -->
 
                     <div
                         class="form-group"
@@ -438,6 +506,30 @@ requireRole(
             );
 
 
+        const niveauGroup =
+            document.getElementById(
+                "niveau-group"
+            );
+
+
+        const niveau =
+            document.getElementById(
+                "niveau"
+            );
+
+
+        const coteGroup =
+            document.getElementById(
+                "cote-group"
+            );
+
+
+        const cote =
+            document.getElementById(
+                "cote"
+            );
+
+
         const problemeGroup =
             document.getElementById(
                 "probleme-group"
@@ -451,6 +543,19 @@ requireRole(
 
 
         // =====================================================
+        // NIVEAUX / ÉTAGES
+        // =====================================================
+
+        const niveaux = [
+            "RDC",
+            "1er",
+            "2e",
+            "3e",
+            "4e"
+        ];
+
+
+        // =====================================================
         // LOCALISATIONS
         // =====================================================
 
@@ -458,54 +563,43 @@ requireRole(
 
             plomberie: [
                 "Chambre",
-                "Toilettes gauche",
-                "Toilettes droite",
-                "Douche gauche",
-                "Douche droite"
+                "Toilettes",
+                "Couloir",
+                "Escalier"
             ],
 
             electricite: [
                 "Chambre",
-                "Toilettes gauche",
-                "Toilettes droite",
-                "Douche gauche",
-                "Douche droite"
+                "Toilettes",
+                "Couloir",
+                "Escalier"
             ],
 
             menuiserie: [
-                "Porte de la chambre",
-                "Porte des toilettes gauche",
-                "Porte des toilettes droite",
-                "Porte de la douche gauche",
-                "Porte de la douche droite",
-                "Lit",
-                "Armoire"
+                "Chambre",
+                "Toilettes",
+                "Couloir",
+                "Escalier"
             ],
 
             peinture: [
-                "Mur de la chambre",
-                "Plafond",
-                "Toilettes gauche",
-                "Toilettes droite",
-                "Douche gauche",
-                "Douche droite"
+                "Chambre",
+                "Toilettes",
+                "Couloir",
+                "Escalier"
             ],
 
             mobilier: [
-                "Lit",
-                "Armoire",
-                "Bureau",
-                "Chaise"
+                "Chambre",
+                "Couloir",
+                "Escalier"
             ],
 
             maconnerie: [
-                "Mur de la chambre",
-                "Plafond",
-                "Sol",
-                "Toilettes gauche",
-                "Toilettes droite",
-                "Douche gauche",
-                "Douche droite"
+                "Chambre",
+                "Toilettes",
+                "Couloir",
+                "Escalier"
             ]
 
         };
@@ -517,6 +611,10 @@ requireRole(
 
         const problemes = {
 
+            // =================================================
+            // PLOMBERIE
+            // =================================================
+
             plomberie: {
 
                 "Chambre": [
@@ -525,10 +623,11 @@ requireRole(
                     "Lavabo bouché",
                     "Évacuation du lavabo bouchée",
                     "Canalisation qui fuit",
-                    "Absence d'eau"
+                    "Absence d'eau",
+                    "Autre"
                 ],
 
-                "Toilettes gauche": [
+                "Toilettes": [
                     "Fuite au robinet",
                     "Chasse d'eau défectueuse",
                     "Fuite au niveau de la chasse d'eau",
@@ -536,40 +635,33 @@ requireRole(
                     "Lavabo bouché",
                     "Évacuation bouchée",
                     "Canalisation qui fuit",
-                    "Absence d'eau"
+                    "Absence d'eau",
+                    "Autre"
                 ],
 
-                "Toilettes droite": [
-                    "Fuite au robinet",
-                    "Chasse d'eau défectueuse",
-                    "Fuite au niveau de la chasse d'eau",
-                    "WC bouché",
-                    "Lavabo bouché",
-                    "Évacuation bouchée",
+                "Couloir": [
+                    "Fuite d'eau",
                     "Canalisation qui fuit",
-                    "Absence d'eau"
+                    "Présence d'eau au sol",
+                    "Infiltration d'eau",
+                    "Absence d'eau",
+                    "Autre"
                 ],
 
-                "Douche gauche": [
-                    "Robinet défectueux",
-                    "Douchette défectueuse",
-                    "Fuite au robinet",
-                    "Évacuation bouchée",
+                "Escalier": [
+                    "Fuite d'eau",
                     "Canalisation qui fuit",
-                    "Absence d'eau"
-                ],
-
-                "Douche droite": [
-                    "Robinet défectueux",
-                    "Douchette défectueuse",
-                    "Fuite au robinet",
-                    "Évacuation bouchée",
-                    "Canalisation qui fuit",
-                    "Absence d'eau"
+                    "Présence d'eau au sol",
+                    "Infiltration d'eau",
+                    "Autre"
                 ]
 
             },
 
+
+            // =================================================
+            // ÉLECTRICITÉ
+            // =================================================
 
             electricite: {
 
@@ -579,41 +671,44 @@ requireRole(
                     "Prise électrique défectueuse",
                     "Prise électrique sans courant",
                     "Court-circuit",
-                    "Coupure d'électricité"
+                    "Coupure d'électricité",
+                    "Autre"
                 ],
 
-                "Toilettes gauche": [
+                "Toilettes": [
                     "Ampoule défectueuse",
                     "Interrupteur défectueux",
                     "Prise électrique défectueuse",
-                    "Coupure d'électricité"
+                    "Coupure d'électricité",
+                    "Autre"
                 ],
 
-                "Toilettes droite": [
+                "Couloir": [
                     "Ampoule défectueuse",
+                    "Éclairage du couloir défectueux",
                     "Interrupteur défectueux",
-                    "Prise électrique défectueuse",
-                    "Coupure d'électricité"
+                    "Coupure d'électricité",
+                    "Autre"
                 ],
 
-                "Douche gauche": [
+                "Escalier": [
                     "Ampoule défectueuse",
+                    "Éclairage de l'escalier défectueux",
                     "Interrupteur défectueux",
-                    "Coupure d'électricité"
-                ],
-
-                "Douche droite": [
-                    "Ampoule défectueuse",
-                    "Interrupteur défectueux",
-                    "Coupure d'électricité"
+                    "Coupure d'électricité",
+                    "Autre"
                 ]
 
             },
 
 
+            // =================================================
+            // MENUISERIE
+            // =================================================
+
             menuiserie: {
 
-                "Porte de la chambre": [
+                "Chambre": [
                     "Serrure à réparer",
                     "Serrure à remplacer",
                     "Loquet intérieur à réparer",
@@ -623,201 +718,178 @@ requireRole(
                     "Porte qui ne ferme pas correctement",
                     "Porte qui ne s'ouvre pas correctement",
                     "Porte endommagée",
-                    "Charnière défectueuse"
-                ],
-
-                "Porte des toilettes gauche": [
-                    "Loquet intérieur à réparer",
-                    "Loquet intérieur à remplacer",
-                    "Loquet extérieur à réparer",
-                    "Loquet extérieur à remplacer",
-                    "Poignée à réparer",
-                    "Poignée à remplacer",
-                    "Porte qui ne ferme pas correctement",
-                    "Porte endommagée",
-                    "Charnière défectueuse"
-                ],
-
-                "Porte des toilettes droite": [
-                    "Loquet intérieur à réparer",
-                    "Loquet intérieur à remplacer",
-                    "Loquet extérieur à réparer",
-                    "Loquet extérieur à remplacer",
-                    "Poignée à réparer",
-                    "Poignée à remplacer",
-                    "Porte qui ne ferme pas correctement",
-                    "Porte endommagée",
-                    "Charnière défectueuse"
-                ],
-
-                "Porte de la douche gauche": [
-                    "Loquet à réparer",
-                    "Loquet à remplacer",
-                    "Poignée à réparer",
-                    "Poignée à remplacer",
-                    "Porte qui ne ferme pas correctement",
-                    "Porte endommagée",
-                    "Charnière défectueuse"
-                ],
-
-                "Porte de la douche droite": [
-                    "Loquet à réparer",
-                    "Loquet à remplacer",
-                    "Poignée à réparer",
-                    "Poignée à remplacer",
-                    "Porte qui ne ferme pas correctement",
-                    "Porte endommagée",
-                    "Charnière défectueuse"
-                ],
-
-                "Lit": [
-                    "Structure du lit endommagée",
-                    "Pied du lit endommagé",
-                    "Sommier endommagé",
-                    "Lit instable",
-                    "Lit inutilisable"
-                ],
-
-                "Armoire": [
-                    "Porte d'armoire endommagée",
                     "Charnière défectueuse",
+                    "Lit endommagé",
+                    "Armoire endommagée",
+                    "Autre"
+                ],
+
+                "Toilettes": [
+                    "Loquet intérieur à réparer",
+                    "Loquet intérieur à remplacer",
+                    "Loquet extérieur à réparer",
+                    "Loquet extérieur à remplacer",
+                    "Poignée à réparer",
+                    "Poignée à remplacer",
+                    "Porte qui ne ferme pas correctement",
+                    "Porte endommagée",
+                    "Charnière défectueuse",
+                    "Autre"
+                ],
+
+                "Couloir": [
+                    "Porte endommagée",
                     "Serrure défectueuse",
-                    "Poignée cassée",
-                    "Armoire instable"
+                    "Poignée défectueuse",
+                    "Charnière défectueuse",
+                    "Porte qui ne ferme pas correctement",
+                    "Porte qui ne s'ouvre pas correctement",
+                    "Autre"
+                ],
+
+                "Escalier": [
+                    "Porte endommagée",
+                    "Serrure défectueuse",
+                    "Poignée défectueuse",
+                    "Charnière défectueuse",
+                    "Porte qui ne ferme pas correctement",
+                    "Autre"
                 ]
 
             },
 
 
+            // =================================================
+            // PEINTURE
+            // =================================================
+
             peinture: {
 
-                "Mur de la chambre": [
+                "Chambre": [
                     "Peinture écaillée",
                     "Mur taché",
                     "Mur dégradé",
                     "Traces d'humidité",
-                    "Peinture complètement détériorée"
+                    "Peinture complètement détériorée",
+                    "Autre"
                 ],
 
-                "Plafond": [
-                    "Peinture écaillée",
-                    "Traces d'humidité",
-                    "Plafond taché",
-                    "Peinture détériorée"
-                ],
-
-                "Toilettes gauche": [
+                "Toilettes": [
                     "Peinture écaillée",
                     "Mur dégradé",
                     "Traces d'humidité",
-                    "Peinture détériorée"
+                    "Peinture détériorée",
+                    "Autre"
                 ],
 
-                "Toilettes droite": [
+                "Couloir": [
                     "Peinture écaillée",
+                    "Mur taché",
                     "Mur dégradé",
                     "Traces d'humidité",
-                    "Peinture détériorée"
+                    "Peinture détériorée",
+                    "Autre"
                 ],
 
-                "Douche gauche": [
+                "Escalier": [
                     "Peinture écaillée",
+                    "Mur taché",
                     "Mur dégradé",
                     "Traces d'humidité",
-                    "Peinture détériorée"
-                ],
-
-                "Douche droite": [
-                    "Peinture écaillée",
-                    "Mur dégradé",
-                    "Traces d'humidité",
-                    "Peinture détériorée"
+                    "Peinture détériorée",
+                    "Autre"
                 ]
 
             },
 
 
+            // =================================================
+            // MOBILIER
+            // =================================================
+
             mobilier: {
 
-                "Lit": [
+                "Chambre": [
                     "Structure du lit endommagée",
                     "Pied du lit cassé",
                     "Sommier endommagé",
                     "Lit instable",
-                    "Lit inutilisable"
-                ],
-
-                "Armoire": [
+                    "Lit inutilisable",
                     "Porte d'armoire endommagée",
                     "Charnière défectueuse",
                     "Serrure défectueuse",
                     "Poignée cassée",
-                    "Armoire instable"
+                    "Armoire instable",
+                    "Plateau de bureau endommagé",
+                    "Bureau instable",
+                    "Assise de chaise endommagée",
+                    "Chaise instable",
+                    "Autre"
                 ],
 
-                "Bureau": [
-                    "Plateau endommagé",
-                    "Pied cassé",
-                    "Bureau instable"
+                "Couloir": [
+                    "Mobilier endommagé",
+                    "Équipement endommagé",
+                    "Mobilier instable",
+                    "Autre"
                 ],
 
-                "Chaise": [
-                    "Assise endommagée",
-                    "Pied cassé",
-                    "Chaise instable"
+                "Escalier": [
+                    "Mobilier endommagé",
+                    "Équipement endommagé",
+                    "Autre"
                 ]
 
             },
 
 
+            // =================================================
+            // MAÇONNERIE
+            // =================================================
+
             maconnerie: {
 
-                "Mur de la chambre": [
+                "Chambre": [
                     "Mur fissuré",
                     "Mur endommagé",
                     "Infiltration d'eau",
-                    "Trace importante d'humidité"
+                    "Trace importante d'humidité",
+                    "Carrelage cassé",
+                    "Carrelage décollé",
+                    "Sol endommagé",
+                    "Autre"
                 ],
 
-                "Plafond": [
-                    "Plafond fissuré",
-                    "Plafond endommagé",
+                "Toilettes": [
+                    "Mur fissuré",
+                    "Mur endommagé",
+                    "Carrelage cassé",
+                    "Carrelage décollé",
                     "Infiltration d'eau",
-                    "Trace importante d'humidité"
+                    "Trace importante d'humidité",
+                    "Autre"
                 ],
 
-                "Sol": [
-                    "Carrelage cassé",
-                    "Carrelage décollé",
-                    "Sol endommagé"
-                ],
-
-                "Toilettes gauche": [
+                "Couloir": [
                     "Mur fissuré",
+                    "Mur endommagé",
                     "Carrelage cassé",
                     "Carrelage décollé",
-                    "Infiltration d'eau"
+                    "Sol endommagé",
+                    "Infiltration d'eau",
+                    "Trace importante d'humidité",
+                    "Autre"
                 ],
 
-                "Toilettes droite": [
+                "Escalier": [
                     "Mur fissuré",
+                    "Mur endommagé",
                     "Carrelage cassé",
                     "Carrelage décollé",
-                    "Infiltration d'eau"
-                ],
-
-                "Douche gauche": [
-                    "Mur fissuré",
-                    "Carrelage cassé",
-                    "Carrelage décollé",
-                    "Infiltration d'eau"
-                ],
-
-                "Douche droite": [
-                    "Mur fissuré",
-                    "Carrelage cassé",
-                    "Carrelage décollé",
-                    "Infiltration d'eau"
+                    "Sol endommagé",
+                    "Infiltration d'eau",
+                    "Trace importante d'humidité",
+                    "Autre"
                 ]
 
             }
@@ -837,12 +909,38 @@ requireRole(
                     typeProbleme.value;
 
 
+                // -------------------------------------------------
+                // RESET LOCALISATION
+                // -------------------------------------------------
+
                 localisation.innerHTML = `
                     <option value="">
                         Sélectionner une localisation
                     </option>
                 `;
 
+
+                // -------------------------------------------------
+                // RESET NIVEAU
+                // -------------------------------------------------
+
+                niveau.innerHTML = `
+                    <option value="">
+                        Sélectionner le niveau
+                    </option>
+                `;
+
+
+                // -------------------------------------------------
+                // RESET CÔTÉ
+                // -------------------------------------------------
+
+                cote.value = "";
+
+
+                // -------------------------------------------------
+                // RESET PROBLÈME
+                // -------------------------------------------------
 
                 probleme.innerHTML = `
                     <option value="">
@@ -851,19 +949,27 @@ requireRole(
                 `;
 
 
+                localisationGroup.style.display =
+                    "none";
+
+                niveauGroup.style.display =
+                    "none";
+
+                coteGroup.style.display =
+                    "none";
+
                 problemeGroup.style.display =
                     "none";
 
 
                 if (!type) {
-
-                    localisationGroup.style.display =
-                        "none";
-
                     return;
-
                 }
 
+
+                // -------------------------------------------------
+                // AJOUT DES LOCALISATIONS
+                // -------------------------------------------------
 
                 localisations[type].forEach(
                     (lieu) => {
@@ -886,7 +992,7 @@ requireRole(
 
 
         // =====================================================
-        // LOCALISATION → PROBLÈME
+        // LOCALISATION → NIVEAU / CÔTÉ
         // =====================================================
 
         localisation.addEventListener(
@@ -900,6 +1006,18 @@ requireRole(
                     localisation.value;
 
 
+                // -------------------------------------------------
+                // RESET
+                // -------------------------------------------------
+
+                niveau.innerHTML = `
+                    <option value="">
+                        Sélectionner le niveau
+                    </option>
+                `;
+
+                cote.value = "";
+
                 probleme.innerHTML = `
                     <option value="">
                         Sélectionner un problème
@@ -907,11 +1025,121 @@ requireRole(
                 `;
 
 
+                niveauGroup.style.display =
+                    "none";
+
+                coteGroup.style.display =
+                    "none";
+
+                problemeGroup.style.display =
+                    "none";
+
+
+                if (
+                    !type ||
+                    !lieu
+                ) {
+                    return;
+                }
+
+
+                // =================================================
+                // NIVEAU / ÉTAGE
+                // =================================================
+                //
+                // Toilettes
+                // Couloir
+                // Escalier
+                //
+                // nécessitent un niveau.
+                // =================================================
+
+                if (
+                    lieu === "Toilettes" ||
+                    lieu === "Couloir" ||
+                    lieu === "Escalier"
+                ) {
+
+                    niveaux.forEach(
+                        (niveauItem) => {
+
+                            niveau.innerHTML += `
+                                <option value="${niveauItem}">
+                                    ${niveauItem}
+                                </option>
+                            `;
+
+                        }
+                    );
+
+
+                    niveauGroup.style.display =
+                        "block";
+
+                }
+
+
+                // =================================================
+                // CÔTÉ
+                // =================================================
+                //
+                // Seules les toilettes nécessitent
+                // actuellement une précision gauche / droite.
+                // =================================================
+
+                if (
+                    lieu === "Toilettes"
+                ) {
+
+                    coteGroup.style.display =
+                        "block";
+
+                }
+
+
+                // =================================================
+                // CHAMBRE
+                // =================================================
+                //
+                // La chambre est déjà connue via
+                // l'hébergement de l'étudiant.
+                // Aucun niveau / côté.
+                // =================================================
+
+                if (
+                    lieu === "Chambre"
+                ) {
+
+                    afficherProblemes(
+                        type,
+                        lieu
+                    );
+
+                }
+
+            }
+        );
+
+
+        // =====================================================
+        // NIVEAU → PROBLÈME
+        // =====================================================
+
+        niveau.addEventListener(
+            "change",
+            () => {
+
+                const type =
+                    typeProbleme.value;
+
+                const lieu =
+                    localisation.value;
+
+
                 if (
                     !type ||
                     !lieu ||
-                    !problemes[type] ||
-                    !problemes[type][lieu]
+                    !niveau.value
                 ) {
 
                     problemeGroup.style.display =
@@ -922,24 +1150,130 @@ requireRole(
                 }
 
 
-                problemes[type][lieu].forEach(
-                    (problemeItem) => {
+                // Pour les toilettes,
+                // le côté est obligatoire avant le problème.
 
-                        probleme.innerHTML += `
-                            <option value="${problemeItem}">
-                                ${problemeItem}
-                            </option>
-                        `;
+                if (
+                    lieu === "Toilettes" &&
+                    !cote.value
+                ) {
 
-                    }
+                    problemeGroup.style.display =
+                        "none";
+
+                    return;
+
+                }
+
+
+                afficherProblemes(
+                    type,
+                    lieu
                 );
-
-
-                problemeGroup.style.display =
-                    "block";
 
             }
         );
+
+
+        // =====================================================
+        // CÔTÉ → PROBLÈME
+        // =====================================================
+
+        cote.addEventListener(
+            "change",
+            () => {
+
+                const type =
+                    typeProbleme.value;
+
+                const lieu =
+                    localisation.value;
+
+
+                if (
+                    !type ||
+                    !lieu ||
+                    !cote.value
+                ) {
+
+                    problemeGroup.style.display =
+                        "none";
+
+                    return;
+
+                }
+
+
+                if (
+                    lieu === "Toilettes" &&
+                    !niveau.value
+                ) {
+
+                    problemeGroup.style.display =
+                        "none";
+
+                    return;
+
+                }
+
+
+                afficherProblemes(
+                    type,
+                    lieu
+                );
+
+            }
+        );
+
+
+        // =====================================================
+        // AFFICHER LES PROBLÈMES
+        // =====================================================
+
+        function afficherProblemes(
+            type,
+            lieu
+        ) {
+
+            probleme.innerHTML = `
+                <option value="">
+                    Sélectionner un problème
+                </option>
+            `;
+
+
+            if (
+                !type ||
+                !lieu ||
+                !problemes[type] ||
+                !problemes[type][lieu]
+            ) {
+
+                problemeGroup.style.display =
+                    "none";
+
+                return;
+
+            }
+
+
+            problemes[type][lieu].forEach(
+                (problemeItem) => {
+
+                    probleme.innerHTML += `
+                        <option value="${problemeItem}">
+                            ${problemeItem}
+                        </option>
+                    `;
+
+                }
+            );
+
+
+            problemeGroup.style.display =
+                "block";
+
+        }
 
 
         // =====================================================
@@ -973,12 +1307,11 @@ requireRole(
                     );
 
                     return;
-
                 }
 
 
                 // =============================================
-                // VÉRIFICATION DES CHAMPS
+                // VALEURS
                 // =============================================
 
                 const type =
@@ -989,18 +1322,98 @@ requireRole(
                     localisation.value;
 
 
+                const niveauSelectionne =
+                    niveau.value;
+
+
+                const coteSelectionne =
+                    cote.value;
+
+
                 const problemeSelectionne =
                     probleme.value;
 
 
+                // =============================================
+                // VÉRIFICATION TYPE
+                // =============================================
+
+                if (!type) {
+
+                    alert(
+                        "Veuillez sélectionner le type de problème."
+                    );
+
+                    return;
+
+                }
+
+
+                // =============================================
+                // VÉRIFICATION LOCALISATION
+                // =============================================
+
+                if (!lieu) {
+
+                    alert(
+                        "Veuillez sélectionner la localisation du problème."
+                    );
+
+                    return;
+
+                }
+
+
+                // =============================================
+                // VÉRIFICATION NIVEAU
+                // =============================================
+
                 if (
-                    !type ||
-                    !lieu ||
+                    (
+                        lieu === "Toilettes" ||
+                        lieu === "Couloir" ||
+                        lieu === "Escalier"
+                    ) &&
+                    !niveauSelectionne
+                ) {
+
+                    alert(
+                        "Veuillez sélectionner le niveau / étage."
+                    );
+
+                    return;
+
+                }
+
+
+                // =============================================
+                // VÉRIFICATION CÔTÉ
+                // =============================================
+
+                if (
+                    lieu === "Toilettes" &&
+                    !coteSelectionne
+                ) {
+
+                    alert(
+                        "Veuillez sélectionner le côté."
+                    );
+
+                    return;
+
+                }
+
+
+                // =============================================
+                // VÉRIFICATION PROBLÈME
+                // =============================================
+
+                if (
                     !problemeSelectionne
                 ) {
 
                     alert(
-                        "Veuillez sélectionner le type, la localisation et le problème."
+                        "Veuillez sélectionner le problème."
                     );
 
                     return;
@@ -1064,6 +1477,12 @@ requireRole(
 
                             localisation:
                                 lieu,
+
+                            niveau:
+                                niveauSelectionne || "",
+
+                            cote:
+                                coteSelectionne || "",
 
                             probleme:
                                 problemeSelectionne,

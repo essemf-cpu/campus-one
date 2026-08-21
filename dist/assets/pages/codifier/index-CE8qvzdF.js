@@ -1,4 +1,4 @@
-import"../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,u as n,v as r,y as i}from"../../authService-DlvHUxoR.js";import{t as a}from"../../authGuard-CR_v3-ld.js";a(`etudiant`,async({profile:a,lectureSeule:o,mode:s,anneeAcademique:c})=>{let l=document.getElementById(`codifier-content`),u=a.matricule;if(!u){l.innerHTML=`
+import"../../modulepreload-polyfill-Dezn_h7o.js";import{d as e,g as t,l as n,m as r,v as i}from"../../authService-DVXfzcTf.js";import{t as a}from"../../authGuard-CFyE0oYo.js";a(`etudiant`,async({profile:a,lectureSeule:o,mode:s,anneeAcademique:c})=>{let l=document.getElementById(`codifier-content`),u=a.matricule;if(!u){l.innerHTML=`
 
                 <div
                     class="service-indisponible"
@@ -29,7 +29,7 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{f as e,g as t,u as n,v a
 
                 </div>
 
-            `;return}try{let s=await e(t(i(n,`hebergements`),r(`matricule`,`==`,u),r(`anneeAcademique`,`==`,c)));if(s.empty){l.innerHTML=`
+            `;return}try{let s=await e(r(i(n,`hebergements`),t(`matricule`,`==`,u),t(`anneeAcademique`,`==`,c)));if(s.empty){l.innerHTML=`
 
                     <div
                         class="

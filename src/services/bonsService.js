@@ -4,9 +4,7 @@ import {
     getDocs,
     query,
     where,
-    orderBy,
     updateDoc,
-    deleteDoc,
     doc,
     serverTimestamp
 } from "firebase/firestore";
@@ -23,19 +21,39 @@ export async function createBon({
     date,
     site,
     pavillon,
+
     type,
     description,
+
     chambre = "",
     toilette = "",
 
-    // Lien éventuel avec une demande étudiant
+    // =================================================
+    // PRÉCISIONS DE LOCALISATION
+    // =================================================
+
+    localisation = "",
+    niveau = "",
+    cote = "",
+
+    // =================================================
+    // LIEN ÉVENTUEL AVEC UNE DEMANDE ÉTUDIANT
+    // =================================================
+
     demandeId = null,
 
-    // Agent qui crée le bon
+    // =================================================
+    // AGENT QUI CRÉE LE BON
+    // =================================================
+
     agentMatricule,
     agentNom
 
 }) {
+
+    // =================================================
+    // VÉRIFICATION DES DONNÉES OBLIGATOIRES
+    // =================================================
 
     if (
         !date ||
@@ -53,6 +71,10 @@ export async function createBon({
     }
 
 
+    // =================================================
+    // DOCUMENT BON
+    // =================================================
+
     const bon = {
 
         date,
@@ -65,9 +87,27 @@ export async function createBon({
 
         description,
 
+        // =================================================
+        // LOCALISATION
+        // =================================================
+
+        localisation,
+
+        niveau,
+
+        cote,
+
+        // =================================================
+        // INFORMATIONS HÉBERGEMENT
+        // =================================================
+
         chambre,
 
         toilette,
+
+        // =================================================
+        // STATUT
+        // =================================================
 
         statut:
             "envoye",
@@ -75,9 +115,9 @@ export async function createBon({
         cause:
             "",
 
-        // =============================================
+        // =================================================
         // TRAÇABILITÉ
-        // =============================================
+        // =================================================
 
         par:
             agentNom ||
@@ -85,25 +125,33 @@ export async function createBon({
 
         agentMatricule,
 
-        // =============================================
-        // LIEN AVEC LA DEMANDE
-        // =============================================
+        // =================================================
+        // LIEN AVEC LA DEMANDE ÉTUDIANT
+        // =================================================
 
         demandeId:
             demandeId || null,
 
-        // =============================================
+        // =================================================
         // SUPPRESSION LOGIQUE
-        // =============================================
+        // =================================================
 
         supprime:
             false,
+
+        // =================================================
+        // DATE DE CRÉATION
+        // =================================================
 
         createdAt:
             serverTimestamp()
 
     };
 
+
+    // =================================================
+    // ENREGISTREMENT FIRESTORE
+    // =================================================
 
     const reference =
         await addDoc(
@@ -114,6 +162,10 @@ export async function createBon({
             bon
         );
 
+
+    // =================================================
+    // RETOUR
+    // =================================================
 
     return {
 
@@ -134,7 +186,9 @@ export async function createBon({
 export async function getBons({
 
     site = null,
+
     pavillon = null,
+
     anneeAcademique = null
 
 } = {}) {
@@ -143,64 +197,95 @@ export async function getBons({
     const contraintes = [];
 
 
+    // =================================================
+    // SITE
+    // =================================================
+
     if (site) {
 
         contraintes.push(
+
             where(
                 "site",
                 "==",
                 site
             )
+
         );
 
     }
 
 
+    // =================================================
+    // PAVILLON
+    // =================================================
+
     if (pavillon) {
 
         contraintes.push(
+
             where(
                 "pavillon",
                 "==",
                 pavillon
             )
+
         );
 
     }
 
 
+    // =================================================
+    // REQUÊTE
+    // =================================================
+
     let requete;
 
 
-    if (contraintes.length > 0) {
+    if (
+        contraintes.length > 0
+    ) {
 
         requete =
             query(
+
                 collection(
                     db,
                     "bons"
                 ),
+
                 ...contraintes
+
             );
 
     } else {
 
         requete =
             query(
+
                 collection(
                     db,
                     "bons"
                 )
+
             );
 
     }
 
+
+    // =================================================
+    // RÉCUPÉRATION
+    // =================================================
 
     const snapshot =
         await getDocs(
             requete
         );
 
+
+    // =================================================
+    // TRANSFORMATION
+    // =================================================
 
     let bons =
         snapshot.docs
@@ -220,19 +305,24 @@ export async function getBons({
             );
 
 
-    // =============================================
+    // =================================================
     // TRI CÔTÉ CLIENT
-    // =============================================
+    // =================================================
 
     bons.sort(
+
         (a, b) =>
+
             String(
                 b.date || ""
             ).localeCompare(
+
                 String(
                     a.date || ""
                 )
+
             )
+
     );
 
 
@@ -246,9 +336,13 @@ export async function getBons({
 // =====================================================
 
 export async function updateBonStatut(
+
     bonId,
+
     statut,
+
     cause = ""
+
 ) {
 
     if (!bonId) {
@@ -286,7 +380,9 @@ export async function updateBonStatut(
 // =====================================================
 
 export async function deleteBon(
+
     bonId
+
 ) {
 
     if (!bonId) {

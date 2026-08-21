@@ -1,4 +1,4 @@
-import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,m as r,s as i,u as a,v as o,y as s}from"../../../authService-DlvHUxoR.js";import{t as c}from"../../../authGuard-CR_v3-ld.js";import{t as l}from"../../../referentielService-DNYTMZbL.js";c(`etudiant`,async({profile:c})=>{let u=document.getElementById(`demandes-container`);if(!u){console.error(`❌ demandes-container introuvable`);return}let d=c.matricule;if(!d){u.innerHTML=`
+import"../../../modulepreload-polyfill-Dezn_h7o.js";import{g as e,h as t,l as n,m as r,p as i,v as a,y as o}from"../../../authService-DVXfzcTf.js";import{t as s}from"../../../sessionManager-DFkkBU6L.js";import{t as c}from"../../../authGuard-CFyE0oYo.js";import{t as l}from"../../../referentielService-8I8cp3Ra.js";c(`etudiant`,async({profile:c})=>{let u=document.getElementById(`demandes-container`);if(!u){console.error(`❌ demandes-container introuvable`);return}let d=c.matricule;if(!d){u.innerHTML=`
 
                 <div class="error-state">
 
@@ -14,7 +14,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,
 
                 </div>
 
-            `;return}let f=await i(),p=f?.anneeAcademique||sessionStorage.getItem(`anneeAcademique`),m=f?.lectureSeule===!0;console.log(`📅 Année académique =`,p),console.log(`🔒 Lecture seule =`,m);let h=document.getElementById(`retour-btn`);h&&h.addEventListener(`click`,()=>{window.location.href=`../index.html`});let g=document.getElementById(`demandes-search`),_=document.getElementById(`demandes-sort-select`),v=document.getElementById(`demandes-type-select`),y=document.getElementById(`demandes-statut-select`),b=[],x=``,S=`date_desc`,C=`tous`,w=`tous`,T=[];try{T=await l()}catch(e){console.error(`❌ Erreur récupération types de travaux :`,e)}v&&(v.innerHTML=`
+            `;return}let f=await s(),p=f?.anneeAcademique||sessionStorage.getItem(`anneeAcademique`),m=f?.lectureSeule===!0;console.log(`📅 Année académique =`,p),console.log(`🔒 Lecture seule =`,m);let h=document.getElementById(`retour-btn`);h&&h.addEventListener(`click`,()=>{window.location.href=`../index.html`});let g=document.getElementById(`demandes-search`),_=document.getElementById(`demandes-sort-select`),v=document.getElementById(`demandes-type-select`),y=document.getElementById(`demandes-statut-select`),b=[],x=``,S=`date_desc`,C=`tous`,w=`tous`,T=[];try{T=await l()}catch(e){console.error(`❌ Erreur récupération types de travaux :`,e)}v&&(v.innerHTML=`
 
                 <option value="tous">
                     Tous les types
@@ -315,7 +315,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,
 
                             </article>
 
-                        `})};g&&g.addEventListener(`input`,()=>{x=g.value,A()}),_&&_.addEventListener(`change`,()=>{S=_.value,A()}),v&&v.addEventListener(`change`,()=>{C=v.value,A()}),y&&y.addEventListener(`change`,()=>{w=y.value,A()});let j;j=n(s(a,`demandes_etudiants`),o(`matricule`,`==`,d)),r(j,e=>{console.log(`📋 Toutes les demandes du matricule :`,e.size),b=[],e.forEach(e=>{let t=e.data();t.anneeAcademique===p&&b.push({id:e.id,...t})}),console.log(`📋 Demandes pour`,p,`:`,b.length),A()},e=>{console.error(`❌ Erreur écoute demandes :`,e),u.innerHTML=`
+                        `})};g&&g.addEventListener(`input`,()=>{x=g.value,A()}),_&&_.addEventListener(`change`,()=>{S=_.value,A()}),v&&v.addEventListener(`change`,()=>{C=v.value,A()}),y&&y.addEventListener(`change`,()=>{w=y.value,A()});let j;j=r(a(n,`demandes_etudiants`),e(`matricule`,`==`,d)),i(j,e=>{console.log(`📋 Toutes les demandes du matricule :`,e.size),b=[],e.forEach(e=>{let t=e.data();t.anneeAcademique===p&&b.push({id:e.id,...t})}),console.log(`📋 Demandes pour`,p,`:`,b.length),A()},e=>{console.error(`❌ Erreur écoute demandes :`,e),u.innerHTML=`
 
                     <div class="error-state">
 
@@ -331,7 +331,7 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,
 
                     </div>
 
-                `}),u.addEventListener(`click`,async n=>{let r=n.target.closest(`.feedback-star`);if(r){let e=r.closest(`.feedback-form`);if(!e)return;let t=Number(r.dataset.note);e.dataset.note=t,e.querySelectorAll(`.feedback-star`).forEach(e=>{let n=Number(e.dataset.note);e.classList.toggle(`selected`,n<=t)});let n=e.querySelector(`.feedback-submit`);n&&e.dataset.avis&&(n.disabled=!1);return}let o=n.target.closest(`.feedback-choice`);if(o){let e=o.closest(`.feedback-form`);if(!e)return;e.dataset.avis=o.dataset.avis,e.querySelectorAll(`.feedback-choice`).forEach(e=>{e.classList.remove(`selected`)}),o.classList.add(`selected`);let t=e.querySelector(`.feedback-submit`);t&&e.dataset.note&&(t.disabled=!1);return}let s=n.target.closest(`.feedback-submit`);if(!s)return;let c=s.closest(`.feedback-form`),l=s.dataset.id;if(!c||!l)return;let u=Number(c.dataset.note),d=c.dataset.avis;if(!(!u||!d||s.disabled)){if((await i())?.lectureSeule===!0){alert(`Cette année académique est en lecture seule.`);return}s.disabled=!0,s.innerHTML=`
+                `}),u.addEventListener(`click`,async e=>{let r=e.target.closest(`.feedback-star`);if(r){let e=r.closest(`.feedback-form`);if(!e)return;let t=Number(r.dataset.note);e.dataset.note=t,e.querySelectorAll(`.feedback-star`).forEach(e=>{let n=Number(e.dataset.note);e.classList.toggle(`selected`,n<=t)});let n=e.querySelector(`.feedback-submit`);n&&e.dataset.avis&&(n.disabled=!1);return}let i=e.target.closest(`.feedback-choice`);if(i){let e=i.closest(`.feedback-form`);if(!e)return;e.dataset.avis=i.dataset.avis,e.querySelectorAll(`.feedback-choice`).forEach(e=>{e.classList.remove(`selected`)}),i.classList.add(`selected`);let t=e.querySelector(`.feedback-submit`);t&&e.dataset.note&&(t.disabled=!1);return}let a=e.target.closest(`.feedback-submit`);if(!a)return;let c=a.closest(`.feedback-form`),l=a.dataset.id;if(!c||!l)return;let u=Number(c.dataset.note),d=c.dataset.avis;if(!(!u||!d||a.disabled)){if((await s())?.lectureSeule===!0){alert(`Cette année académique est en lecture seule.`);return}a.disabled=!0,a.innerHTML=`
 
                     <i class="
                         fa-solid
@@ -341,4 +341,4 @@ import"../../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,b as t,g as n,
 
                     Enregistrement...
 
-                `;try{let n=b.find(e=>e.id===l);if(!n)throw Error(`DEMANDE_INTRouvable`);if(!k(n))throw Error(`FEEDBACK_EXPIRE`);await e(t(a,`demandes_etudiants`,l),{evaluation:u,commentaire:d,feedbackAutorise:!1}),console.log(`✅ Feedback enregistré`)}catch(e){console.error(`❌ Erreur feedback :`,e),s.disabled=!1,s.innerHTML=`Valider`,e.message===`FEEDBACK_EXPIRE`?alert(`Le délai de 7 jours pour évaluer cette demande est dépassé.`):alert(`Impossible d'enregistrer votre évaluation.`)}}})});
+                `;try{let e=b.find(e=>e.id===l);if(!e)throw Error(`DEMANDE_INTRouvable`);if(!k(e))throw Error(`FEEDBACK_EXPIRE`);await t(o(n,`demandes_etudiants`,l),{evaluation:u,commentaire:d,feedbackAutorise:!1}),console.log(`✅ Feedback enregistré`)}catch(e){console.error(`❌ Erreur feedback :`,e),a.disabled=!1,a.innerHTML=`Valider`,e.message===`FEEDBACK_EXPIRE`?alert(`Le délai de 7 jours pour évaluer cette demande est dépassé.`):alert(`Impossible d'enregistrer votre évaluation.`)}}})});
