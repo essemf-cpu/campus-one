@@ -92,10 +92,7 @@ export default [
         service:
             "Service de l'Entretien et de la Maintenance",
 
-        // Poste non encore exploité dans Campus One
-        // pour le moment.
-        posteId:
-            null,
+        posteId: "chef_atelier",
 
         fonction:
             "Technicien de maintenance",

@@ -495,6 +495,40 @@ match /bons/{documentId} {
         if false;
 
 }
+
+
+// =====================================================
+// NOTIFICATIONS ATELIER
+// =====================================================
+
+match /notificationsAtelier/{documentId} {
+
+    // Les agents peuvent consulter
+    // les notifications de leur site.
+    allow read:
+        if agent()
+        && resource.data.site ==
+            compte().data.profile.site;
+
+
+    // Création d'une notification
+    // lors de la création ou du traitement d'un bon.
+    allow create:
+        if agent()
+        || admin();
+
+
+    // Marquage comme lue.
+    allow update:
+        if agent()
+        && resource.data.site ==
+            compte().data.profile.site;
+
+
+    // Suppression physique interdite.
+    allow delete:
+        if false;
+}
       
 
         // =====================================================

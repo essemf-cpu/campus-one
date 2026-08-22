@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Atelier - Bons de travail</title>
+
+    <link
+        rel="stylesheet"
+        href="../components/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="bons.css"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         HEADER MOBILE
+    ====================================================== -->
+
+    <header class="mobile-header">
+
+        <button
+            id="mobile-menu-btn"
+            type="button"
+        >
+            ☰
+        </button>
+
+        <h2 id="mobile-title">
+            Atelier
+        </h2>
+
+    </header>
+
+
+    <!-- =====================================================
+         LOADER
+    ====================================================== -->
+
+    <div id="app-loader">
+
+        <img
+            src="/src/assets/logo coud.png"
+            alt="Campus One"
+        >
+
+        <h2>
+            Campus One
+        </h2>
+
+        <p>
+            Chargement de votre espace...
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <div id="sidebar-container"></div>
+
+
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
+
+    <main id="content">
+
+
+        <!-- =================================================
+             TITRE
+        ================================================== -->
+
+            <section class="page-title">
+
+                <h1>
+                    Gestion des bons de l'Atelier
+                    <span id="page-site"></span>
+                </h1>
+
+            </section>
+
+
+        <!-- =================================================
+             BONS DE TRAVAIL
+        ================================================== -->
+
+        <section class="card bons-card">
+
+            <div class="card-header">
+
+                <h2>
+                    Bons de travail
+                </h2>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table class="table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Type
+                            </th>
+
+                            <th>
+                                Pavillon
+                            </th>
+
+                            <th>
+                                Localisation
+                            </th>
+
+                            <th>
+                                Niveau
+                            </th>
+
+                            <th>
+                                Côté
+                            </th>
+
+                            <th>
+                                Chambre
+                            </th>
+
+                            <th>
+                                Toilette
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                            <th>
+                                Par
+                            </th>
+
+                            <th>
+                                Statut
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="bons-body">
+
+                        <tr class="empty-row">
+
+                            <td colspan="13">
+
+                                Aucun bon de travail
+                                disponible.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         MODALE : CAUSE NON TERMINÉ
+    ====================================================== -->
+
+    <div
+        id="cause-modal"
+        class="modal-overlay"
+        hidden
+    >
+
+        <div
+            class="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cause-modal-title"
+        >
+
+            <div class="modal-header">
+
+                <h2 id="cause-modal-title">
+                    Pourquoi le bon n'est-il pas terminé ?
+                </h2>
+
+                <button
+                    type="button"
+                    id="close-cause-modal"
+                    class="modal-close"
+                    aria-label="Fermer"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <label for="cause-select">
+                    Cause
+                </label>
+
+                <select id="cause-select">
+
+                    <option value="">
+                        Sélectionner une cause
+                    </option>
+
+                    <option value="Stock de matériel indisponible">
+                        Stock de matériel indisponible
+                    </option>
+
+                    <option value="Personnel adéquat indisponible">
+                        Personnel adéquat indisponible
+                    </option>
+
+                    <option value="Personnel en descente">
+                        Personnel en descente
+                    </option>
+
+                    <option value="Matériel en attente d’approvisionnement">
+                        Matériel en attente d’approvisionnement
+                    </option>
+
+                    <option value="Intervention nécessitant une compétence spécifique">
+                        Intervention nécessitant une compétence spécifique
+                    </option>
+
+                    <option value="Accès au lieu d’intervention impossible">
+                        Accès au lieu d’intervention impossible
+                    </option>
+
+                    <option value="Intervention reportée">
+                        Intervention reportée
+                    </option>
+
+                    <option value="Autre">
+                        Autre
+                    </option>
+
+                </select>
+
+
+                <div
+                    id="autre-cause-container"
+                    hidden
+                >
+
+                    <label for="autre-cause">
+                        Précision
+                    </label>
+
+                    <textarea
+                        id="autre-cause"
+                        rows="3"
+                        placeholder="Précisez la cause..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    id="cancel-cause"
+                    class="secondary-btn"
+                >
+                    Annuler
+                </button>
+
+                <button
+                    type="button"
+                    id="confirm-cause"
+                    class="primary-btn"
+                >
+                    Confirmer
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SCRIPT
+    ====================================================== -->
+
+    <script
+        type="module"
+        src="bons.js"
+    ></script>
+
+
+</body>
+
+</html>

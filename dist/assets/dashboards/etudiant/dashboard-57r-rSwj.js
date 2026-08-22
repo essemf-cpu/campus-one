@@ -1,1 +1,0 @@
-import"../../modulepreload-polyfill-Dezn_h7o.js";import{t as e}from"../../authGuard-CFyE0oYo.js";e(`etudiant`,async()=>{window.location.href=`../../modules/etudiant/dashboard/index.html`});

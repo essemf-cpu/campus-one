@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Atelier - Notifications</title>
+
+    <link
+        rel="stylesheet"
+        href="../components/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="notifications.css"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         HEADER MOBILE
+    ====================================================== -->
+
+    <header class="mobile-header">
+
+        <button
+            id="mobile-menu-btn"
+            type="button"
+        >
+            ☰
+        </button>
+
+        <h2 id="mobile-title">
+            Notifications
+        </h2>
+
+    </header>
+
+
+    <!-- =====================================================
+         LOADER
+    ====================================================== -->
+
+    <div id="app-loader">
+
+        <img
+            src="/src/assets/logo coud.png"
+            alt="Campus One"
+        >
+
+        <h2>
+            Campus One
+        </h2>
+
+        <p>
+            Chargement de votre espace...
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <div id="sidebar-container"></div>
+
+
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
+
+    <main id="content">
+
+
+        <!-- =================================================
+             TITRE
+        ================================================== -->
+
+        <section class="page-title">
+
+            <h1>
+                Notifications
+            </h1>
+
+            <p>
+                Suivi des activités de l'Atelier
+            </p>
+
+        </section>
+
+
+        <!-- =================================================
+             NOTIFICATIONS
+        ================================================== -->
+
+        <section class="notifications-card">
+
+            <div class="notifications-header">
+
+                <div>
+
+                    <h2>
+                        Activités récentes
+                    </h2>
+
+                    <p>
+                        Les informations concernant
+                        les bons et les activités de l'Atelier
+                        apparaîtront ici.
+                    </p>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================================
+                 LISTE
+            ================================================== -->
+
+            <div
+                id="notifications-list"
+                class="notifications-list"
+            >
+
+                <!-- État vide -->
+
+                <div
+                    id="notifications-empty"
+                    class="notifications-empty"
+                >
+
+                    <div class="empty-icon">
+                        🔔
+                    </div>
+
+                    <h3>
+                        Aucune notification
+                    </h3>
+
+                    <p>
+                        Les nouveaux bons, changements de traitement,
+                        informations de stock et finalisations
+                        apparaîtront ici.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         SCRIPT
+    ====================================================== -->
+
+    <script
+        type="module"
+        src="notifications.js"
+    ></script>
+
+
+</body>
+
+</html>

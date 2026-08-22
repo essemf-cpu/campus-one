@@ -1,0 +1,17 @@
+import"../modulepreload-polyfill-Dezn_h7o.js";import{f as e,l as t,r as n,s as r,y as i}from"../authService-DX3gg-GL.js";import{n as a}from"../sessionManager-DuiOh9M5.js";var o={APP:{NAME:`Campus One`,DESCRIPTION:`Système d'information du COUD`},LOGIN:{IDENTIFIER:`Identifiant`,PASSWORD:`Mot de passe`,BUTTON:`Se connecter`,FORGOT:`Mot de passe oublié ?`},ERRORS:{EMPTY_FIELDS:`Veuillez renseigner votre identifiant et votre mot de passe.`,INVALID_CREDENTIALS:`Identifiant ou mot de passe incorrect.`,NETWORK:`Erreur de connexion.`,USER_NOT_FOUND:`Utilisateur introuvable.`,UNKNOWN:`Une erreur est survenue.`},SUCCESS:{LOGIN:`Connexion réussie.`}},s=document.getElementById(`loginForm`),c=document.getElementById(`identifiant`),l=document.getElementById(`password`),u=document.getElementById(`btnLogin`),d=document.getElementById(`message`),f=document.getElementById(`togglePassword`);document.getElementById(`annee-group`);var p=document.getElementById(`anneeAcademique`);async function m(){if(p){p.innerHTML=`
+        <option value="">
+            Chargement...
+        </option>
+    `;try{let n=await e(i(t,`anneesAcademiques`));console.log(`ANNEES FIRESTORE :`,n.size);let r=n.docs.map(e=>({id:e.id,...e.data()})).filter(e=>e.active===!0).sort((e,t)=>(t.ordre||0)-(e.ordre||0));p.innerHTML=`
+            <option value="">
+                Choisir l'année académique
+            </option>
+        `,r.forEach(e=>{let t=document.createElement(`option`);t.value=e.libelle,t.textContent=e.libelle,p.appendChild(t)}),r.length||(p.innerHTML=`
+                <option value="">
+                    Aucune année disponible
+                </option>
+            `)}catch(e){console.error(`ERREUR FIRESTORE :`,e),p.innerHTML=`
+            <option value="">
+                Erreur Firestore
+            </option>
+        `}}}s.addEventListener(`submit`,async e=>{e.preventDefault(),d.textContent=``,d.style.color=`red`;let t=c.value.trim(),i=l.value.trim(),s=p.value.trim();if(!s){d.textContent=`Veuillez choisir une année académique.`;return}if(!t||!i){d.textContent=o.ERRORS.EMPTY_FIELDS;return}u.disabled=!0,u.textContent=`Connexion...`;try{let e=await n(t);switch(a(s),await r(e.email,i),console.log(`🔥 FIREBASE AUTH OK`),sessionStorage.setItem(`user`,JSON.stringify(e)),console.log(`✅ Connexion réussie`),console.log(`📅 Année académique sélectionnée :`,s),d.style.color=`green`,d.textContent=o.SUCCESS.LOGIN,e.collection){case`agents`:window.location.href=`../dashboards/agent/dashboard.html`;break;case`etudiants`:window.location.href=`../dashboards/etudiant/dashboard.html`;break;default:throw Error(`UNKNOWN_ROLE`)}}catch(e){switch(a(null),console.error(`❌ ERREUR CONNEXION :`,e),d.style.color=`red`,e.message){case`USER_NOT_FOUND`:d.textContent=o.ERRORS.USER_NOT_FOUND;break;case`UNKNOWN_ROLE`:d.textContent=`Rôle inconnu.`;break;default:switch(e.code){case`auth/invalid-credential`:d.textContent=o.ERRORS.INVALID_CREDENTIALS;break;case`auth/network-request-failed`:d.textContent=o.ERRORS.NETWORK;break;default:d.textContent=o.ERRORS.UNKNOWN}}}finally{u.disabled=!1,u.textContent=`Se connecter`}}),f.addEventListener(`click`,()=>{l.type===`password`?(l.type=`text`,f.classList.replace(`fa-eye`,`fa-eye-slash`)):(l.type=`password`,f.classList.replace(`fa-eye-slash`,`fa-eye`))}),m();

@@ -2,6 +2,7 @@ import {
     collection,
     addDoc,
     getDocs,
+    getDoc,
     query,
     where,
     updateDoc,
@@ -162,6 +163,28 @@ export async function createBon({
             bon
         );
 
+        // =================================================
+// NOTIFICATION : NOUVEAU BON
+// =================================================
+
+await createNotificationAtelier({
+
+    site,
+
+    type:
+        "nouveau_bon",
+
+    titre:
+        "Nouveau bon reçu",
+
+    message:
+        `Un nouveau bon de travail a été reçu pour le pavillon ${pavillon}.`,
+
+    bonId:
+        reference.id
+
+});
+
 
     // =================================================
     // RETOUR
@@ -176,6 +199,67 @@ export async function createBon({
 
     };
 
+}
+
+// =====================================================
+// CRÉER UNE NOTIFICATION ATELIER
+// =====================================================
+
+export async function createNotificationAtelier({
+    site,
+    type,
+    titre,
+    message,
+    bonId = null
+}) {
+
+    if (
+        !site ||
+        !type ||
+        !titre ||
+        !message
+    ) {
+        throw new Error(
+            "DONNEES_NOTIFICATION_INCOMPLETES"
+        );
+    }
+
+    const notification = {
+
+        site,
+
+        type,
+
+        titre,
+
+        message,
+
+        bonId,
+
+        lu: false,
+
+        createdAt:
+            serverTimestamp()
+
+    };
+
+    const reference =
+        await addDoc(
+            collection(
+                db,
+                "notificationsAtelier"
+            ),
+            notification
+        );
+
+    return {
+
+        id:
+            reference.id,
+
+        ...notification
+
+    };
 }
 
 
@@ -336,79 +420,173 @@ export async function getBons({
 // =====================================================
 
 export async function updateBonStatut(
-
     bonId,
-
     statut,
-
     cause = ""
-
 ) {
 
     if (!bonId) {
-
         throw new Error(
             "BON_ID_MANQUANT"
         );
-
     }
 
 
-    await updateDoc(
+    // =================================================
+    // RÉCUPÉRER LE BON
+    // =================================================
 
+    const reference =
         doc(
             db,
             "bons",
             bonId
-        ),
+        );
 
+    const snapshot =
+        await getDoc(
+            reference
+        );
+
+
+    if (!snapshot.exists()) {
+        throw new Error(
+            "BON_NOT_FOUND"
+        );
+    }
+
+
+    const bon =
+        snapshot.data();
+
+
+    // =================================================
+    // MODIFICATION DU BON
+    // =================================================
+
+    await updateDoc(
+        reference,
         {
-
             statut,
-
             cause
-
         }
-
     );
+
+
+    // =================================================
+    // NOTIFICATION : BON TERMINÉ
+    // =================================================
+
+    if (
+        statut === "termine"
+    ) {
+
+        await createNotificationAtelier({
+
+            site:
+                bon.site,
+
+            type:
+                "bon_termine",
+
+            titre:
+                "Bon terminé",
+
+            message:
+                `Le bon de travail concernant le pavillon ${bon.pavillon} est terminé.`,
+
+            bonId
+
+        });
+
+    }
+
+
+    // =================================================
+    // NOTIFICATION : BON NON TERMINÉ
+    // =================================================
+
+    if (
+        statut === "non-termine"
+    ) {
+
+        await createNotificationAtelier({
+
+            site:
+                bon.site,
+
+            type:
+                "bon_non_termine",
+
+            titre:
+                "Bon non terminé",
+
+            message:
+                cause
+                    ? `Le bon concernant le pavillon ${bon.pavillon} n'a pas été terminé : ${cause}.`
+                    : `Le bon concernant le pavillon ${bon.pavillon} n'a pas été terminé.`,
+
+            bonId
+
+        });
+
+    }
 
 }
 
-
 // =====================================================
-// SUPPRIMER UN BON
+// SUPPRIMER LOGIQUEMENT UN BON
 // =====================================================
 
-export async function deleteBon(
-
-    bonId
-
-) {
+export async function deleteBon(bonId) {
 
     if (!bonId) {
-
         throw new Error(
             "BON_ID_MANQUANT"
         );
-
     }
 
-
-    await updateDoc(
-
+    const reference =
         doc(
             db,
             "bons",
             bonId
-        ),
+        );
 
+    const snapshot =
+        await getDoc(
+            reference
+        );
+
+    if (!snapshot.exists()) {
+        throw new Error(
+            "BON_NOT_FOUND"
+        );
+    }
+
+    const bon =
+        snapshot.data();
+
+    // =================================================
+    // UN BON NE PEUT ÊTRE SUPPRIMÉ QUE S'IL EST ENVOYÉ
+    // =================================================
+
+    if (
+        bon.statut !== "envoye"
+    ) {
+        throw new Error(
+            "BON_NON_SUPPRIMABLE"
+        );
+    }
+
+    // =================================================
+    // SUPPRESSION LOGIQUE
+    // =================================================
+
+    await updateDoc(
+        reference,
         {
-
-            supprime:
-                true
-
+            supprime: true
         }
-
     );
-
 }

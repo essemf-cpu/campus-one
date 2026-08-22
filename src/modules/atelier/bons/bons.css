@@ -1,0 +1,684 @@
+/* =========================================================
+   BASE
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    background: #f6f7f9;
+    color: #1f2937;
+}
+
+
+/* =========================================================
+   CONTENU PRINCIPAL
+========================================================= */
+
+#content {
+    flex: 1;
+    width: auto;
+    min-width: 0;
+    margin-left: 0;
+    padding: 32px 28px 40px;
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.page-title {
+    width: 100%;
+    margin: 0 0 24px;
+}
+
+.page-title h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.page-title p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   CARTE
+========================================================= */
+
+.card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.bons-card {
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+}
+
+
+/* =========================================================
+   CONTENEUR DU TABLEAU
+========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+/* =========================================================
+   TABLEAU
+========================================================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.table {
+    width: 100%;
+    min-width: 1210px;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+
+/* =========================================================
+   LARGEUR DES COLONNES
+========================================================= */
+
+/* 1 — ID */
+.table th:nth-child(1),
+.table td:nth-child(1) {
+    width: 150px;
+    min-width: 150px;
+    white-space: nowrap;
+}
+
+.table td:nth-child(1) {
+    overflow: visible;
+    text-overflow: clip;
+}
+
+/* 2 — Date */
+.table th:nth-child(2),
+.table td:nth-child(2) {
+    width: 85px;
+}
+
+/* 3 — Type */
+.table th:nth-child(3),
+.table td:nth-child(3) {
+    width: 90px;
+}
+
+/* 4 — Pavillon */
+.table th:nth-child(4),
+.table td:nth-child(4) {
+    width: 85px;
+}
+
+/* 5 — Localisation */
+.table th:nth-child(5),
+.table td:nth-child(5) {
+    width: 105px;
+}
+
+/* 6 — Niveau */
+.table th:nth-child(6),
+.table td:nth-child(6) {
+    width: 75px;
+}
+
+/* 7 — Côté */
+.table th:nth-child(7),
+.table td:nth-child(7) {
+    width: 65px;
+}
+
+/* 8 — Chambre */
+.table th:nth-child(8),
+.table td:nth-child(8) {
+    width: 90px;
+}
+
+/* 9 — Toilette */
+.table th:nth-child(9),
+.table td:nth-child(9) {
+    width: 90px;
+}
+
+/* 10 — Description */
+.table th:nth-child(10),
+.table td:nth-child(10) {
+    width: 175px;
+}
+
+/* 11 — Par */
+.table th:nth-child(11),
+.table td:nth-child(11) {
+    width: 105px;
+}
+
+/* 12 — Statut */
+.table th:nth-child(12),
+.table td:nth-child(12) {
+    width: 95px;
+}
+
+/* 13 — Action */
+.table th:nth-child(13),
+.table td:nth-child(13) {
+    width: 90px;
+}
+
+
+/* =========================================================
+   CELLULES
+========================================================= */
+
+.table th,
+.table td {
+    padding: 12px 9px;
+    border-bottom: 1px solid #edf0f2;
+    text-align: left;
+    vertical-align: middle;
+    font-size: 13px;
+}
+
+.table th {
+    background: #f8fafc;
+    color: #4b5563;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.table td {
+    color: #374151;
+}
+
+.table tbody tr:hover {
+    background: #fafafa;
+}
+
+
+/* =========================================================
+   CHAMBRE / TOILETTE
+========================================================= */
+
+.table th:nth-child(8),
+.table td:nth-child(8),
+.table th:nth-child(9),
+.table td:nth-child(9) {
+    white-space: nowrap;
+}
+
+.table td:nth-child(1) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table td:nth-child(10) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.45;
+}
+
+.table td:nth-child(11) {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.table th:nth-child(10),
+.table td:nth-child(10) {
+    white-space: normal;
+}
+
+.table td:nth-child(10) {
+    line-height: 1.45;
+    overflow-wrap: break-word;
+}
+
+
+/* =========================================================
+   PAR
+========================================================= */
+
+.table th:nth-child(11),
+.table td:nth-child(11) {
+    white-space: normal;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   STATUT
+========================================================= */
+
+.table th:nth-child(12),
+.table td:nth-child(12) {
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   ACTION
+========================================================= */
+
+.table th:nth-child(13),
+.table td:nth-child(13) {
+    text-align: center;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   LIGNE VIDE
+========================================================= */
+
+.empty-row td {
+    padding: 40px 20px;
+    text-align: center;
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   STATUTS
+========================================================= */
+
+.statut-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.statut-envoye {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.statut-recu {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.statut-en-cours {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.statut-termine {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.statut-non-termine {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.bon-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+}
+
+.bon-action-btn {
+    border: none;
+    border-radius: 7px;
+    padding: 7px 9px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+        background 0.15s ease,
+        opacity 0.15s ease;
+}
+
+.bon-action-btn:hover {
+    opacity: 0.88;
+}
+
+.bon-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.bon-action-recu {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.bon-action-encours {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.bon-action-termine {
+    background: #d1fae5;
+    color: #047857;
+}
+
+.bon-action-nontermine {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+
+/* =========================================================
+   MODALE
+========================================================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(17, 24, 39, 0.45);
+    z-index: 2000;
+}
+
+.modal-overlay[hidden] {
+    display: none;
+}
+
+.modal {
+    width: min(500px, 100%);
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #6b7280;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-body label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.modal-body select,
+.modal-body textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    color: #111827;
+    outline: none;
+}
+
+.modal-body select:focus,
+.modal-body textarea:focus {
+    border-color: #6366f1;
+}
+
+.modal-body textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+#autre-cause-container {
+    margin-top: 18px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 16px 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.primary-btn,
+.secondary-btn {
+    border: none;
+    border-radius: 7px;
+    padding: 9px 15px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: #111827;
+    color: #ffffff;
+}
+
+.primary-btn:hover {
+    background: #1f2937;
+}
+
+.secondary-btn {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.secondary-btn:hover {
+    background: #e5e7eb;
+}
+
+
+/* =========================================================
+   LOADER CAMPUS ONE
+========================================================= */
+
+#app-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+#app-loader img {
+    width: 105px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin-bottom: 14px;
+}
+
+#app-loader h2 {
+    margin: 0 0 6px;
+    font-family: "Inter", sans-serif;
+    font-size: 23px;
+    font-weight: 700;
+    color: #1c6ef1;
+    line-height: 1.2;
+}
+
+#app-loader p {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: #9ca3af;
+}
+
+#app-loader.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   MOBILE HEADER
+========================================================= */
+
+.mobile-header {
+    display: none;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .mobile-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+        z-index: 900;
+    }
+
+    #mobile-menu-btn {
+        border: none;
+        background: transparent;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    #mobile-title {
+        margin: 0 0 0 14px;
+        font-size: 17px;
+        font-weight: 600;
+    }
+
+    #content {
+        width: 100%;
+        margin-left: 0;
+        padding: 80px 16px 24px;
+    }
+
+    .page-title h1 {
+        font-size: 22px;
+    }
+
+    .page-title p {
+        font-size: 13px;
+    }
+
+    .card-header {
+        padding: 16px;
+    }
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

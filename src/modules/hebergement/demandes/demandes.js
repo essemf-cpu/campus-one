@@ -848,6 +848,9 @@ requireRole(
                     // =================================================
                     // CHAMBRE
                     // =================================================
+                    // La chambre n'est renseignée que lorsque
+                    // l'intervention concerne réellement une chambre.
+                    // =================================================
 
                     const chambreInput =
                         document.getElementById(
@@ -856,8 +859,20 @@ requireRole(
 
                     if (chambreInput) {
 
+                        const localisation =
+                            String(
+                                demande.localisation || ""
+                            )
+                            .trim()
+                            .toLowerCase();
+
+                        const concerneChambre =
+                            localisation === "chambre";
+
                         chambreInput.value =
-                            demande.chambre || "";
+                            concerneChambre
+                                ? (demande.chambre || "")
+                                : "";
 
                     }
 
@@ -1212,7 +1227,7 @@ requireRole(
 
                         <tr class="empty-row">
 
-                            <td colspan="12">
+                            <td colspan="13">
 
                                 Aucun bon aujourd'hui
 
@@ -1233,20 +1248,19 @@ requireRole(
                 bonsDuJour.forEach(
                     (bon) => {
 
-                        const boutonSuppression =
-                            lectureSeule
-                                ? ""
-                                : `
-
-                                    <button
-                                        type="button"
-                                        class="bon-delete-btn"
-                                        data-bon-id="${bon.id}"
-                                    >
-                                        Supprimer
-                                    </button>
-
-                                `;
+                const boutonSuppression =
+                    !lectureSeule &&
+                    bon.statut === "envoye"
+                        ? `
+                            <button
+                                type="button"
+                                class="bon-delete-btn"
+                                data-bon-id="${bon.id}"
+                            >
+                                Supprimer
+                            </button>
+                        `
+                        : "";
 
 
                         bonsBody.innerHTML += `
@@ -1317,6 +1331,12 @@ requireRole(
 
                                 <td>
                                     ${bon.description || "-"}
+                                </td>
+
+                                <!-- PAR -->
+
+                                <td>
+                                    ${bon.par || "-"}
                                 </td>
 
 
@@ -1453,7 +1473,7 @@ requireRole(
 
                     <tr class="empty-row">
 
-                        <td colspan="12">
+                        <td colspan="13">
 
                             Impossible de charger
                             les bons.
