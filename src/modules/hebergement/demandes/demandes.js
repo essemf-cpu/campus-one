@@ -14,7 +14,6 @@ import { db } from "../../../firebase/firebase.js";
 
 import {
     createBon,
-    getBons,
     deleteBon
 } from "../../../services/bonsService.js";
 
@@ -263,19 +262,11 @@ requireRole(
                             documentSnapshot.id;
 
 
-                        // =================================================
-                        // CACHE
-                        // =================================================
-
                         demandesCache.set(
                             demandeId,
                             demande
                         );
 
-
-                        // =================================================
-                        // UNIQUEMENT LES DEMANDES ACTIVES
-                        // =================================================
 
                         if (
                             demande.statut &&
@@ -289,18 +280,10 @@ requireRole(
                         demandesActives++;
 
 
-                        // =================================================
-                        // NOM
-                        // =================================================
-
                         const nomComplet =
                             `${demande.prenom || ""} ${demande.nom || ""}`
                                 .trim();
 
-
-                        // =================================================
-                        // ACTIONS
-                        // =================================================
 
                         let actions = "";
 
@@ -398,15 +381,9 @@ requireRole(
                         }
 
 
-                        // =================================================
-                        // LIGNE
-                        // =================================================
-
                         demandesBody.innerHTML += `
 
                             <tr>
-
-                                <!-- ÉTUDIANT -->
 
                                 <td>
                                     <strong>
@@ -414,22 +391,13 @@ requireRole(
                                     </strong>
                                 </td>
 
-
-                                <!-- CARTE -->
-
                                 <td>
                                     ${demande.matricule || "-"}
                                 </td>
 
-
-                                <!-- CHAMBRE -->
-
                                 <td>
                                     ${demande.chambre || "-"}
                                 </td>
-
-
-                                <!-- TYPE -->
 
                                 <td>
                                     ${
@@ -439,36 +407,21 @@ requireRole(
                                     }
                                 </td>
 
-
-                                <!-- LOCALISATION -->
-
                                 <td>
                                     ${demande.localisation || "-"}
                                 </td>
-
-
-                                <!-- NIVEAU -->
 
                                 <td>
                                     ${demande.niveau || "-"}
                                 </td>
 
-
-                                <!-- CÔTÉ -->
-
                                 <td>
                                     ${demande.cote || "-"}
                                 </td>
 
-
-                                <!-- PROBLÈME -->
-
                                 <td>
                                     ${demande.probleme || "-"}
                                 </td>
-
-
-                                <!-- ACTION -->
 
                                 <td>
                                     ${actions}
@@ -480,10 +433,6 @@ requireRole(
                     }
                 );
 
-
-                // =================================================
-                // AUCUNE DEMANDE ACTIVE
-                // =================================================
 
                 if (
                     demandesActives === 0
@@ -506,10 +455,6 @@ requireRole(
 
             },
 
-
-            // =====================================================
-            // ERREUR ÉCOUTE TEMPS RÉEL
-            // =====================================================
 
             (error) => {
 
@@ -547,6 +492,101 @@ requireRole(
             );
 
 
+        // =====================================================
+        // DATE AUTORISÉE
+        // =====================================================
+        //
+        // Un bon peut être daté :
+        //
+        // - aujourd'hui
+        // - demain
+        //
+        // Interdit :
+        //
+        // - toute date passée
+        // - après-demain et au-delà
+        //
+        // =====================================================
+
+        function obtenirDateLocaleISO(
+            date = new Date()
+        ) {
+
+            const annee =
+                date.getFullYear();
+
+            const mois =
+                String(
+                    date.getMonth() + 1
+                ).padStart(2, "0");
+
+            const jour =
+                String(
+                    date.getDate()
+                ).padStart(2, "0");
+
+            return `${annee}-${mois}-${jour}`;
+        }
+
+
+        function obtenirDateDemainISO() {
+
+            const demain =
+                new Date();
+
+            demain.setDate(
+                demain.getDate() + 1
+            );
+
+            return obtenirDateLocaleISO(
+                demain
+            );
+        }
+
+
+        function dateBonAutorisee(
+            date
+        ) {
+
+            if (!date) {
+                return false;
+            }
+
+            const aujourdHui =
+                obtenirDateLocaleISO();
+
+            const demain =
+                obtenirDateDemainISO();
+
+            return (
+                date === aujourdHui ||
+                date === demain
+            );
+        }
+
+
+        // =====================================================
+        // INITIALISER LA DATE DU FORMULAIRE
+        // =====================================================
+
+        const dateInputInitial =
+            document.getElementById(
+                "date"
+            );
+
+        if (dateInputInitial) {
+
+            dateInputInitial.value =
+                obtenirDateLocaleISO();
+
+            dateInputInitial.min =
+                obtenirDateLocaleISO();
+
+            dateInputInitial.max =
+                obtenirDateDemainISO();
+        }
+
+
         bonForm?.addEventListener(
             "submit",
             async (event) => {
@@ -570,6 +610,25 @@ requireRole(
                             .getElementById("date")
                             ?.value;
 
+
+                    // =================================================
+                    // CONTRÔLE DE DATE
+                    // =================================================
+
+                    if (
+                        !dateBonAutorisee(
+                            date
+                        )
+                    ) {
+
+                        alert(
+                            "La date du bon doit être aujourd'hui ou demain."
+                        );
+
+                        return;
+                    }
+
+
                     const type =
                         document
                             .getElementById("type")
@@ -584,12 +643,6 @@ requireRole(
                     const chambre =
                         document
                             .getElementById("chambre")
-                            ?.value
-                            .trim();
-
-                    const toilette =
-                        document
-                            .getElementById("toilette")
                             ?.value
                             .trim();
 
@@ -624,6 +677,10 @@ requireRole(
                     await createBon({
 
                         date,
+                            heureEnvoi: new Date().toLocaleTimeString("fr-FR", {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            }),
 
                         site:
                             profile.site,
@@ -642,8 +699,6 @@ requireRole(
 
                         chambre,
 
-                        toilette,
-
                         localisation,
 
                         niveau,
@@ -659,7 +714,9 @@ requireRole(
 
                         agentNom:
                             `${profile.prenom || ""} ${profile.nom || ""}`
-                                .trim()
+                                .trim(),
+
+                        anneeAcademique
 
                     });
 
@@ -672,6 +729,28 @@ requireRole(
                     bonForm.reset();
 
                     delete bonForm.dataset.demandeId;
+
+
+                    // =================================================
+                    // DATE PAR DÉFAUT APRÈS RESET
+                    // =================================================
+
+                    const dateInput =
+                        document.getElementById(
+                            "date"
+                        );
+
+                    if (dateInput) {
+
+                        dateInput.value =
+                            obtenirDateLocaleISO();
+
+                        dateInput.min =
+                            obtenirDateLocaleISO();
+
+                        dateInput.max =
+                            obtenirDateDemainISO();
+                    }
 
 
                     // =================================================
@@ -707,12 +786,6 @@ requireRole(
                     }
 
 
-                    // =================================================
-                    // ACTUALISER LE SUIVI
-                    // =================================================
-
-                    await chargerSuiviBons();
-
                 } catch (error) {
 
                     console.error(
@@ -737,10 +810,6 @@ requireRole(
         demandesBody.addEventListener(
             "click",
             async (event) => {
-
-                // =================================================
-                // LECTURE SEULE
-                // =================================================
 
                 if (lectureSeule) {
 
@@ -804,9 +873,13 @@ requireRole(
                     if (dateInput) {
 
                         dateInput.value =
-                            new Date()
-                                .toISOString()
-                                .split("T")[0];
+                            obtenirDateLocaleISO();
+
+                        dateInput.min =
+                            obtenirDateLocaleISO();
+
+                        dateInput.max =
+                            obtenirDateDemainISO();
 
                     }
 
@@ -847,9 +920,6 @@ requireRole(
 
                     // =================================================
                     // CHAMBRE
-                    // =================================================
-                    // La chambre n'est renseignée que lorsque
-                    // l'intervention concerne réellement une chambre.
                     // =================================================
 
                     const chambreInput =
@@ -926,24 +996,6 @@ requireRole(
 
                         coteInput.value =
                             demande.cote ||
-                            "";
-
-                    }
-
-
-                    // =================================================
-                    // TOILETTE
-                    // =================================================
-
-                    const toiletteInput =
-                        document.getElementById(
-                            "toilette"
-                        );
-
-                    if (toiletteInput) {
-
-                        toiletteInput.value =
-                            demande.toilette ||
                             "";
 
                     }
@@ -1159,7 +1211,7 @@ requireRole(
 
 
         // =====================================================
-        // SUIVI DES BONS
+        // SUIVI DES BONS — TEMPS RÉEL
         // =====================================================
 
         const bonsBody =
@@ -1168,40 +1220,76 @@ requireRole(
             );
 
 
-        async function chargerSuiviBons() {
+        if (!bonsBody) {
 
-            if (!bonsBody) {
+            console.error(
+                "❌ bons-body introuvable"
+            );
 
-                console.error(
-                    "❌ bons-body introuvable"
+            return;
+        }
+
+
+        // =====================================================
+        // REQUÊTE TEMPS RÉEL DES BONS
+        // =====================================================
+
+        const bonsQuery =
+            query(
+                collection(db, "bons"),
+
+                where("site", "==", siteAgent),
+
+                where("pavillon", "==", pavillonAgent),
+
+                where(
+                    "anneeAcademique",
+                    "==",
+                    anneeAcademique
+                )
+            );
+
+
+        // =====================================================
+        // ÉCOUTE TEMPS RÉEL DES BONS
+        // =====================================================
+
+        onSnapshot(
+
+            bonsQuery,
+
+            (snapshot) => {
+
+                console.log(
+                    "🔄 Bons mis à jour en temps réel :",
+                    snapshot.size
                 );
 
-                return;
-            }
 
+                let bons =
+                    snapshot.docs
+                        .map(
+                            documentSnapshot => ({
 
-            try {
+                                id:
+                                    documentSnapshot.id,
 
-                const bons =
-                    await getBons({
+                                ...documentSnapshot.data()
 
-                        site:
-                            siteAgent,
-
-                        pavillon:
-                            pavillonAgent
-
-                    });
+                            })
+                        )
+                        .filter(
+                            bon =>
+                                bon.supprime !== true
+                        );
 
 
                 // =================================================
-                // FILTRE : BONS DU JOUR
+                // DATE DU JOUR — LOCALE
                 // =================================================
 
                 const aujourdHui =
-                    new Date()
-                        .toISOString()
-                        .split("T")[0];
+                    obtenirDateLocaleISO();
 
 
                 const bonsDuJour =
@@ -1210,6 +1298,22 @@ requireRole(
                             bon.date ===
                             aujourdHui
                     );
+
+
+                // =================================================
+                // TRI
+                // =================================================
+
+                bonsDuJour.sort(
+                    (a, b) =>
+                        String(
+                            b.date || ""
+                        ).localeCompare(
+                            String(
+                                a.date || ""
+                            )
+                        )
+                );
 
 
                 bonsBody.innerHTML = "";
@@ -1227,7 +1331,7 @@ requireRole(
 
                         <tr class="empty-row">
 
-                            <td colspan="13">
+                            <td colspan="12">
 
                                 Aucun bon aujourd'hui
 
@@ -1248,40 +1352,32 @@ requireRole(
                 bonsDuJour.forEach(
                     (bon) => {
 
-                const boutonSuppression =
-                    !lectureSeule &&
-                    bon.statut === "envoye"
-                        ? `
-                            <button
-                                type="button"
-                                class="bon-delete-btn"
-                                data-bon-id="${bon.id}"
-                            >
-                                Supprimer
-                            </button>
-                        `
-                        : "";
+                        const boutonSuppression =
+                            !lectureSeule &&
+                            bon.statut === "envoye"
+                                ? `
+                                    <button
+                                        type="button"
+                                        class="bon-delete-btn"
+                                        data-bon-id="${bon.id}"
+                                    >
+                                        Supprimer
+                                    </button>
+                                `
+                                : "";
 
 
                         bonsBody.innerHTML += `
 
                             <tr>
 
-                                <!-- ID -->
-
                                 <td>
                                     ${bon.id || "-"}
                                 </td>
 
-
-                                <!-- DATE -->
-
                                 <td>
-                                    ${bon.date || "-"}
+                                    ${formaterDate(bon.date)}
                                 </td>
-
-
-                                <!-- TYPE -->
 
                                 <td>
                                     ${
@@ -1291,70 +1387,37 @@ requireRole(
                                     }
                                 </td>
 
-
-                                <!-- LOCALISATION -->
-
                                 <td>
                                     ${bon.localisation || "-"}
                                 </td>
-
-
-                                <!-- NIVEAU -->
 
                                 <td>
                                     ${bon.niveau || "-"}
                                 </td>
 
-
-                                <!-- CÔTÉ -->
-
                                 <td>
                                     ${bon.cote || "-"}
                                 </td>
-
-
-                                <!-- CHAMBRE -->
 
                                 <td>
                                     ${bon.chambre || "-"}
                                 </td>
 
-
-                                <!-- TOILETTE -->
-
-                                <td>
-                                    ${bon.toilette || "-"}
-                                </td>
-
-
-                                <!-- DESCRIPTION -->
-
                                 <td>
                                     ${bon.description || "-"}
                                 </td>
-
-                                <!-- PAR -->
 
                                 <td>
                                     ${bon.par || "-"}
                                 </td>
 
-
-                                <!-- SUPPRESSION -->
-
                                 <td>
                                     ${boutonSuppression}
                                 </td>
 
-
-                                <!-- STATUT -->
-
                                 <td>
                                     ${bon.statut || "-"}
                                 </td>
-
-
-                                <!-- CAUSE -->
 
                                 <td>
                                     ${bon.cause || "-"}
@@ -1365,6 +1428,32 @@ requireRole(
                         `;
                     }
                 );
+
+
+
+function formaterDate(date) {
+
+    if (!date) {
+        return "-";
+    }
+
+    const d = new Date(date);
+
+    if (Number.isNaN(d.getTime())) {
+        return date;
+    }
+
+    return new Intl.DateTimeFormat(
+        "fr-FR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    ).format(d);
+}
 
 
                 // =================================================
@@ -1435,8 +1524,8 @@ requireRole(
                                                 bonId
                                             );
 
-
-                                            await chargerSuiviBons();
+                                            // Pas de refresh manuel :
+                                            // onSnapshot actualise automatiquement.
 
 
                                         } catch (error) {
@@ -1461,10 +1550,13 @@ requireRole(
                         );
                 }
 
-            } catch (error) {
+            },
+
+
+            (error) => {
 
                 console.error(
-                    "❌ Chargement des bons :",
+                    "❌ Erreur écoute temps réel des bons :",
                     error
                 );
 
@@ -1473,7 +1565,7 @@ requireRole(
 
                     <tr class="empty-row">
 
-                        <td colspan="13">
+                        <td colspan="12">
 
                             Impossible de charger
                             les bons.
@@ -1485,14 +1577,7 @@ requireRole(
                 `;
             }
 
-        }
-
-
-        // =====================================================
-        // CHARGEMENT INITIAL DU SUIVI
-        // =====================================================
-
-        await chargerSuiviBons();
+        );
 
 
         // =====================================================

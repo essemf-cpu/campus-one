@@ -15,15 +15,23 @@
     </title>
 
 
+    <!-- SIDEBAR -->
+
     <link
         rel="stylesheet"
         href="../components/sidebar.css"
     >
 
+
+    <!-- STYLE PAGE -->
+
     <link
         rel="stylesheet"
         href="historique-demandes.css"
     >
+
+
+    <!-- FONT AWESOME -->
 
     <link
         rel="stylesheet"
@@ -42,17 +50,17 @@
 
     <header class="mobile-header">
 
-        <button id="mobile-menu-btn">
-
+        <button
+            id="mobile-menu-btn"
+            type="button"
+            aria-label="Ouvrir le menu"
+        >
             ☰
-
         </button>
 
 
         <h2 id="mobile-title">
-
             Hébergement
-
         </h2>
 
     </header>
@@ -90,7 +98,7 @@
 
 
     <!-- ==========================================
-         CONTENU
+         CONTENU PRINCIPAL
     =========================================== -->
 
     <main id="content">
@@ -214,62 +222,53 @@
                     >
 
                         <option value="tous">
-
                             Tous les types
-
                         </option>
 
                     </select>
 
                 </div>
 
+
                 <!-- ==============================
-     STATUT
-=============================== -->
+                     STATUT
+                =============================== -->
 
-<div class="historique-filter-group">
+                <div class="historique-filter-group">
 
-    <label
-        for="historique-statut"
-    >
-        Statut
-    </label>
-
-
-    <select
-        id="historique-statut"
-    >
-
-        <option value="tous">
-
-            Tous les statuts
-
-        </option>
+                    <label
+                        for="historique-statut"
+                    >
+                        Statut
+                    </label>
 
 
-        <option value="termine">
+                    <select
+                        id="historique-statut"
+                    >
 
-            Terminée
-
-        </option>
-
-
-        <option value="forclos">
-
-            Forclos
-
-        </option>
+                        <option value="tous">
+                            Tous les statuts
+                        </option>
 
 
-        <option value="non_termine">
+                        <option value="termine">
+                            Terminée
+                        </option>
 
-            Non terminée
 
-        </option>
+                        <option value="forclos">
+                            Forclos
+                        </option>
 
-    </select>
 
-</div>
+                        <option value="non_termine">
+                            Non terminée
+                        </option>
+
+                    </select>
+
+                </div>
 
 
                 <!-- ==============================
@@ -290,58 +289,42 @@
                     >
 
                         <option value="toutes">
-
                             Toutes les périodes
-
                         </option>
 
 
                         <option value="aujourd_hui">
-
                             Aujourd'hui
-
                         </option>
 
 
                         <option value="hier">
-
                             Hier
-
                         </option>
 
 
                         <option value="semaine">
-
                             Cette semaine
-
                         </option>
 
 
                         <option value="mois">
-
                             Ce mois
-
                         </option>
 
 
                         <option value="choisir_mois">
-
                             Choisir un mois
-
                         </option>
 
 
                         <option value="annee">
-
                             Cette année
-
                         </option>
 
 
                         <option value="choisir_annee">
-
                             Choisir une année
-
                         </option>
 
                     </select>
@@ -371,9 +354,7 @@
                     >
 
                         <option value="">
-
                             Choisir une année
-
                         </option>
 
                     </select>
@@ -403,9 +384,7 @@
                     >
 
                         <option value="">
-
                             Choisir un mois
-
                         </option>
 
 
@@ -472,7 +451,6 @@
 
                 </div>
 
-
             </div>
 
 
@@ -488,45 +466,84 @@
 
                         <tr>
 
+                            <!-- 1 -->
+
                             <th>
-                                Date
+                                Date et heure
                             </th>
 
+
+                            <!-- 2 -->
 
                             <th>
                                 Nom
                             </th>
 
 
-                            <th>
-                                Chambre
-                            </th>
-
+                            <!-- 3 -->
 
                             <th>
                                 Type
                             </th>
 
 
+                            <!-- 4 -->
+
+                            <th>
+                                Localisation
+                            </th>
+
+
+                            <!-- 5 -->
+
+                            <th>
+                                Niveau
+                            </th>
+
+
+                            <!-- 6 -->
+
+                            <th>
+                                Côté
+                            </th>
+
+
+                            <!-- 7 -->
+
+                            <th>
+                                Chambre
+                            </th>
+
+
+                            <!-- 8 -->
+
                             <th>
                                 Description
                             </th>
 
+
+                            <!-- 9 -->
 
                             <th>
                                 Statut
                             </th>
 
 
+                            <!-- 10 -->
+
                             <th>
                                 Cause
                             </th>
 
 
+                            <!-- 11 -->
+
                             <th>
                                 Évaluation
                             </th>
 
+
+                            <!-- 12 -->
 
                             <th>
                                 Commentaire
@@ -541,7 +558,7 @@
 
                         <tr class="empty-row">
 
-                            <td colspan="9">
+                            <td colspan="12">
 
                                 Aucun historique disponible.
 
@@ -558,8 +575,13 @@
 
         </section>
 
+
     </main>
 
+
+    <!-- ==========================================
+         SCRIPT
+    =========================================== -->
 
     <script
         type="module"

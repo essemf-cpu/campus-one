@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Payer mon loyer - Campus One
+    </title>
+
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+  <script type="module" crossorigin src="/assets/pages/codifier/loyer/index-CgulZ33T.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="stylesheet" crossorigin href="/assets/index-Q6oF6B3r.css">
+</head>
+
+<body>
+
+    <main class="loyer-page">
+
+        <header class="loyer-header">
+
+            <button
+                id="back-btn"
+                class="back-btn"
+                type="button"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+
+            <div>
+                <h1>Payer mon loyer</h1>
+                <p>Votre situation de paiement</p>
+            </div>
+
+        </header>
+
+
+        <section class="annee-card">
+
+            <span>Année académique</span>
+
+            <strong id="annee-academique">
+                2026-2027
+            </strong>
+
+        </section>
+
+
+        <section class="situation-card">
+
+            <div class="situation-header">
+
+                <div>
+                    <span class="section-label">
+                        Situation actuelle
+                    </span>
+
+                    <h2 id="montant-total">
+                        3 000 FCFA
+                    </h2>
+                </div>
+
+                <div class="situation-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+
+            </div>
+
+            <div class="situation-status">
+                <i class="fa-solid fa-circle-exclamation"></i>
+
+                <span>
+                    Mois à régulariser :
+                    <strong id="mois-a-payer">
+                        Janvier 2027
+                    </strong>
+                </span>
+            </div>
+
+        </section>
+
+
+        <section class="paiements-section">
+
+            <div class="section-title">
+
+                <div>
+                    <span class="section-label">
+                        Historique
+                    </span>
+
+                    <h2>
+                        Mes paiements
+                    </h2>
+                </div>
+
+            </div>
+
+
+            <div
+                id="paiements-list"
+                class="paiements-list"
+            ></div>
+
+        </section>
+
+
+        <section class="actions-section">
+
+            <button
+                id="payer-btn"
+                class="
+                    action-button
+                    action-button-primary
+                "
+                type="button"
+            >
+
+                <i class="fa-solid fa-credit-card"></i>
+
+                Payer mon loyer
+
+            </button>
+
+
+            <button
+                id="reglement-btn"
+                class="
+                    action-button
+                    action-button-secondary
+                "
+                type="button"
+            >
+
+                <i class="fa-solid fa-book-open"></i>
+
+                Voir article de règlement intérieur
+
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         MODAL CHOIX DU PAIEMENT
+    ===================================================== -->
+
+    <div
+        id="paiement-modal"
+        class="modal"
+    >
+
+        <div class="modal-content">
+
+            <button
+                id="close-modal"
+                class="modal-close"
+                type="button"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+
+            <div class="modal-icon">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+
+
+            <h2>
+                Régulariser votre loyer
+            </h2>
+
+            <p class="modal-description">
+
+                Votre prochain mois à régulariser est
+
+                <strong id="modal-mois">
+                    Janvier 2027
+                </strong>.
+
+                <br>
+
+                Souhaitez-vous payer uniquement ce mois
+                ou plusieurs mois à l'avance ?
+
+            </p>
+
+
+            <div class="choix-paiement">
+
+                <button
+                    id="payer-seul-btn"
+                    class="choix-button"
+                    type="button"
+                >
+
+                    <div>
+                        <strong>
+                            Payer uniquement ce mois
+                        </strong>
+
+                        <span id="montant-mois">
+                            3 000 FCFA
+                        </span>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </button>
+
+
+                <button
+                    id="payer-plusieurs-btn"
+                    class="choix-button"
+                    type="button"
+                >
+
+                    <div>
+                        <strong>
+                            Payer plusieurs mois
+                        </strong>
+
+                        <span>
+                            Payer plusieurs mois à l'avance
+                        </span>
+                    </div>
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MODAL PLUSIEURS MOIS
+    ===================================================== -->
+
+    <div
+        id="plusieurs-modal"
+        class="modal"
+    >
+
+        <div class="modal-content modal-large">
+
+            <button
+                id="close-plusieurs-modal"
+                class="modal-close"
+                type="button"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+
+            <div class="modal-icon">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+
+
+            <h2>
+                Choisissez les mois
+            </h2>
+
+            <p class="modal-description">
+                Les mois doivent être réglés dans l'ordre.
+            </p>
+
+
+            <div
+                id="mois-selection"
+                class="mois-selection"
+            ></div>
+
+
+            <div class="total-card">
+
+                <span>
+                    Total à payer
+                </span>
+
+                <strong id="total-selection">
+                    3 000 FCFA
+                </strong>
+
+            </div>
+
+
+            <button
+                id="continuer-paiement-btn"
+                class="
+                    action-button
+                    action-button-primary
+                "
+                type="button"
+            >
+
+                Continuer
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MODAL RÉCAPITULATIF
+    ===================================================== -->
+
+    <div
+        id="recap-modal"
+        class="modal"
+    >
+
+        <div class="modal-content modal-large">
+
+            <button
+                id="close-recap-modal"
+                class="modal-close"
+                type="button"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+
+            <div class="modal-icon">
+                <i class="fa-solid fa-file-invoice"></i>
+            </div>
+
+
+            <h2>
+                Récapitulatif
+            </h2>
+
+            <p class="modal-description">
+                Vérifiez votre sélection avant de continuer.
+            </p>
+
+
+            <div
+                id="recap-list"
+                class="recap-list"
+            ></div>
+
+
+            <div class="total-card">
+
+                <span>
+                    Total à payer
+                </span>
+
+                <strong id="recap-total">
+                    3 000 FCFA
+                </strong>
+
+            </div>
+
+
+            <button
+                id="confirmer-paiement-btn"
+                class="
+                    action-button
+                    action-button-primary
+                "
+                type="button"
+            >
+
+                <i class="fa-solid fa-lock"></i>
+
+                Confirmer et payer
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+</body>
+
+</html>

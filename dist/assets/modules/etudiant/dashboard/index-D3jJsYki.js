@@ -83,17 +83,17 @@ Minimum version required to store current data is: `+s+`.
     </a>
 
 
-    <a
-        href="../../../pages/gps/index.html"
-        class="premium-card">
+<a
+    href="../../../pages/fiche-medicale/index.html"
+    class="premium-card">
 
-        <i class="fa-solid fa-location-dot"></i>
+    <i class="fa-solid fa-notes-medical"></i>
 
-        <span>
-            GPS
-        </span>
+    <span>
+        Fiche médicale
+    </span>
 
-    </a>
+</a>
 
 
     <a

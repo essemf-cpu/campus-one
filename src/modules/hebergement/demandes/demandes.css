@@ -5,402 +5,307 @@
 }
 
 body{
-
     display:flex;
-
     min-height:100vh;
-
     background:#f5f7fb;
-
     font-family:Arial, Helvetica, sans-serif;
-
 }
 
 #sidebar{
-
     width:280px;
-
     background:white;
-
     border-right:1px solid #e5e5e5;
-
 }
 
 #content{
-
     flex:1;
-
     padding:28px;
-
     background:#f6f8fb;
-
     overflow:auto;
-
 }
 
-.page-header{
-
-    margin-bottom:30px;
-
-}
-
-.page-header h1{
-
-    font-size:36px;
-
-    color:#1d2a44;
-
-    font-weight:700;
-
-}
-
-.card{
-
-    background:white;
-
-    border-radius:16px;
-
-    padding:20px;
-
-    box-shadow:0 2px 12px rgba(0,0,0,.05);
-
-}
-
-.card h2{
-
-    margin-bottom:20px;
-
-    font-size:24px;
-
-}
-
-.table{
-
-    width:100%;
-
-    border-collapse:collapse;
-
-}
-
-.table th{
-
-    text-align:left;
-
-    padding:15px;
-
-    border-bottom:1px solid #e5e7eb;
-
-    font-weight:600;
-
-}
-
-.table td{
-
-    padding:18px 15px;
-
-    border-bottom:1px solid #f0f0f0;
-
-}
 
 /* ==========================
    PAGE
 ========================== */
 
+.page-header{
+    margin-bottom:30px;
+}
+
+.page-header h1{
+    font-size:36px;
+    color:#1d2a44;
+    font-weight:700;
+}
+
 .page-title{
-
     margin-bottom:20px;
-
 }
 
 .page-title h1{
-
     font-size:24px;
-
     font-weight:700;
-
     color:#0f172a;
-
 }
+
 
 /* ==========================
    CARTES
 ========================== */
 
 .card{
-
     width:100%;
-
     max-width:1150px;
-
     background:#fff;
-
     border:1px solid #edf1f7;
-
     border-radius:18px;
-
     padding:20px;
-
     margin-bottom:22px;
-
     box-shadow:0 4px 16px rgba(15,23,42,.05);
-
 }
 
 .card-header{
-
     margin-bottom:16px;
-
 }
 
 .card-header h2{
-
     font-size:22px;
-
     font-weight:700;
-
     color:#0f172a;
-
 }
+
 
 /* ==========================
    TABLEAUX
 ========================== */
 
 .table{
-
     width:100%;
-
     border-collapse:collapse;
-
 }
 
 .table th{
-
     text-align:left;
-
     padding:12px 10px;
-
     font-size:14px;
-
     font-weight:700;
-
     color:#334155;
-
     border-bottom:1px solid #e8edf4;
-
 }
 
 .table td{
-
     padding:14px 10px;
-
     border-bottom:1px solid #eef2f7;
-
     color:#475569;
-
     font-size:14px;
-
 }
 
 .table tbody tr:hover{
-
     background:#f8fafc;
-
 }
 
 .empty-row td{
-
     text-align:center;
-
     padding:30px;
-
     color:#94a3b8;
-
 }
+
 
 /* ==========================
    FORMULAIRE
 ========================== */
 
 .grid{
-
     display:grid;
-
     grid-template-columns:repeat(2,minmax(260px,420px));
-
     gap:16px 20px;
-
     align-items:start;
-
 }
 
 .full{
-
     grid-column:1 / -1;
-
     max-width:860px;
-
 }
 
 label{
-
     display:block;
-
     margin-bottom:6px;
-
     font-size:13px;
-
     font-weight:600;
-
     color:#475569;
-
 }
 
 input,
 select,
 textarea{
-
     width:100%;
-
     height:44px;
-
     padding:0 14px;
-
     border:1px solid #dbe3ee;
-
     border-radius:12px;
-
     background:#fff;
-
     font-size:14px;
-
     color:#0f172a;
-
     outline:none;
-
     transition:.2s;
-
 }
 
 textarea{
-
     min-height:110px;
-
     padding:14px;
-
     resize:vertical;
-
 }
 
 input:focus,
 select:focus,
 textarea:focus{
-
     border-color:#3b82f6;
-
     box-shadow:0 0 0 3px rgba(59,130,246,.10);
-
 }
 
 .primary-btn{
-
     margin-top:20px;
-
     width:140px;
-
     height:42px;
-
     border:none;
-
     border-radius:12px;
-
     background:#3b82f6;
-
     color:#fff;
-
     font-size:14px;
-
     font-weight:600;
-
     cursor:pointer;
-
     transition:.2s;
-
 }
 
 .primary-btn:hover{
-
     background:#2563eb;
-
     transform:translateY(-1px);
-
 }
+
 
 /* ==========================
    LOADER CAMPUS ONE
 ========================== */
 
-/* ==========================
-   LOADER
-========================== */
-
 #app-loader{
-
     position:fixed;
-
     inset:0;
-
     background:#fff;
-
     display:flex;
-
     flex-direction:column;
-
     align-items:center;
-
     justify-content:center;
-
     z-index:999999;
-
 }
 
 #app-loader img{
-
     width:260px;
-
     max-width:70%;
-
 }
 
 #app-loader h2{
-
     margin-top:18px;
-
     color:#1d4ed8;
-
 }
 
 #app-loader p{
-
     margin-top:8px;
-
     color:#64748b;
-
 }
 
 body:not(.loaded) #sidebar-container,
 body:not(.loaded) .sidebar,
 body:not(.loaded) #content{
-
     visibility:hidden;
-
 }
 
 body.loaded #app-loader{
-
     display:none;
-
 }
+
+
+/* ==========================
+   ACTIONS DEMANDES
+========================== */
+
+.demande-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+.demande-action-btn{
+    border:none;
+    border-radius:8px;
+    padding:7px 10px;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:.2s;
+}
+
+.demande-action-btn:hover{
+    transform:translateY(-1px);
+}
+
+.demande-action-encours{
+    background:#ede9fe;
+    color:#6d28d9;
+}
+
+.demande-action-forclos{
+    background:#fef2f2;
+    color:#b91c1c;
+}
+
+.demande-action-bon{
+    background:#eff6ff;
+    color:#1d4ed8;
+}
+
+.demande-action-termine{
+    background:#ecfdf5;
+    color:#047857;
+}
+
+.demande-action-nontermine{
+    background:#fff7ed;
+    color:#c2410c;
+}
+
+
+/* ==========================
+   BOUTON SUPPRESSION
+========================== */
+
+.bon-delete-btn{
+    border:none;
+    border-radius:8px;
+    padding:7px 10px;
+    background:#fef2f2;
+    color:#b91c1c;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:.2s;
+}
+
+.bon-delete-btn:hover{
+    background:#fee2e2;
+}
+
+.bon-delete-btn:disabled,
+.demande-action-btn:disabled,
+.primary-btn:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+    transform:none;
+}
+
 
 /* ==========================
    RESPONSIVE MOBILE
@@ -409,84 +314,70 @@ body.loaded #app-loader{
 @media (max-width:768px){
 
     #content{
-
         padding-top:90px;
         padding-left:16px;
         padding-right:16px;
         padding-bottom:16px;
-
     }
 
     .page-title{
-
         margin:0 0 20px 0;
         padding:0;
-
     }
 
     .page-title h1{
-
         font-size:20px;
         line-height:1.3;
-
     }
 
     .card{
-
         margin:0 0 18px 0;
         padding:16px;
         border-radius:14px;
-
     }
 
     .card-header h2{
-
         font-size:18px;
-
     }
 
     .table{
-
         min-width:900px;
-
     }
 
     .demandes-card,
     .suivi-card{
-
         overflow-x:auto;
         -webkit-overflow-scrolling:touch;
-
     }
 
     .grid{
-
         grid-template-columns:1fr;
         gap:14px;
-
     }
 
     .full{
-
         grid-column:auto;
         max-width:none;
-
     }
 
     input,
     select,
     textarea{
-
         font-size:16px;
-
     }
 
     .primary-btn{
-
         width:100%;
         height:48px;
         font-size:16px;
-
     }
 
+    .demande-actions{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .demande-action-btn{
+        width:100%;
+    }
 }

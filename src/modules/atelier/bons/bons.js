@@ -5,10 +5,7 @@ import {
     collection,
     query,
     where,
-    onSnapshot,
-    doc,
-    updateDoc,
-    serverTimestamp
+    onSnapshot
 } from "firebase/firestore";
 
 import { db } from "../../../firebase/firebase.js";
@@ -17,62 +14,154 @@ import {
     getTypesTravaux
 } from "../../../services/referentielService.js";
 
-
-// =====================================================
-// CAUSES PRÉÉTABLIES — BON NON TERMINÉ
-// =====================================================
-
-const CAUSES_NON_TERMINE = [
-    "Stock de matériels",
-    "Personnel adéquat en descente",
-    "Intervention nécessitant une pièce",
-    "Intervention reportée",
-    "Intervention nécessitant une intervention externe",
-    "Autre"
-];
+import {
+    updateBonStatut,
+    STATUTS_BON
+} from "../../../services/bonsService.js";
 
 
 // =====================================================
-// FORMATAGE DATE FRANÇAIS
+// FORMATAGE DATE + HEURE FRANÇAISE
 // =====================================================
 
-function formaterDate(date) {
+function formaterDate(dateValue) {
 
-    if (!date) {
+    if (!dateValue) {
         return "-";
     }
 
-    const valeur =
-        String(date).trim();
+    let dateObjet;
 
-    // Date YYYY-MM-DD
-    const correspondance =
-        valeur.match(
-            /^(\d{4})-(\d{2})-(\d{2})$/
-        );
+    // Firestore Timestamp
+    if (
+        dateValue &&
+        typeof dateValue.toDate === "function"
+    ) {
 
-    if (correspondance) {
+        dateObjet = dateValue.toDate();
 
-        return `${correspondance[3]}/${correspondance[2]}/${correspondance[1]}`;
     }
 
-    // Si la valeur est déjà dans un autre format
-    const dateObjet =
-        new Date(date);
+    // Date JavaScript
+    else if (
+        dateValue instanceof Date
+    ) {
+
+        dateObjet = dateValue;
+
+    }
+
+    // Chaîne de caractères
+    else {
+
+        const valeur =
+            String(dateValue).trim();
+
+        /*
+         * Format :
+         * 2026-08-22
+         * 2026-08-22T14:35
+         * 2026-08-22T14:35:00
+         * 2026-08-22T14:35:00.000Z
+         */
+
+        const correspondance =
+            valeur.match(
+                /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/
+            );
+
+        if (correspondance) {
+
+            const jour =
+                correspondance[3];
+
+            const mois =
+                correspondance[2];
+
+            const annee =
+                correspondance[1];
+
+            // Si aucune heure n'est enregistrée
+            if (
+                correspondance[4] === undefined ||
+                correspondance[5] === undefined
+            ) {
+
+                return `${jour}/${mois}/${annee}`;
+
+            }
+
+            return (
+                `${jour}/${mois}/${annee}` +
+                ` à ${correspondance[4]}:${correspondance[5]}`
+            );
+
+        }
+
+        dateObjet =
+            new Date(dateValue);
+
+    }
+
 
     if (
+        !dateObjet ||
         Number.isNaN(
             dateObjet.getTime()
         )
     ) {
 
-        return valeur;
+        return String(dateValue);
+
     }
 
-    return new Intl.DateTimeFormat(
-        "fr-FR"
-    ).format(
-        dateObjet
+
+    const dateFormatee =
+        new Intl.DateTimeFormat(
+            "fr-FR",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            }
+        ).format(
+            dateObjet
+        );
+
+
+    const heureFormatee =
+        new Intl.DateTimeFormat(
+            "fr-FR",
+            {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+            }
+        ).format(
+            dateObjet
+        );
+
+
+    return `${dateFormatee} à ${heureFormatee}`;
+
+}
+
+
+// =====================================================
+// NOM DU TYPE
+// =====================================================
+
+function obtenirNomType(
+    bon,
+    typesTravauxMap
+) {
+
+    return (
+        typesTravauxMap.get(
+            bon.type
+        ) ||
+        bon.type ||
+        "-"
     );
 }
 
@@ -101,9 +190,19 @@ requireRole(
             "🏭 Module Atelier chargé"
         );
 
+        console.log(
+            "👤 profile =",
+            profile
+        );
+
+        console.log(
+            "🏭 posteId =",
+            posteId
+        );
+
 
         // =================================================
-        // VÉRIFICATION SERVICE
+        // VÉRIFICATION POSTE
         // =================================================
 
         if (
@@ -115,6 +214,18 @@ requireRole(
                 "⛔ Accès refusé : poste incorrect."
             );
 
+            document.body.classList.add(
+                "loaded"
+            );
+
+            document
+                .getElementById(
+                    "app-loader"
+                )
+                ?.classList.add(
+                    "hidden"
+                );
+
             return;
         }
 
@@ -124,7 +235,17 @@ requireRole(
         // =================================================
 
         await loadSidebar(
-            profile
+            {
+                ...profile,
+                permissions,
+                affectation:
+                    affectation?.affectation ||
+                    profile?.affectation ||
+                    "",
+                posteId,
+                anneeAcademique,
+                lectureSeule
+            }
         );
 
 
@@ -147,7 +268,7 @@ requireRole(
 
 
         // =================================================
-        // CORPS DU TABLEAU
+        // CORPS TABLEAU
         // =================================================
 
         const bonsBody =
@@ -161,12 +282,16 @@ requireRole(
                 "❌ bons-body introuvable."
             );
 
+            document.body.classList.add(
+                "loaded"
+            );
+
             return;
         }
 
 
         // =================================================
-        // SITE DE L'ATELIER
+        // SITE ATELIER
         // =================================================
 
         const siteAtelier =
@@ -177,7 +302,7 @@ requireRole(
             bonsBody.innerHTML = `
                 <tr class="empty-row">
 
-                    <td colspan="13">
+                    <td colspan="12">
                         Impossible de déterminer
                         le site de l'Atelier.
                     </td>
@@ -185,12 +310,16 @@ requireRole(
                 </tr>
             `;
 
+            document.body.classList.add(
+                "loaded"
+            );
+
             return;
         }
 
 
         // =================================================
-        // RÉFÉRENTIEL DES TYPES DE TRAVAUX
+        // RÉFÉRENTIEL TYPES
         // =================================================
 
         let typesTravauxMap =
@@ -219,7 +348,7 @@ requireRole(
         } catch (error) {
 
             console.error(
-                "❌ Erreur chargement référentiel des types :",
+                "❌ Erreur chargement référentiel :",
                 error
             );
         }
@@ -244,446 +373,450 @@ requireRole(
 
 
         // =================================================
-        // ÉCOUTE TEMPS RÉEL
+        // LISTENER TEMPS RÉEL
         // =================================================
 
-        onSnapshot(
+        const unsubscribe =
+            onSnapshot(
 
-            bonsQuery,
+                bonsQuery,
 
-            (snapshot) => {
+                (snapshot) => {
 
-                console.log(
-                    "📋 Bons du site :",
-                    snapshot.size
-                );
-
-
-                // =================================================
-                // RÉCUPÉRATION
-                // =================================================
-
-                const bons =
-                    snapshot.docs
-                        .map(
-                            documentSnapshot => ({
-                                id:
-                                    documentSnapshot.id,
-
-                                ...documentSnapshot.data()
-                            })
-                        );
+                    console.log(
+                        "📋 Bons du site :",
+                        snapshot.size
+                    );
 
 
-                // =================================================
-                // UNIQUEMENT LES BONS ACTIFS
-                // =================================================
+                    // =================================================
+                    // RÉCUPÉRATION
+                    // =================================================
+
+                    const bons =
+                        snapshot.docs
+                            .map(
+                                documentSnapshot => ({
+
+                                    id:
+                                        documentSnapshot.id,
+
+                                    ...documentSnapshot.data()
+                                })
+                            );
+
+
+                    // =================================================
+                    // UNIQUEMENT LES BONS ACTIFS
+                    // =================================================
 
                     const bonsActifs =
                         bons.filter(
-                            bon =>
-                                bon.supprime !== true &&
-                                (
-                                    bon.statut === "envoye" ||
-                                    bon.statut === "recu" ||
-                                    bon.statut === "en_cours"
-                                )
+                            bon => {
+
+                                if (
+                                    bon.supprime === true
+                                ) {
+                                    return false;
+                                }
+
+                                if (
+                                    bon.archive === true
+                                ) {
+                                    return false;
+                                }
+
+                                return (
+
+                                    bon.statut ===
+                                        STATUTS_BON.ENVOYE ||
+
+                                    bon.statut ===
+                                        STATUTS_BON.RECU ||
+
+                                    bon.statut ===
+                                        STATUTS_BON.EN_COURS
+                                );
+                            }
                         );
 
 
-                // =================================================
-                // TRI
-                // =================================================
+                    // =================================================
+                    // TRI
+                    // =================================================
 
-                bonsActifs.sort(
-                    (a, b) => {
+                    bonsActifs.sort(
+                        (a, b) => {
 
-                        const dateA =
-                            String(
-                                a.date || ""
+                            const dateA =
+                                String(
+                                    a.date || ""
+                                );
+
+                            const dateB =
+                                String(
+                                    b.date || ""
+                                );
+
+                            return dateB.localeCompare(
+                                dateA
                             );
-
-                        const dateB =
-                            String(
-                                b.date || ""
-                            );
-
-                        return dateB.localeCompare(
-                            dateA
-                        );
-                    }
-                );
-
-
-                // =================================================
-                // NETTOYAGE
-                // =================================================
-
-                bonsBody.innerHTML = "";
-
-
-                // =================================================
-                // AUCUN BON
-                // =================================================
-
-                if (
-                    bonsActifs.length === 0
-                ) {
-
-                    bonsBody.innerHTML = `
-                        <tr class="empty-row">
-
-                            <td colspan="13">
-                                Aucun bon de travail reçu.
-                            </td>
-
-                        </tr>
-                    `;
-
-                    return;
-                }
-
-
-                // =================================================
-                // AFFICHAGE
-                // =================================================
-
-                bonsActifs.forEach(
-                    (bon) => {
-
-                        // =================================================
-                        // NOM DU TYPE
-                        // =================================================
-
-                        const typeNom =
-                            typesTravauxMap.get(
-                                bon.type
-                            ) ||
-                            bon.type ||
-                            "-";
-
-
-                        // =================================================
-                        // DATE
-                        // =================================================
-
-                        const dateFormatee =
-                            formaterDate(
-                                bon.date
-                            );
-
-
-                        // =================================================
-                        // STATUT
-                        // =================================================
-
-                        let statutLabel =
-                            "-";
-
-                        let statutClasse =
-                            "";
-
-
-                        if (
-                            bon.statut ===
-                            "envoye"
-                        ) {
-
-                            statutLabel =
-                                "Reçu";
-
-                            statutClasse =
-                                "statut-envoye";
-
-                        } else if (
-                            bon.statut ===
-                            "recu"
-                        ) {
-
-                            statutLabel =
-                                "Reçu";
-
-                            statutClasse =
-                                "statut-recu";
-
-                        } else if (
-                            bon.statut ===
-                            "en_cours"
-                        ) {
-
-                            statutLabel =
-                                "En cours";
-
-                            statutClasse =
-                                "statut-en-cours";
                         }
+                    );
 
 
-                        // =================================================
-                        // ACTIONS
-                        // =================================================
+                    // =================================================
+                    // NETTOYAGE
+                    // =================================================
 
-                        let actions =
-                            "";
+                    bonsBody.innerHTML =
+                        "";
 
 
-                        if (
-                            lectureSeule
-                        ) {
+                    // =================================================
+                    // AUCUN BON
+                    // =================================================
 
-                            actions = `
-                                <span class="lecture-seule">
-                                    Lecture seule
-                                </span>
-                            `;
+                    if (
+                        bonsActifs.length ===
+                        0
+                    ) {
 
-                        }
+                        bonsBody.innerHTML = `
+                            <tr class="empty-row">
 
-
-                        // =================================================
-                        // BON ENVOYÉ
-                        // =================================================
-                        //
-                        // [ Reçu ]
-                        //
-                        // =================================================
-
-                        else if (
-                            bon.statut ===
-                            "envoye"
-                        ) {
-
-                            actions = `
-                                <div class="bon-actions">
-
-                                    <button
-                                        type="button"
-                                        class="bon-action-btn bon-action-recu"
-                                        data-id="${bon.id}"
-                                        data-action="recu"
-                                    >
-                                        Reçu
-                                    </button>
-
-                                </div>
-                            `;
-
-                        }
-
-
-                        // =================================================
-                        // BON REÇU
-                        // =================================================
-                        //
-                        // [ En cours ]
-                        //
-                        // =================================================
-
-                        else if (
-                            bon.statut ===
-                            "recu"
-                        ) {
-
-                            actions = `
-                                <div class="bon-actions">
-
-                                    <button
-                                        type="button"
-                                        class="bon-action-btn bon-action-encours"
-                                        data-id="${bon.id}"
-                                        data-action="encours"
-                                    >
-                                        En cours
-                                    </button>
-
-                                </div>
-                            `;
-
-                        }
-
-
-                        // =================================================
-                        // BON EN COURS
-                        // =================================================
-                        //
-                        // [ Terminée ] [ Non terminée ]
-                        //
-                        // =================================================
-
-                        else if (
-                            bon.statut ===
-                            "en_cours"
-                        ) {
-
-                            actions = `
-                                <div class="bon-actions">
-
-                                    <button
-                                        type="button"
-                                        class="bon-action-btn bon-action-termine"
-                                        data-id="${bon.id}"
-                                        data-action="termine"
-                                    >
-                                        Terminée
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        class="bon-action-btn bon-action-nontermine"
-                                        data-id="${bon.id}"
-                                        data-action="nontermine"
-                                    >
-                                        Non terminée
-                                    </button>
-
-                                </div>
-                            `;
-                        }
-
-
-                        // =================================================
-                        // LIGNE DU TABLEAU
-                        // =================================================
-
-                        bonsBody.innerHTML += `
-
-                            <tr>
-
-                                <!-- 1 — ID -->
-
-                                <td>
-                                    ${bon.id || "-"}
-                                </td>
-
-
-                                <!-- 2 — DATE -->
-
-                                <td>
-                                    ${dateFormatee}
-                                </td>
-
-
-                                <!-- 3 — TYPE -->
-
-                                <td>
-                                    ${typeNom}
-                                </td>
-
-
-                                <!-- 4 — PAVILLON -->
-
-                                <td>
-                                    ${bon.pavillon || "-"}
-                                </td>
-
-
-                                <!-- 5 — LOCALISATION -->
-
-                                <td>
-                                    ${bon.localisation || "-"}
-                                </td>
-
-
-                                <!-- 6 — NIVEAU -->
-
-                                <td>
-                                    ${bon.niveau || "-"}
-                                </td>
-
-
-                                <!-- 7 — CÔTÉ -->
-
-                                <td>
-                                    ${bon.cote || "-"}
-                                </td>
-
-
-                                <!-- 8 — CHAMBRE -->
-
-                                <td>
-                                    ${bon.chambre || "-"}
-                                </td>
-
-
-                                <!-- 9 — TOILETTE -->
-
-                                <td>
-                                    ${bon.toilette || "-"}
-                                </td>
-
-
-                                <!-- 10 — DESCRIPTION -->
-
-                                <td>
-                                    ${bon.description || "-"}
-                                </td>
-
-
-                                <!-- 11 — PAR -->
-
-                                <td>
-                                    ${
-                                        bon.par ||
-                                        bon.agentNom ||
-                                        bon.agentMatricule ||
-                                        "-"
-                                    }
-                                </td>
-
-
-                                <!-- 12 — STATUT -->
-
-                                <td>
-
-                                    <span
-                                        class="statut-badge ${statutClasse}"
-                                    >
-                                        ${statutLabel}
-                                    </span>
-
-                                </td>
-
-
-                                <!-- 13 — ACTION -->
-
-                                <td>
-                                    ${actions}
+                                <td colspan="12">
+                                    Aucun bon de travail reçu.
                                 </td>
 
                             </tr>
-
                         `;
+
+                        return;
                     }
-                );
-
-            },
 
 
-            // =================================================
-            // ERREUR
-            // =================================================
+                    // =================================================
+                    // AFFICHAGE
+                    // =================================================
 
-            (error) => {
+                    bonsActifs.forEach(
+                        bon => {
 
-                console.error(
-                    "❌ Erreur chargement des bons :",
-                    error
-                );
+                            // =================================================
+                            // TYPE
+                            // =================================================
 
-                bonsBody.innerHTML = `
+                            const typeNom =
+                                obtenirNomType(
+                                    bon,
+                                    typesTravauxMap
+                                );
 
-                    <tr class="empty-row">
 
-                        <td colspan="13">
-                            Impossible de charger
-                            les bons de travail.
-                        </td>
+                            // =================================================
+                            // DATE
+                            // =================================================
 
-                    </tr>
+                            const dateFormatee =
+                                formaterDate(
+                                    bon.date
+                                );
 
-                `;
-            }
-        );
+
+                            // =================================================
+                            // STATUT
+                            // =================================================
+
+                            let statutLabel =
+                                "-";
+
+                            let statutClasse =
+                                "";
+
+
+                            if (
+                                bon.statut ===
+                                STATUTS_BON.ENVOYE
+                            ) {
+
+                                statutLabel =
+                                    "Reçu";
+
+                                statutClasse =
+                                    "statut-envoye";
+
+                            } else if (
+                                bon.statut ===
+                                STATUTS_BON.RECU
+                            ) {
+
+                                statutLabel =
+                                    "Reçu";
+
+                                statutClasse =
+                                    "statut-recu";
+
+                            } else if (
+                                bon.statut ===
+                                STATUTS_BON.EN_COURS
+                            ) {
+
+                                statutLabel =
+                                    "En cours";
+
+                                statutClasse =
+                                    "statut-en-cours";
+                            }
+
+
+                            // =================================================
+                            // ACTIONS
+                            // =================================================
+
+                            let actions =
+                                "";
+
+
+                            if (
+                                lectureSeule
+                            ) {
+
+                                actions = `
+                                    <span class="lecture-seule">
+                                        Lecture seule
+                                    </span>
+                                `;
+
+                            }
+
+
+                            // =================================================
+                            // ENVOYÉ → REÇU
+                            // =================================================
+
+                            else if (
+                                bon.statut ===
+                                STATUTS_BON.ENVOYE
+                            ) {
+
+                                actions = `
+                                    <div class="bon-actions">
+
+                                        <button
+                                            type="button"
+                                            class="bon-action-btn bon-action-recu"
+                                            data-id="${bon.id}"
+                                            data-action="recu"
+                                        >
+                                            Reçu
+                                        </button>
+
+                                    </div>
+                                `;
+
+                            }
+
+
+                            // =================================================
+                            // REÇU → EN COURS
+                            // =================================================
+
+                            else if (
+                                bon.statut ===
+                                STATUTS_BON.RECU
+                            ) {
+
+                                actions = `
+                                    <div class="bon-actions">
+
+                                        <button
+                                            type="button"
+                                            class="bon-action-btn bon-action-encours"
+                                            data-id="${bon.id}"
+                                            data-action="encours"
+                                        >
+                                            En cours
+                                        </button>
+
+                                    </div>
+                                `;
+
+                            }
+
+
+                            // =================================================
+                            // EN COURS → TERMINÉ / NON TERMINÉ
+                            // =================================================
+
+                            else if (
+                                bon.statut ===
+                                STATUTS_BON.EN_COURS
+                            ) {
+
+                                actions = `
+                                    <div class="bon-actions">
+
+                                        <button
+                                            type="button"
+                                            class="bon-action-btn bon-action-termine"
+                                            data-id="${bon.id}"
+                                            data-action="termine"
+                                        >
+                                            Terminée
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            class="bon-action-btn bon-action-nontermine"
+                                            data-id="${bon.id}"
+                                            data-action="nontermine"
+                                        >
+                                            Non terminée
+                                        </button>
+
+                                    </div>
+                                `;
+                            }
+
+
+                            // =================================================
+                            // LIGNE
+                            // =================================================
+
+                            bonsBody.innerHTML += `
+
+                                <tr>
+
+                                    <!-- ID -->
+
+                                    <td>
+                                        ${bon.id || "-"}
+                                    </td>
+
+
+                                    <!-- DATE -->
+
+                                    <td>
+                                        ${dateFormatee}
+                                    </td>
+
+
+                                    <!-- TYPE -->
+
+                                    <td>
+                                        ${typeNom}
+                                    </td>
+
+
+                                    <!-- PAVILLON -->
+
+                                    <td>
+                                        ${bon.pavillon || "-"}
+                                    </td>
+
+
+                                    <!-- LOCALISATION -->
+
+                                    <td>
+                                        ${bon.localisation || "-"}
+                                    </td>
+
+
+                                    <!-- NIVEAU -->
+
+                                    <td>
+                                        ${bon.niveau || "-"}
+                                    </td>
+
+
+                                    <!-- CÔTÉ -->
+
+                                    <td>
+                                        ${bon.cote || "-"}
+                                    </td>
+
+
+                                    <!-- CHAMBRE -->
+
+                                    <td>
+                                        ${bon.chambre || "-"}
+                                    </td>
+
+
+                                    <!-- DESCRIPTION -->
+
+                                    <td>
+                                        ${bon.description || "-"}
+                                    </td>
+
+
+                                    <!-- PAR -->
+
+                                    <td>
+                                        ${
+                                            bon.par ||
+                                            bon.agentNom ||
+                                            bon.agentMatricule ||
+                                            "-"
+                                        }
+                                    </td>
+
+
+                                    <!-- STATUT -->
+
+                                    <td>
+
+                                        <span
+                                            class="statut-badge ${statutClasse}"
+                                        >
+                                            ${statutLabel}
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- ACTION -->
+
+                                    <td>
+                                        ${actions}
+                                    </td>
+
+                                </tr>
+
+                            `;
+                        }
+                    );
+                },
+
+
+                // =================================================
+                // ERREUR
+                // =================================================
+
+                (error) => {
+
+                    console.error(
+                        "❌ Erreur chargement des bons :",
+                        error
+                    );
+
+                    bonsBody.innerHTML = `
+
+                        <tr class="empty-row">
+
+                            <td colspan="12">
+
+                                Impossible de charger
+                                les bons de travail.
+
+                            </td>
+
+                        </tr>
+
+                    `;
+                }
+            );
 
 
         // =====================================================
@@ -711,7 +844,7 @@ requireRole(
 
 
                 // =================================================
-                // RÉCUPÉRER LE BOUTON
+                // BOUTON
                 // =================================================
 
                 const button =
@@ -765,32 +898,15 @@ requireRole(
                         "recu"
                     ) {
 
-                        await updateDoc(
+                        await updateBonStatut(
 
-                            doc(
-                                db,
-                                "bons",
-                                bonId
-                            ),
+                            bonId,
 
-                            {
-                                statut:
-                                    "recu",
+                            STATUTS_BON.RECU,
 
-                                cause:
-                                    "",
+                            "",
 
-                                atelierAgentMatricule:
-                                    profile.matricule ||
-                                    "",
-
-                                atelierAgentNom:
-                                    `${profile.prenom || ""} ${profile.nom || ""}`
-                                        .trim(),
-
-                                atelierReceptionAt:
-                                    serverTimestamp()
-                            }
+                            profile
                         );
                     }
 
@@ -804,32 +920,15 @@ requireRole(
                         "encours"
                     ) {
 
-                        await updateDoc(
+                        await updateBonStatut(
 
-                            doc(
-                                db,
-                                "bons",
-                                bonId
-                            ),
+                            bonId,
 
-                            {
-                                statut:
-                                    "en_cours",
+                            STATUTS_BON.EN_COURS,
 
-                                cause:
-                                    "",
+                            "",
 
-                                atelierAgentMatricule:
-                                    profile.matricule ||
-                                    "",
-
-                                atelierAgentNom:
-                                    `${profile.prenom || ""} ${profile.nom || ""}`
-                                        .trim(),
-
-                                atelierPriseEnChargeAt:
-                                    serverTimestamp()
-                            }
+                            profile
                         );
                     }
 
@@ -843,32 +942,15 @@ requireRole(
                         "termine"
                     ) {
 
-                        await updateDoc(
+                        await updateBonStatut(
 
-                            doc(
-                                db,
-                                "bons",
-                                bonId
-                            ),
+                            bonId,
 
-                            {
-                                statut:
-                                    "termine",
+                            STATUTS_BON.TERMINE,
 
-                                cause:
-                                    "",
+                            "",
 
-                                atelierAgentMatricule:
-                                    profile.matricule ||
-                                    "",
-
-                                atelierAgentNom:
-                                    `${profile.prenom || ""} ${profile.nom || ""}`
-                                        .trim(),
-
-                                atelierTermineAt:
-                                    serverTimestamp()
-                            }
+                            profile
                         );
                     }
 
@@ -882,27 +964,55 @@ requireRole(
                         "nontermine"
                     ) {
 
-                        const choix =
-                            prompt(
-                                "Sélectionnez la cause du bon non terminé :\n\n" +
-                                CAUSES_NON_TERMINE
-                                    .map(
-                                        (
-                                            cause,
-                                            index
-                                        ) =>
-                                            `${index + 1}. ${cause}`
-                                    )
-                                    .join(
-                                        "\n"
-                                    )
+                        const modal =
+                            document.getElementById(
+                                "cause-modal"
+                            );
+
+                        const select =
+                            document.getElementById(
+                                "cause-select"
+                            );
+
+                        const autreContainer =
+                            document.getElementById(
+                                "autre-cause-container"
+                            );
+
+                        const autreInput =
+                            document.getElementById(
+                                "autre-cause"
+                            );
+
+                        const confirmButton =
+                            document.getElementById(
+                                "confirm-cause"
+                            );
+
+                        const cancelButton =
+                            document.getElementById(
+                                "cancel-cause"
+                            );
+
+                        const closeButton =
+                            document.getElementById(
+                                "close-cause-modal"
                             );
 
 
+                        // =================================================
+                        // VÉRIFICATION MODALE
+                        // =================================================
+
                         if (
-                            choix ===
-                            null
+                            !modal ||
+                            !select ||
+                            !confirmButton
                         ) {
+
+                            console.error(
+                                "❌ Modale de cause introuvable."
+                            );
 
                             button.disabled =
                                 false;
@@ -911,67 +1021,233 @@ requireRole(
                         }
 
 
-                        const index =
-                            Number(
-                                choix.trim()
-                            ) - 1;
+                        // =================================================
+                        // RESET
+                        // =================================================
 
+                        select.value =
+                            "";
 
-                        if (
-                            !Number.isInteger(
-                                index
-                            ) ||
-                            index < 0 ||
-                            index >=
-                                CAUSES_NON_TERMINE.length
-                        ) {
+                        if (autreInput) {
 
-                            alert(
-                                "Choix invalide."
-                            );
+                            autreInput.value =
+                                "";
+                        }
 
-                            button.disabled =
-                                false;
+                        if (autreContainer) {
 
-                            return;
+                            autreContainer.hidden =
+                                true;
                         }
 
 
-                        const cause =
-                            CAUSES_NON_TERMINE[
-                                index
-                            ];
+                        // =================================================
+                        // OUVERTURE
+                        // =================================================
+
+                        modal.hidden =
+                            false;
 
 
-                        await updateDoc(
+                        // =================================================
+                        // FERMETURE
+                        // =================================================
 
-                            doc(
-                                db,
-                                "bons",
-                                bonId
-                            ),
+                        const fermerModal =
+                            () => {
 
+                                modal.hidden =
+                                    true;
+
+                                button.disabled =
+                                    false;
+
+                                select.value =
+                                    "";
+
+                                if (autreInput) {
+
+                                    autreInput.value =
+                                        "";
+                                }
+
+                                if (autreContainer) {
+
+                                    autreContainer.hidden =
+                                        true;
+                                }
+
+                                select.removeEventListener(
+                                    "change",
+                                    gererAutre
+                                );
+                            };
+
+
+                        // =================================================
+                        // AUTRE
+                        // =================================================
+
+                        const gererAutre =
+                            () => {
+
+                                if (
+                                    autreContainer
+                                ) {
+
+                                    autreContainer.hidden =
+                                        select.value !==
+                                        "Autre";
+                                }
+
+
+                                if (
+                                    select.value ===
+                                    "Autre"
+                                ) {
+
+                                    autreInput?.focus();
+                                }
+                            };
+
+
+                        select.addEventListener(
+                            "change",
+                            gererAutre
+                        );
+
+
+                        // =================================================
+                        // ANNULER
+                        // =================================================
+
+                        cancelButton?.addEventListener(
+                            "click",
+                            fermerModal,
                             {
-                                statut:
-                                    "non_termine",
-
-                                cause,
-
-                                atelierAgentMatricule:
-                                    profile.matricule ||
-                                    "",
-
-                                atelierAgentNom:
-                                    `${profile.prenom || ""} ${profile.nom || ""}`
-                                        .trim(),
-
-                                atelierNonTermineAt:
-                                    serverTimestamp()
+                                once:
+                                    true
                             }
                         );
+
+
+                        closeButton?.addEventListener(
+                            "click",
+                            fermerModal,
+                            {
+                                once:
+                                    true
+                            }
+                        );
+
+
+                        // =================================================
+                        // CONFIRMER
+                        // =================================================
+
+                        confirmButton.onclick =
+                            async () => {
+
+                                if (
+                                    !select.value
+                                ) {
+
+                                    alert(
+                                        "Veuillez sélectionner une cause."
+                                    );
+
+                                    return;
+                                }
+
+
+                                let cause =
+                                    select.value;
+
+
+                                // =================================================
+                                // AUTRE
+                                // =================================================
+
+                                if (
+                                    cause ===
+                                    "Autre"
+                                ) {
+
+                                    cause =
+                                        autreInput
+                                            ?.value
+                                            ?.trim() ||
+                                        "";
+
+
+                                    if (
+                                        !cause
+                                    ) {
+
+                                        alert(
+                                            "Veuillez préciser la cause."
+                                        );
+
+                                        autreInput?.focus();
+
+                                        return;
+                                    }
+                                }
+
+
+                                // =================================================
+                                // DÉSACTIVER
+                                // =================================================
+
+                                confirmButton.disabled =
+                                    true;
+
+
+                                try {
+
+                                    await updateBonStatut(
+
+                                        bonId,
+
+                                        STATUTS_BON.NON_TERMINE,
+
+                                        cause,
+
+                                        profile
+                                    );
+
+
+                                    modal.hidden =
+                                        true;
+
+                                    button.disabled =
+                                        false;
+
+                                } catch (
+                                    error
+                                ) {
+
+                                    console.error(
+                                        "❌ Erreur bon non terminé :",
+                                        error
+                                    );
+
+                                    alert(
+                                        "Impossible d'enregistrer la cause."
+                                    );
+
+                                    confirmButton.disabled =
+                                        false;
+
+                                    button.disabled =
+                                        false;
+                                }
+                            };
                     }
 
-                } catch (error) {
+                } catch (
+                    error
+                ) {
 
                     console.error(
                         "❌ Erreur traitement du bon :",
@@ -986,6 +1262,25 @@ requireRole(
                     );
                 }
 
+            }
+        );
+
+
+        // =====================================================
+        // NETTOYAGE LISTENER
+        // =====================================================
+
+        window.addEventListener(
+            "beforeunload",
+            () => {
+
+                if (
+                    typeof unsubscribe ===
+                    "function"
+                ) {
+
+                    unsubscribe();
+                }
             }
         );
 

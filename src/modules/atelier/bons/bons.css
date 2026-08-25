@@ -111,6 +111,7 @@ body {
 
 /* =========================================================
    LARGEUR DES COLONNES
+   12 COLONNES
 ========================================================= */
 
 /* 1 — ID */
@@ -129,7 +130,9 @@ body {
 /* 2 — Date */
 .table th:nth-child(2),
 .table td:nth-child(2) {
-    width: 85px;
+    width: 110px;
+    min-width: 110px;
+    white-space: nowrap;
 }
 
 /* 3 — Type */
@@ -168,33 +171,27 @@ body {
     width: 90px;
 }
 
-/* 9 — Toilette */
+/* 9 — Description */
 .table th:nth-child(9),
 .table td:nth-child(9) {
-    width: 90px;
-}
-
-/* 10 — Description */
-.table th:nth-child(10),
-.table td:nth-child(10) {
     width: 175px;
 }
 
-/* 11 — Par */
-.table th:nth-child(11),
-.table td:nth-child(11) {
+/* 10 — Par */
+.table th:nth-child(10),
+.table td:nth-child(10) {
     width: 105px;
 }
 
-/* 12 — Statut */
-.table th:nth-child(12),
-.table td:nth-child(12) {
+/* 11 — Statut */
+.table th:nth-child(11),
+.table td:nth-child(11) {
     width: 95px;
 }
 
-/* 13 — Action */
-.table th:nth-child(13),
-.table td:nth-child(13) {
+/* 12 — Action */
+.table th:nth-child(12),
+.table td:nth-child(12) {
     width: 90px;
 }
 
@@ -229,13 +226,11 @@ body {
 
 
 /* =========================================================
-   CHAMBRE / TOILETTE
+   CHAMBRE
 ========================================================= */
 
 .table th:nth-child(8),
-.table td:nth-child(8),
-.table th:nth-child(9),
-.table td:nth-child(9) {
+.table td:nth-child(8) {
     white-space: nowrap;
 }
 
@@ -245,14 +240,14 @@ body {
     text-overflow: ellipsis;
 }
 
-.table td:nth-child(10) {
+.table td:nth-child(9) {
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
     line-height: 1.45;
 }
 
-.table td:nth-child(11) {
+.table td:nth-child(10) {
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -263,12 +258,12 @@ body {
    DESCRIPTION
 ========================================================= */
 
-.table th:nth-child(10),
-.table td:nth-child(10) {
+.table th:nth-child(9),
+.table td:nth-child(9) {
     white-space: normal;
 }
 
-.table td:nth-child(10) {
+.table td:nth-child(9) {
     line-height: 1.45;
     overflow-wrap: break-word;
 }
@@ -278,8 +273,8 @@ body {
    PAR
 ========================================================= */
 
-.table th:nth-child(11),
-.table td:nth-child(11) {
+.table th:nth-child(10),
+.table td:nth-child(10) {
     white-space: normal;
     line-height: 1.4;
 }
@@ -289,8 +284,8 @@ body {
    STATUT
 ========================================================= */
 
-.table th:nth-child(12),
-.table td:nth-child(12) {
+.table th:nth-child(11),
+.table td:nth-child(11) {
     white-space: nowrap;
 }
 
@@ -299,8 +294,8 @@ body {
    ACTION
 ========================================================= */
 
-.table th:nth-child(13),
-.table td:nth-child(13) {
+.table th:nth-child(12),
+.table td:nth-child(12) {
     text-align: center;
     white-space: nowrap;
 }

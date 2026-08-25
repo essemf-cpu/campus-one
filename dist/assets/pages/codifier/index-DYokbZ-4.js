@@ -285,11 +285,34 @@ import"../../modulepreload-polyfill-Dezn_h7o.js";import{_ as e,f as t,h as n,l a
 
     </button>
 
+
+    <div class="codifier-loyer-separator"></div>
+
+<button
+    id="payer-loyer-btn"
+    class="
+        codifier-button
+        codifier-button-secondary
+    "
+    type="button"
+>
+
+    <i
+        class="
+            fa-solid
+            fa-money-bill-wave
+        "
+    ></i>
+
+    Payer mon loyer
+
+</button>
+
 </div>
 
                 </div>
 
-            `;let f=document.getElementById(`faire-reclamation-btn`);f&&f.addEventListener(`click`,()=>{window.location.href=`./reclamation/index.html`});let p=document.getElementById(`voir-demandes-btn`);p&&p.addEventListener(`click`,()=>{window.location.href=`./mes-demandes/index.html`})}catch(e){console.error(`❌ Erreur récupération hébergement :`,e),l.innerHTML=`
+            `;let f=document.getElementById(`faire-reclamation-btn`);f&&f.addEventListener(`click`,()=>{window.location.href=`./reclamation/index.html`});let p=document.getElementById(`voir-demandes-btn`);p&&p.addEventListener(`click`,()=>{window.location.href=`./mes-demandes/index.html`});let m=document.getElementById(`payer-loyer-btn`);m&&m.addEventListener(`click`,()=>{window.location.href=`./loyer/index.html`})}catch(e){console.error(`❌ Erreur récupération hébergement :`,e),l.innerHTML=`
 
                 <div
                     class="

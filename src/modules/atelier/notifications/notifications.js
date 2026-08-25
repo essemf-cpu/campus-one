@@ -173,6 +173,7 @@ function chargerNotifications(profile) {
         return;
     }
 
+    window.__atelierSite = site;
 
     // =================================================
     // ÉVITER LES DOUBLES LISTENERS
@@ -206,19 +207,20 @@ function chargerNotifications(profile) {
     // REQUÊTE FIRESTORE
     // =================================================
 
-    const requete =
-        query(
-            collection(
-                db,
-                "notificationsAtelier"
-            ),
-            where(
-                "site",
-                "==",
-                site
-            )
-        );
+   const requete =
+    query(
+        collection(
+            db,
+            "notificationsAtelier"
+        ),
+        where(
+            "site",
+            "==",
+            site
+        )
+    );
 
+console.log("🔎 Site utilisé pour notifications :", site);
 
     // =================================================
     // LISTENER TEMPS RÉEL
@@ -288,17 +290,17 @@ function chargerNotifications(profile) {
                 if (
                     notifications.length === 0
                 ) {
-
                     if (vide) {
                         vide.hidden = false;
+                        vide.style.display = "";
                     }
 
                     return;
                 }
 
-
                 if (vide) {
                     vide.hidden = true;
+                    vide.style.display = "none";
                 }
 
 

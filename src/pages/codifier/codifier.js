@@ -390,6 +390,29 @@ requireRole(
 
     </button>
 
+
+    <div class="codifier-loyer-separator"></div>
+
+<button
+    id="payer-loyer-btn"
+    class="
+        codifier-button
+        codifier-button-secondary
+    "
+    type="button"
+>
+
+    <i
+        class="
+            fa-solid
+            fa-money-bill-wave
+        "
+    ></i>
+
+    Payer mon loyer
+
+</button>
+
 </div>
 
                 </div>
@@ -435,6 +458,25 @@ if (voirDemandesButton) {
 
             window.location.href =
                 "./mes-demandes/index.html";
+
+        }
+    );
+
+}
+
+const payerLoyerButton =
+    document.getElementById(
+        "payer-loyer-btn"
+    );
+
+if (payerLoyerButton) {
+
+    payerLoyerButton.addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "./loyer/index.html";
 
         }
     );

@@ -108,6 +108,7 @@ match /etudiants/{documentId} {
 
     allow read:
         if admin()
+        || agent()
         || (
             etudiant()
             && documentId == monMatricule()
@@ -503,29 +504,27 @@ match /bons/{documentId} {
 
 match /notificationsAtelier/{documentId} {
 
-    // Les agents peuvent consulter
-    // les notifications de leur site.
+    // Lecture uniquement des notifications
+    // correspondant au site de l'agent.
     allow read:
         if agent()
         && resource.data.site ==
-            compte().data.profile.site;
+            get(
+                /databases/$(database)/documents/agents/$(monMatricule())
+            ).data.site;
 
-
-    // Création d'une notification
-    // lors de la création ou du traitement d'un bon.
+    // Création par le serveur / agent / admin.
     allow create:
-        if agent()
-        || admin();
+        if agent() || admin();
 
-
-    // Marquage comme lue.
+    // Marquage comme lue uniquement sur son site.
     allow update:
         if agent()
         && resource.data.site ==
-            compte().data.profile.site;
+            get(
+                /databases/$(database)/documents/agents/$(monMatricule())
+            ).data.site;
 
-
-    // Suppression physique interdite.
     allow delete:
         if false;
 }

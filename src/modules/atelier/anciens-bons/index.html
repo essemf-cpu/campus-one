@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Anciens bons</title>
+
+    <link
+        rel="stylesheet"
+        href="../components/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="anciens-bons.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         HEADER MOBILE
+    ====================================================== -->
+
+    <header class="mobile-header">
+
+        <button
+            id="mobile-menu-btn"
+            type="button"
+        >
+            ☰
+        </button>
+
+        <h2 id="mobile-title">
+            Atelier
+        </h2>
+
+    </header>
+
+
+    <!-- =====================================================
+         LOADER
+    ====================================================== -->
+
+    <div id="app-loader">
+
+        <img
+            src="/src/assets/logo coud.png"
+            alt="Campus One"
+        >
+
+        <h2>
+            Campus One
+        </h2>
+
+        <p>
+            Chargement de votre espace...
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <div id="sidebar-container"></div>
+
+
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
+
+    <main id="content">
+
+
+        <!-- =================================================
+             TITRE
+        ================================================== -->
+
+        <section class="page-title">
+
+            <h1>
+                Anciens bons -
+                <span id="page-title"></span>
+            </h1>
+
+        </section>
+
+
+        <!-- =================================================
+             FILTRES
+        ================================================== -->
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    Recherche et filtres
+                </h2>
+
+            </div>
+
+
+            <div class="grid">
+
+
+                <!-- RECHERCHE -->
+
+                <div>
+
+                    <label for="recherche">
+                        Recherche
+                    </label>
+
+                    <input
+                        type="text"
+                        id="recherche"
+                        placeholder="ID, date, pavillon, description..."
+                    >
+
+                </div>
+
+
+                <!-- TYPE -->
+
+                <div>
+
+                    <label for="typeFiltre">
+                        Type de travail
+                    </label>
+
+                    <select id="typeFiltre">
+
+                        <option value="">
+                            Tous les types
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- PÉRIODE -->
+
+                <div>
+
+                    <label for="periode">
+                        Période
+                    </label>
+
+                    <select id="periode">
+
+                        <option value="">
+                            Toutes les périodes
+                        </option>
+
+                        <option value="semaine">
+                            Semaine passée
+                        </option>
+
+                        <option value="mois">
+                            Mois passé
+                        </option>
+
+                        <option value="annee">
+                            Année passée
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- ANNÉE -->
+
+                <div>
+
+                    <label for="anneeFiltre">
+                        Année
+                    </label>
+
+                    <select id="anneeFiltre">
+
+                        <option value="">
+                            Toutes les années
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- MOIS -->
+
+                <div>
+
+                    <label for="moisFiltre">
+                        Mois
+                    </label>
+
+                    <select id="moisFiltre">
+
+                        <option value="">
+                            Tous les mois
+                        </option>
+
+                        <option value="01">
+                            Janvier
+                        </option>
+
+                        <option value="02">
+                            Février
+                        </option>
+
+                        <option value="03">
+                            Mars
+                        </option>
+
+                        <option value="04">
+                            Avril
+                        </option>
+
+                        <option value="05">
+                            Mai
+                        </option>
+
+                        <option value="06">
+                            Juin
+                        </option>
+
+                        <option value="07">
+                            Juillet
+                        </option>
+
+                        <option value="08">
+                            Août
+                        </option>
+
+                        <option value="09">
+                            Septembre
+                        </option>
+
+                        <option value="10">
+                            Octobre
+                        </option>
+
+                        <option value="11">
+                            Novembre
+                        </option>
+
+                        <option value="12">
+                            Décembre
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             HISTORIQUE
+        ================================================== -->
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    Historique des bons
+                </h2>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table class="table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                ID
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Type
+                            </th>
+
+                            <th>
+                                Pavillon
+                            </th>
+
+                            <th>
+                                Localisation
+                            </th>
+
+                            <th>
+                                Niveau
+                            </th>
+
+                            <th>
+                                Côté
+                            </th>
+
+                            <th>
+                                Chambre
+                            </th>
+
+                            <th>
+                                Description
+                            </th>
+
+                            <th>
+                                Par
+                            </th>
+
+                            <th>
+                                Statut
+                            </th>
+
+                            <th>
+                                Cause
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="anciens-body">
+
+                        <tr class="empty-row">
+
+                            <td colspan="12">
+
+                                Aucun ancien bon trouvé.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         SCRIPT
+    ====================================================== -->
+
+    <script
+        type="module"
+        src="anciens-bons.js"
+    ></script>
+
+
+</body>
+
+</html>

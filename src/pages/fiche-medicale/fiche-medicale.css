@@ -1,0 +1,877 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+
+
+body {
+    background: #f5f7fb;
+    color: #111827;
+}
+
+
+/* ==================================================
+   LOADER
+================================================== */
+
+#app-loader {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: #fff;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 18px;
+
+    z-index: 999999;
+
+}
+
+
+#app-loader img {
+
+    width: 260px;
+
+    max-width: 70%;
+
+}
+
+
+#app-loader h2 {
+
+    color: #2563eb;
+
+    font-size: 34px;
+
+    font-weight: 700;
+
+}
+
+
+#app-loader p {
+
+    color: #64748b;
+
+    font-size: 16px;
+
+}
+
+
+body:not(.loaded) #medical-page {
+
+    visibility: hidden;
+
+}
+
+
+body.loaded #app-loader {
+
+    display: none;
+
+}
+
+
+/* ==================================================
+   PAGE
+================================================== */
+
+#medical-page {
+
+    max-width: 460px;
+
+    min-height: 100vh;
+
+    margin: auto;
+
+    padding: 0 20px 120px;
+
+    background: #f5f7fb;
+
+}
+
+
+/* ==================================================
+   HEADER
+================================================== */
+
+.medical-header {
+
+    height: 78px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+}
+
+
+.back-button {
+
+    width: 44px;
+
+    height: 44px;
+
+    border-radius: 50%;
+
+    background: #fff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #2563eb;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, .06);
+
+}
+
+
+.back-button i {
+
+    font-size: 18px;
+
+}
+
+
+.medical-header-title {
+
+    font-size: 21px;
+
+    font-weight: 800;
+
+}
+
+
+/* ==================================================
+   INTRODUCTION
+================================================== */
+
+.medical-intro {
+
+    padding: 18px 4px 24px;
+
+}
+
+
+.medical-icon {
+
+    width: 58px;
+
+    height: 58px;
+
+    border-radius: 18px;
+
+    background: #2563eb;
+
+    color: #fff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 25px;
+
+    margin-bottom: 16px;
+
+}
+
+
+.medical-intro h1 {
+
+    font-size: 29px;
+
+    font-weight: 800;
+
+}
+
+
+.medical-intro p {
+
+    margin-top: 8px;
+
+    color: #64748b;
+
+    line-height: 1.55;
+
+    font-size: 15px;
+
+}
+
+
+/* ==================================================
+   STATUT
+================================================== */
+
+.medical-status-card {
+
+    background: #fff;
+
+    border-radius: 20px;
+
+    padding: 17px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    box-shadow:
+        0 8px 22px rgba(0, 0, 0, .05);
+
+    margin-bottom: 18px;
+
+}
+
+
+.status-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    border-radius: 14px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.medical-status-card strong {
+
+    font-size: 15px;
+
+}
+
+
+.medical-status-card p {
+
+    margin-top: 3px;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+}
+
+
+/* ==================================================
+   CARTE MÉDICALE
+================================================== */
+
+.medical-card {
+
+    background: #fff;
+
+    border-radius: 22px;
+
+    padding: 22px;
+
+    margin-top: 16px;
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, .05);
+
+}
+
+
+/* ==================================================
+   TITRE SECTION
+================================================== */
+
+.section-title {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    margin-bottom: 22px;
+
+}
+
+
+.section-title-icon {
+
+    width: 44px;
+
+    height: 44px;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.section-title h2 {
+
+    font-size: 18px;
+
+    font-weight: 750;
+
+}
+
+
+.section-title p {
+
+    margin-top: 3px;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+}
+
+
+/* ==================================================
+   FORMULAIRE
+================================================== */
+
+.form-group {
+
+    margin-top: 18px;
+
+}
+
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    color: #374151;
+
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+
+    width: 100%;
+
+    border: 1px solid #e5e7eb;
+
+    background: #f8fafc;
+
+    border-radius: 14px;
+
+    padding: 13px 14px;
+
+    font-size: 15px;
+
+    color: #111827;
+
+    outline: none;
+
+    transition: .2s;
+
+}
+
+
+.form-group input,
+.form-group select {
+
+    height: 48px;
+
+}
+
+
+.form-group textarea {
+
+    resize: vertical;
+
+    min-height: 95px;
+
+    line-height: 1.5;
+
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+
+    border-color: #2563eb;
+
+    background: #fff;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, .08);
+
+}
+
+
+/* ==================================================
+   CHECKBOX
+================================================== */
+
+.checkbox-list {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+
+.checkbox-item {
+
+    min-height: 46px;
+
+    padding: 11px 12px;
+
+    border-radius: 13px;
+
+    background: #f8fafc;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    cursor: pointer;
+
+}
+
+
+.checkbox-item input {
+
+    width: 18px;
+
+    height: 18px;
+
+    accent-color: #2563eb;
+
+}
+
+
+.checkbox-item span {
+
+    font-size: 14px;
+
+    color: #374151;
+
+}
+
+
+/* ==================================================
+   RADIO
+================================================== */
+
+.radio-list {
+
+    display: flex;
+
+    gap: 12px;
+
+}
+
+
+.radio-item {
+
+    flex: 1;
+
+    min-height: 48px;
+
+    border-radius: 14px;
+
+    background: #f8fafc;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    cursor: pointer;
+
+}
+
+
+.radio-item input {
+
+    accent-color: #2563eb;
+
+}
+
+
+.radio-item span {
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+
+/* ==================================================
+   TRAITEMENT
+================================================== */
+
+#traitement-details-group {
+
+    display: none;
+
+}
+
+
+#traitement-details-group.visible {
+
+    display: block;
+
+}
+
+
+/* ==================================================
+   URGENCE
+================================================== */
+
+.emergency-icon {
+
+    background: #fff7ed;
+
+    color: #ea580c;
+
+}
+
+
+/* ==================================================
+   CONFIDENTIALITÉ
+================================================== */
+
+.medical-privacy-card {
+
+    margin-top: 18px;
+
+    padding: 18px;
+
+    border-radius: 20px;
+
+    background: #eff6ff;
+
+    display: flex;
+
+    gap: 14px;
+
+}
+
+
+.privacy-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    flex-shrink: 0;
+
+    border-radius: 13px;
+
+    background: #fff;
+
+    color: #2563eb;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+.privacy-content h3 {
+
+    font-size: 15px;
+
+}
+
+
+.privacy-content p {
+
+    margin-top: 6px;
+
+    color: #475569;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+}
+
+
+/* ==================================================
+   CONSENTEMENT
+================================================== */
+
+.consent-item {
+
+    margin-top: 18px;
+
+    padding: 14px;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    cursor: pointer;
+
+}
+
+
+.consent-item input {
+
+    width: 18px;
+
+    height: 18px;
+
+    margin-top: 1px;
+
+    flex-shrink: 0;
+
+    accent-color: #2563eb;
+
+}
+
+
+.consent-item span {
+
+    color: #475569;
+
+    font-size: 13px;
+
+    line-height: 1.45;
+
+}
+
+
+/* ==================================================
+   BOUTON
+================================================== */
+
+.primary-btn {
+
+    width: 100%;
+
+    height: 52px;
+
+    border: none;
+
+    border-radius: 15px;
+
+    background: #2563eb;
+
+    color: #fff;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    margin-top: 8px;
+
+    box-shadow:
+        0 8px 18px rgba(37, 99, 235, .18);
+
+}
+
+
+.primary-btn:hover {
+
+    background: #1d4ed8;
+
+}
+
+
+/* ==================================================
+   NAVBAR
+================================================== */
+
+.ios-navbar {
+
+    position: fixed;
+
+    left: 50%;
+
+    bottom: 14px;
+
+    transform: translateX(-50%);
+
+    width: calc(100% - 56px);
+
+    max-width: 390px;
+
+    height: 64px;
+
+    background: rgba(255,255,255,.97);
+
+    border-radius: 32px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-around;
+
+    padding: 0 14px;
+
+    box-shadow:
+        0 8px 24px rgba(15,23,42,.12);
+
+    z-index: 9990;
+
+    backdrop-filter: blur(12px);
+
+    -webkit-backdrop-filter: blur(12px);
+
+}
+
+
+.ios-navbar a {
+
+    width: 48px;
+
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-decoration: none;
+
+    color: #64748b;
+
+    border-radius: 50%;
+
+}
+
+
+.ios-navbar a.active {
+
+    color: #2563eb;
+
+}
+
+
+.ios-navbar a i {
+
+    font-size: 22px;
+
+}
+
+
+/* ==================================================
+   MOBILE
+================================================== */
+
+@media (max-width: 768px) {
+
+    #medical-page {
+
+        padding-left: 16px;
+
+        padding-right: 16px;
+
+    }
+
+
+    .medical-intro h1 {
+
+        font-size: 27px;
+
+    }
+
+
+    .medical-card {
+
+        padding: 19px;
+
+    }
+
+
+    .radio-list {
+
+        gap: 8px;
+
+    }
+
+}
+
+
+@supports (padding: max(0px)) {
+
+    .ios-navbar {
+
+        bottom: max(
+            14px,
+            env(safe-area-inset-bottom)
+        );
+
+    }
+
+}

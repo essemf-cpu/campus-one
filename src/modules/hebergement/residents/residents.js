@@ -14,10 +14,12 @@ import { loadSidebar } from "../components/sidebar.js";
 
 requireRole(
     "agent",
-    async ({
-        profile,
-        anneeAcademique
-    }) => {
+async ({
+    profile,
+    affectation,
+    anneeAcademique,
+    lectureSeule
+}) => {
 
         // =====================================================
         // VÉRIFICATION SERVICE
@@ -127,18 +129,18 @@ const occupantColumnTitle =
         // AFFECTATION
         // =====================================================
 
-        const site =
-            profile.site ||
-            "";
+const site =
+    affectation?.site ||
+    profile.site ||
+    "";
 
-        const affectation =
-            profile.affectation ||
-            "";
-
-        const pavillon =
-            extrairePavillon(
-                affectation
-            );
+const pavillon =
+    affectation?.pavillon ||
+    extrairePavillon(
+        affectation?.affectation ||
+        profile.affectation ||
+        ""
+    );
 
 
         // =====================================================
@@ -325,41 +327,41 @@ const occupantColumnTitle =
 
 
                     // -----------------------------------------
-                    // OCCUPATION ACTIVE UNIQUEMENT
-                    // -----------------------------------------
+// ANNÉE ACADÉMIQUE
+// -----------------------------------------
 
-                    if (
-                        hebergement.statutOccupation !==
-                        "actif"
-                    ) {
+if (
+    !anneeAcademique ||
+    hebergement.anneeAcademique !==
+        anneeAcademique
+) {
 
-                        return;
+    return;
 
-                    }
+}
 
 
-                    // -----------------------------------------
-                    // ANNÉE ACADÉMIQUE
-                    // -----------------------------------------
-                    //
-                    // Si une année est sélectionnée dans la
-                    // session, on ne prend que cette année.
-                    //
-                    // Si profile.anneeAcademique n'existe pas
-                    // encore, aucun filtre d'année n'est imposé.
-                    //
-                    // -----------------------------------------
+// -----------------------------------------
+// ANNÉE COURANTE
+// -----------------------------------------
+//
+// Pour l'année actuelle, on ne montre
+// que les occupations réellement actives.
+//
+// Pour une année historique, lectureSeule
+// permet de consulter également les
+// occupations terminées.
+//
 
-                    if (
-                        anneeAcademique &&
-                        hebergement.anneeAcademique &&
-                        hebergement.anneeAcademique !==
-                            anneeAcademique
-                    ) {
+if (
+    !lectureSeule &&
+    hebergement.statutOccupation !==
+        "actif"
+) {
 
-                        return;
+    return;
 
-                    }
+}
 
 
                     // -----------------------------------------
@@ -716,14 +718,18 @@ afficherResidents();
                         </td>
 
 
-                        <td>
+                    <td>
 
-                            ${escapeHtml(
-                                resident.telephone ||
-                                "-"
-                            )}
+                        ${
+                            lectureSeule
+                                ? "—"
+                                : escapeHtml(
+                                    resident.telephone ||
+                                    "-"
+                                )
+                        }
 
-                        </td>
+                    </td>
 
 
                         <td>
@@ -746,14 +752,18 @@ afficherResidents();
                         </td>
 
 
-                        <td>
+                    <td>
 
-                            ${escapeHtml(
-                                resident.niveau ||
-                                "-"
-                            )}
+                        ${
+                            lectureSeule
+                                ? "—"
+                                : escapeHtml(
+                                    resident.niveau ||
+                                    "-"
+                                )
+                        }
 
-                        </td>
+                    </td>
 
                     `;
 

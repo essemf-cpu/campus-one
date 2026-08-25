@@ -121,66 +121,64 @@
 
             <table class="table">
 
-    <thead>
+                <thead>
 
-        <tr>
+                    <tr>
 
-            <th>
-                Étudiant
-            </th>
+                        <th>
+                            Étudiant
+                        </th>
 
-            <th>
-                Carte
-            </th>
+                        <th>
+                            Carte
+                        </th>
 
-            <th>
-                Chambre
-            </th>
+                        <th>
+                            Chambre
+                        </th>
 
-            <th>
-                Type
-            </th>
+                        <th>
+                            Type
+                        </th>
 
-            <th>
-                Localisation
-            </th>
+                        <th>
+                            Localisation
+                        </th>
 
-            <th>
-                Niveau
-            </th>
+                        <th>
+                            Niveau
+                        </th>
 
-            <th>
-                Côté
-            </th>
+                        <th>
+                            Côté
+                        </th>
 
-            <th>
-                Problème
-            </th>
+                        <th>
+                            Problème
+                        </th>
 
-            <th>
-                Action
-            </th>
+                        <th>
+                            Action
+                        </th>
 
-        </tr>
+                    </tr>
 
-    </thead>
+                </thead>
 
 
-    <tbody id="demandes-body">
+                <tbody id="demandes-body">
 
-        <tr class="empty-row">
+                    <tr class="empty-row">
 
-            <td colspan="9">
+                        <td colspan="9">
+                            Aucune demande pour le moment
+                        </td>
 
-                Aucune demande pour le moment
+                    </tr>
 
-            </td>
+                </tbody>
 
-        </tr>
-
-    </tbody>
-
-</table>
+            </table>
 
         </section>
 
@@ -219,6 +217,7 @@
                         <input
                             type="date"
                             id="date"
+                            required
                         >
 
                     </div>
@@ -234,7 +233,10 @@
                             Type
                         </label>
 
-                        <select id="type">
+                        <select
+                            id="type"
+                            required
+                        >
 
                         </select>
 
@@ -317,25 +319,6 @@
 
 
                     <!-- =====================================
-                         TOILETTE
-                         COMPATIBILITÉ ANCIEN SYSTÈME
-                    ====================================== -->
-
-                    <div>
-
-                        <label for="toilette">
-                            Toilette
-                        </label>
-
-                        <input
-                            id="toilette"
-                            type="text"
-                        >
-
-                    </div>
-
-
-                    <!-- =====================================
                          DESCRIPTION
                     ====================================== -->
 
@@ -348,6 +331,7 @@
                         <textarea
                             id="description"
                             rows="4"
+                            required
                         ></textarea>
 
                     </div>
@@ -376,103 +360,99 @@
 
 
         <!-- =================================================
-     SUIVI
-================================================== -->
+             SUIVI
+        ================================================== -->
 
-<section
-    id="suivi"
-    class="card suivi-card"
->
+        <section
+            id="suivi"
+            class="card suivi-card"
+        >
 
-    <div class="card-header">
+            <div class="card-header">
 
-        <h2>
-            Suivi (bons du jour)
-        </h2>
+                <h2>
+                    Suivi (bons du jour)
+                </h2>
 
-    </div>
-
-
-    <table class="table">
-
-        <thead>
-
-            <tr>
-
-                <th>
-                    ID
-                </th>
-
-                <th>
-                    Date
-                </th>
-
-                <th>
-                    Type
-                </th>
-
-                <th>
-                    Localisation
-                </th>
-
-                <th>
-                    Niveau
-                </th>
-
-                <th>
-                    Côté
-                </th>
-
-                <th>
-                    Chambre
-                </th>
-
-                <th>
-                    Toilette
-                </th>
-
-                <th>
-                    Description
-                </th>
-
-                <th>
-                    Par
-                </th>
-
-                <th>
-                    Supprimer
-                </th>
-
-                <th>
-                    Statut
-                </th>
-
-                <th>
-                    Cause
-                </th>
-
-            </tr>
-
-        </thead>
+            </div>
 
 
-        <tbody id="bons-body">
+            <table class="table">
 
-            <tr class="empty-row">
+                <thead>
 
-                <td colspan="12">
+                    <tr>
 
-                    Aucun bon aujourd'hui
+                        <th>
+                            ID
+                        </th>
 
-                </td>
+                        <th>
+                            Date
+                        </th>
 
-            </tr>
+                        <th>
+                            Type
+                        </th>
 
-        </tbody>
+                        <th>
+                            Localisation
+                        </th>
 
-    </table>
+                        <th>
+                            Niveau
+                        </th>
 
-</section>
+                        <th>
+                            Côté
+                        </th>
+
+                        <th>
+                            Chambre
+                        </th>
+
+                        <th>
+                            Description
+                        </th>
+
+                        <th>
+                            Par
+                        </th>
+
+                        <th>
+                            Supprimer
+                        </th>
+
+                        <th>
+                            Statut
+                        </th>
+
+                        <th>
+                            Cause
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="bons-body">
+
+                    <tr class="empty-row">
+
+                        <td colspan="12">
+
+                            Aucun bon aujourd'hui
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
 
 
     </main>
