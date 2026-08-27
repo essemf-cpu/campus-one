@@ -1,0 +1,804 @@
+/* =====================================================
+   DÉTAILS RECOUVREMENT — CAMPUS ONE
+===================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   STRUCTURE
+===================================================== */
+
+body {
+    display: flex;
+    min-height: 100vh;
+
+    background: #f6f8fb;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+#content {
+    flex: 1;
+
+    padding: 32px 36px;
+
+    background: #f6f8fb;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
+/* =====================================================
+   TITRE DE PAGE
+===================================================== */
+
+.page-title {
+    margin-bottom: 22px;
+}
+
+.page-title-top {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.page-title h1 {
+    font-size: 26px;
+
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+.page-title p {
+    margin-top: 7px;
+
+    color: #64748b;
+
+    font-size: 15px;
+
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   BOUTON RETOUR
+===================================================== */
+
+.back-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 40px;
+
+    padding: 0 15px;
+
+    border: 1px solid #dbe3ee;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .15s ease;
+}
+
+.back-btn:hover {
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+
+    box-shadow:
+        0 3px 8px
+        rgba(15, 23, 42, 0.06);
+}
+
+.back-btn:active {
+    transform: translateY(1px);
+}
+
+
+/* =====================================================
+   CARTE ÉTUDIANT
+===================================================== */
+
+.student-card {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    width: 100%;
+
+    margin-bottom: 22px;
+
+    padding: 22px 24px;
+
+    background: #ffffff;
+
+    border: 1px solid #edf1f7;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 4px 16px
+        rgba(15, 23, 42, 0.05);
+}
+
+.student-main {
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    min-width: 0;
+}
+
+.student-avatar {
+    width: 58px;
+    height: 58px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e8f0fa;
+
+    color: #17365d;
+
+    font-size: 18px;
+
+    font-weight: 700;
+}
+
+.student-info {
+    min-width: 0;
+}
+
+.student-label {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+.student-info h2 {
+    color: #0f172a;
+
+    font-size: 21px;
+
+    font-weight: 700;
+}
+
+.student-info p {
+    margin-top: 6px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+.student-info strong {
+    color: #334155;
+}
+
+.student-location {
+    display: flex;
+
+    align-items: center;
+
+    gap: 28px;
+}
+
+.student-location > div {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.student-location span {
+    color: #64748b;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+.student-location strong {
+    color: #0f172a;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   RÉSUMÉ FINANCIER
+===================================================== */
+
+.payment-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 18px;
+
+    margin-bottom: 22px;
+}
+
+.summary-card {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    padding: 19px 21px;
+
+    background: #ffffff;
+
+    border: 1px solid #edf1f7;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 4px 16px
+        rgba(15, 23, 42, 0.05);
+}
+
+.summary-card span {
+    color: #64748b;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+.summary-card strong {
+    color: #0f172a;
+
+    font-size: 21px;
+
+    font-weight: 700;
+}
+
+.summary-card .status {
+    color: #15803d;
+}
+
+
+/* =====================================================
+   CARTES
+===================================================== */
+
+.card {
+    width: 100%;
+
+    margin-bottom: 22px;
+
+    padding: 22px;
+
+    background: #ffffff;
+
+    border: 1px solid #edf1f7;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 4px 16px
+        rgba(15, 23, 42, 0.05);
+}
+
+.card-header {
+    margin-bottom: 18px;
+}
+
+.card-header h2 {
+    color: #0f172a;
+
+    font-size: 20px;
+
+    font-weight: 700;
+}
+
+.card-header p {
+    margin-top: 5px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   TABLEAU
+===================================================== */
+
+.table-container {
+    width: 100%;
+
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+}
+
+.payment-table {
+    width: 100%;
+
+    min-width: 760px;
+
+    border-collapse: separate;
+
+    border-spacing: 0;
+}
+
+
+/* =====================================================
+   EN-TÊTE TABLEAU
+===================================================== */
+
+.payment-table th {
+    padding: 14px;
+
+    text-align: left;
+
+    color: #475569;
+
+    background: #fafbfc;
+
+    border-bottom: 1px solid #e8edf4;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.payment-table th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.payment-table th:last-child {
+    border-top-right-radius: 10px;
+}
+
+
+/* =====================================================
+   CELLULES
+===================================================== */
+
+.payment-table td {
+    padding: 15px 14px;
+
+    color: #475569;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #f0f3f7;
+
+    font-size: 14px;
+
+    line-height: 1.4;
+
+    white-space: nowrap;
+}
+
+.payment-table tbody tr:hover td {
+    background: #fafcff;
+}
+
+
+/* =====================================================
+   COLONNES
+===================================================== */
+
+.payment-table th:nth-child(1),
+.payment-table td:nth-child(1) {
+    width: 60px;
+}
+
+.payment-table th:nth-child(2),
+.payment-table td:nth-child(2) {
+    min-width: 180px;
+}
+
+.payment-table th:nth-child(3),
+.payment-table td:nth-child(3) {
+    min-width: 220px;
+}
+
+.payment-table th:nth-child(4),
+.payment-table td:nth-child(4) {
+    min-width: 150px;
+}
+
+.payment-table th:nth-child(5),
+.payment-table td:nth-child(5) {
+    min-width: 120px;
+}
+
+
+/* =====================================================
+   MONTANT
+===================================================== */
+
+.payment-table td:nth-child(4) {
+    color: #1e293b;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   STATUT
+===================================================== */
+
+.payment-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 6px 10px;
+
+    border-radius: 8px;
+
+    background: #ecfdf3;
+
+    color: #15803d;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   TOTAL TABLEAU
+===================================================== */
+
+.payment-table tfoot td {
+    padding-top: 16px;
+
+    border-bottom: none;
+
+    background: #ffffff;
+}
+
+.payment-table .total-label {
+    text-align: right;
+
+    color: #475569;
+
+    font-weight: 700;
+}
+
+.payment-table .total-value {
+    color: #0f172a;
+
+    font-size: 15px;
+
+    font-weight: 700;
+}
+
+
+/* =====================================================
+   LIGNE VIDE
+===================================================== */
+
+.empty-row td {
+    padding: 38px 20px;
+
+    text-align: center;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   SITUATION MENSUELLE
+===================================================== */
+
+.monthly-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+.month-card {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 15px 17px;
+
+    border: 1px solid #edf1f7;
+
+    border-radius: 12px;
+
+    background: #fafbfc;
+}
+
+.month-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.month-info strong {
+    color: #1e293b;
+
+    font-size: 14px;
+}
+
+.month-info span {
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+.month-paid {
+    color: #15803d;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.month-unpaid {
+    color: #b42318;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+.monthly-empty {
+    grid-column: 1 / -1;
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   LOADER CAMPUS ONE
+===================================================== */
+
+#app-loader {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 999999;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+}
+
+#app-loader img {
+    width: 260px;
+
+    max-width: 70%;
+}
+
+#app-loader h2 {
+    margin-top: 18px;
+
+    color: #1d4ed8;
+
+    font-size: 20px;
+}
+
+#app-loader p {
+    margin-top: 8px;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+body:not(.loaded) #sidebar-container,
+body:not(.loaded) .sidebar,
+body:not(.loaded) #content {
+    visibility: hidden;
+}
+
+body.loaded #app-loader {
+    display: none;
+}
+
+
+/* =====================================================
+   RESPONSIVE — TABLETTE
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    #content {
+        padding: 28px 26px;
+    }
+
+    .payment-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .student-card {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE — MOBILE
+===================================================== */
+
+@media (max-width: 900px) {
+
+    #content {
+        padding:
+            80px
+            16px
+            24px;
+    }
+
+    .page-title-top {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .back-btn {
+        width: 100%;
+    }
+
+    .payment-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .student-location {
+        width: 100%;
+
+        justify-content: space-between;
+
+        gap: 15px;
+    }
+
+    .monthly-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 18px;
+
+        border-radius: 15px;
+    }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE — PETIT MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    #content {
+        padding:
+            75px
+            12px
+            20px;
+    }
+
+    .page-title h1 {
+        font-size: 22px;
+    }
+
+    .page-title p {
+        font-size: 14px;
+    }
+
+    .student-card {
+        padding: 18px;
+    }
+
+    .student-info h2 {
+        font-size: 19px;
+    }
+
+    .student-location {
+        flex-wrap: wrap;
+    }
+
+    .summary-card {
+        padding: 17px 18px;
+    }
+
+    .card {
+        margin-bottom: 16px;
+
+        padding: 15px;
+
+        border-radius: 14px;
+    }
+
+    .card-header h2 {
+        font-size: 18px;
+    }
+
+    .payment-table {
+        min-width: 760px;
+    }
+
+}

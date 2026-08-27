@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Recouvrement</title>
+
+    <link
+        rel="stylesheet"
+        href="../components/sidebar.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="recouvrement.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         HEADER MOBILE
+    ====================================================== -->
+
+    <header class="mobile-header">
+
+        <button
+            id="mobile-menu-btn"
+            type="button"
+        >
+            ☰
+        </button>
+
+        <h2 id="mobile-title">
+            Hébergement
+        </h2>
+
+    </header>
+
+
+    <!-- =====================================================
+         LOADER
+    ====================================================== -->
+
+    <div id="app-loader">
+
+        <img
+            src="/src/assets/logo coud.png"
+            alt="Campus One"
+        >
+
+        <h2>
+            Campus One
+        </h2>
+
+        <p>
+            Chargement du recouvrement...
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <div id="sidebar-container"></div>
+
+
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
+
+    <main id="content">
+
+
+        <!-- =================================================
+             TITRE
+        ================================================== -->
+
+        <section class="page-title">
+
+            <h1>
+                Recouvrement
+            </h1>
+
+            <p>
+
+                Suivi des paiements de loyer de l’année
+                académique
+
+                <span id="annee-academique">
+                    —
+                </span>
+
+                du pavillon
+
+                <span id="pavillon-concerne">
+                    —
+                </span>
+
+            </p>
+
+        </section>
+
+
+        <!-- =================================================
+             INDICATEURS
+        ================================================== -->
+
+        <section class="recouvrement-summary">
+
+
+            <!-- ÉTUDIANTS -->
+
+            <div class="summary-card">
+
+                <span>
+                    Étudiants
+                </span>
+
+                <strong id="total-etudiants">
+                    0
+                </strong>
+
+            </div>
+
+
+            <!-- TOTAL PAYÉ -->
+
+            <div class="summary-card">
+
+                <span>
+                    Total payé
+                </span>
+
+                <strong id="total-paye">
+                    0 FCFA
+                </strong>
+
+            </div>
+
+
+            <!-- TOTAL DÛ -->
+
+            <div class="summary-card">
+
+                <span>
+                    Total dû
+                </span>
+
+                <strong id="total-du">
+                    0 FCFA
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             RECHERCHE / FILTRES
+        ================================================== -->
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <h2>
+                    Recherche et filtres
+                </h2>
+
+            </div>
+
+
+            <div class="grid">
+
+
+                <!-- RECHERCHE -->
+
+                <div>
+
+                    <label for="search-recouvrement">
+                        Recherche
+                    </label>
+
+                    <input
+                        type="text"
+                        id="search-recouvrement"
+                        placeholder="Carte étudiant, nom, prénom ou chambre..."
+                    >
+
+                </div>
+
+
+                <!-- CHAMBRE -->
+
+                <div>
+
+                    <label for="chambre-filter">
+                        Chambre
+                    </label>
+
+                    <select id="chambre-filter">
+
+                        <option value="">
+                            Toutes les chambres
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- SITUATION -->
+
+                <div>
+
+                    <label for="statut-filter">
+                        Situation
+                    </label>
+
+                    <select id="statut-filter">
+
+                        <option value="">
+                            Toutes les situations
+                        </option>
+
+                        <option value="paye">
+                            À jour
+                        </option>
+
+                        <option value="du">
+                            Montant dû
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TABLEAU
+        ================================================== -->
+
+        <section class="card">
+
+
+            <div class="table-title-container">
+
+                <h2 id="table-title">
+                    Suivi des recouvrements
+                </h2>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table class="table">
+
+
+                    <!-- =================================================
+                         EN-TÊTE
+                    ================================================== -->
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Chambre
+                            </th>
+
+                            <th>
+                                Lit
+                            </th>
+
+                            <th>
+                                Carte étudiant
+                            </th>
+
+                            <th>
+                                Étudiant
+                            </th>
+
+                            <th>
+                                Montant payé
+                            </th>
+
+                            <th>
+                                Montant dû
+                            </th>
+
+                            <th>
+                                Rappel
+                            </th>
+
+                            <th>
+                                Détails
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <!-- =================================================
+                         CORPS
+                    ================================================== -->
+
+                    <tbody id="recouvrement-body">
+
+                        <tr class="empty-row">
+
+                            <td colspan="8">
+
+                                Chargement...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+
+                </table>
+
+            </div>
+
+
+            <!-- =================================================
+                 PIED DU TABLEAU
+            ================================================== -->
+
+            <div class="recouvrement-footer">
+
+                <span>
+                    Nombre total d’étudiants :
+                </span>
+
+                <strong id="total-recouvrement">
+                    0
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script
+        type="module"
+        src="./recouvrement.js"
+    ></script>
+
+
+</body>
+
+</html>

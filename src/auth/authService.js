@@ -900,25 +900,17 @@ export function clearCurrentUserCache() {
 const API_URL =
     "http://192.168.1.6:3000/api/auth";
 
-
-/* =====================================================
-   RECHERCHE UTILISATEUR POUR ACTIVATION
-===================================================== */
-
-export async function findUserByMatricule(
+    export async function findUserByMatricule(
     matricule
 ) {
 
-    if (
-        !matricule
-    ) {
+    if (!matricule) {
 
         throw new Error(
             "USER_NOT_FOUND"
         );
 
     }
-
 
     const response =
         await fetch(
@@ -945,10 +937,8 @@ export async function findUserByMatricule(
             }
         );
 
-
     const result =
         await response.json();
-
 
     if (
         !response.ok ||
@@ -962,8 +952,75 @@ export async function findUserByMatricule(
 
     }
 
-
     return result.user;
+
+}
+
+
+/* =====================================================
+   RECHERCHE UTILISATEUR POUR ACTIVATION
+===================================================== */
+
+export async function findUser(matricule) {
+
+    if (!matricule) {
+
+        throw new Error(
+            "USER_NOT_FOUND"
+        );
+
+    }
+
+    const collections = [
+        "agents",
+        "etudiants"
+    ];
+
+    for (
+        const collectionName
+        of collections
+    ) {
+
+        const snapshot =
+            await getDocs(
+
+                query(
+
+                    collection(
+                        db,
+                        collectionName
+                    ),
+
+                    where(
+                        "matricule",
+                        "==",
+                        matricule
+                    )
+
+                )
+
+            );
+
+        if (
+            !snapshot.empty
+        ) {
+
+            return {
+
+                ...snapshot.docs[0].data(),
+
+                collection:
+                    collectionName
+
+            };
+
+        }
+
+    }
+
+    throw new Error(
+        "USER_NOT_FOUND"
+    );
 
 }
 
@@ -1193,72 +1250,5 @@ export async function getActivationInfos(
             )
 
     };
-
-}
-
-
-/* =====================================================
-   RECHERCHE UTILISATEUR POUR LOGIN
-===================================================== */
-
-export async function findUser(
-    matricule
-) {
-
-    if (
-        !matricule
-    ) {
-
-        throw new Error(
-            "USER_NOT_FOUND"
-        );
-
-    }
-
-
-    const response =
-        await fetch(
-            `${API_URL}/login-user`,
-            {
-
-                method:
-                    "POST",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json"
-
-                },
-
-                body:
-                    JSON.stringify({
-
-                        matricule
-
-                    })
-
-            }
-        );
-
-
-    const result =
-        await response.json();
-
-
-    if (
-        !response.ok ||
-        !result.success ||
-        !result.user
-    ) {
-
-        throw new Error(
-            "USER_NOT_FOUND"
-        );
-
-    }
-
-
-    return result.user;
 
 }

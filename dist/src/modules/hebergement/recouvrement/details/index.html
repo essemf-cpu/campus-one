@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Détails du recouvrement</title>
+
+
+
+  <script type="module" crossorigin src="/assets/modules/hebergement/recouvrement/details/index-CMtpcFyq.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-Dezn_h7o.js">
+  <link rel="modulepreload" crossorigin href="/assets/authService-D_VO4Eli.js">
+  <link rel="modulepreload" crossorigin href="/assets/sessionManager-ruQTA9XT.js">
+  <link rel="modulepreload" crossorigin href="/assets/authGuard-CQaJ0AEA.js">
+  <link rel="modulepreload" crossorigin href="/assets/rolldown-runtime-QTnfLwEv.js">
+  <link rel="modulepreload" crossorigin href="/assets/logo coud-0SNPf6hE.js">
+  <link rel="modulepreload" crossorigin href="/assets/sidebar-C4KV5qly.js">
+  <link rel="stylesheet" crossorigin href="/assets/sidebar-C77Ai2pi.css">
+  <link rel="stylesheet" crossorigin href="/assets/index-CkKtLXZV.css">
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         HEADER MOBILE
+    ====================================================== -->
+
+    <header class="mobile-header">
+
+        <button
+            id="mobile-menu-btn"
+            type="button"
+        >
+            ☰
+        </button>
+
+        <h2 id="mobile-title">
+            Hébergement
+        </h2>
+
+    </header>
+
+
+    <!-- =====================================================
+         LOADER
+    ====================================================== -->
+
+    <div id="app-loader">
+
+        <img
+            src="/assets/logo%20coud-BWhvgonx.png"
+            alt="Campus One"
+        >
+
+        <h2>
+            Campus One
+        </h2>
+
+        <p>
+            Chargement des détails...
+        </p>
+
+    </div>
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <div id="sidebar-container"></div>
+
+
+    <!-- =====================================================
+         CONTENU
+    ====================================================== -->
+
+    <main id="content">
+
+
+        <!-- =================================================
+             EN-TÊTE DE LA PAGE
+        ================================================== -->
+
+        <section class="page-title">
+
+            <div class="page-title-top">
+
+                <div>
+
+                    <h1>
+                        Détails du recouvrement
+                    </h1>
+
+                    <p>
+
+                        Historique des paiements de loyer de
+                        <span id="annee-academique">
+                            —
+                        </span>
+
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="retour-btn"
+                    type="button"
+                    class="back-btn"
+                >
+
+                    ← Retour
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             IDENTITÉ ÉTUDIANT
+        ================================================== -->
+
+        <section class="student-card">
+
+            <div class="student-main">
+
+                <div class="student-avatar">
+
+                    <span id="student-initials">
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="student-info">
+
+                    <span class="student-label">
+                        Étudiant
+                    </span>
+
+                    <h2 id="student-name">
+                        Chargement...
+                    </h2>
+
+                    <p>
+
+                        Carte étudiant :
+                        <strong id="student-card-number">
+                            —
+                        </strong>
+
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="student-location">
+
+                <div>
+
+                    <span>
+                        Pavillon
+                    </span>
+
+                    <strong id="student-pavillon">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Chambre
+                    </span>
+
+                    <strong id="student-chambre">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Lit
+                    </span>
+
+                    <strong id="student-lit">
+                        —
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             RÉSUMÉ FINANCIER
+        ================================================== -->
+
+        <section class="payment-summary">
+
+
+            <div class="summary-card">
+
+                <span>
+                    Total payé
+                </span>
+
+                <strong id="total-paye">
+                    0 FCFA
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Total dû
+                </span>
+
+                <strong id="total-du">
+                    0 FCFA
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Nombre de paiements
+                </span>
+
+                <strong id="nombre-paiements">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <span>
+                    Situation
+                </span>
+
+                <strong
+                    id="situation-paiement"
+                    class="status"
+                >
+                    —
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             HISTORIQUE DES PAIEMENTS
+        ================================================== -->
+
+        <section class="card">
+
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+                        Historique des paiements
+                    </h2>
+
+                    <p>
+                        Liste des paiements enregistrés pour cet étudiant.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table class="payment-table">
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                #
+                            </th>
+
+                            <th>
+                                Mois
+                            </th>
+
+                            <th>
+                                Date de paiement
+                            </th>
+
+                            <th>
+                                Montant
+                            </th>
+
+                            <th>
+                                Statut
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="paiements-body">
+
+                        <tr class="empty-row">
+
+                            <td colspan="5">
+
+                                Chargement...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+
+                    <tfoot>
+
+                        <tr>
+
+                            <td
+                                colspan="3"
+                                class="total-label"
+                            >
+                                Total
+                            </td>
+
+                            <td
+                                id="table-total"
+                                class="total-value"
+                            >
+                                0 FCFA
+                            </td>
+
+                            <td></td>
+
+                        </tr>
+
+                    </tfoot>
+
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SITUATION MENSUELLE
+        ================================================== -->
+
+        <section class="card">
+
+
+            <div class="card-header">
+
+                <div>
+
+                    <h2>
+                        Situation mensuelle
+                    </h2>
+
+                    <p>
+                        État du paiement du loyer pour chaque mois de l’année académique.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="situation-mensuelle"
+                class="monthly-grid"
+            >
+
+                <div class="monthly-empty">
+
+                    Chargement...
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+
+
+</body>
+
+</html>

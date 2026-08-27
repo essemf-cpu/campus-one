@@ -1,17 +1,54 @@
+import {
+    collection,
+    query,
+    where,
+    getDocs,
+    setDoc,
+    doc,
+    serverTimestamp
+} from "firebase/firestore";
+
+import {
+    auth,
+    db
+} from "../../../firebase/firebase.js";
+
+import {
+    getCurrentUser
+} from "../../../auth/authService.js";
+
+import {
+    onAuthStateChanged
+} from "firebase/auth";
+
+
 // =====================================================
-// DONNÉES DE DÉMONSTRATION
-// =====================================================
-//
-// Aucun raccordement Firestore pour le moment.
-// Ces données seront remplacées par les données
-// du système de recouvrement plus tard.
+// CONFIGURATION
 // =====================================================
 
-const situation = {
+const MONTANT_MENSUEL = 3000;
+
+const COLLECTION_PAIEMENTS =
+    "paiementsLoyers";
+
+
+// =====================================================
+// SITUATION DE DÉMONSTRATION DE BASE
+// =====================================================
+//
+// Cette partie sert uniquement de base tant que
+// Recouvrement n'est pas encore complètement branché.
+//
+// Les paiements enregistrés dans Firestore prennent
+// ensuite le dessus sur cette situation.
+//
+
+const situationBase = {
 
     anneeAcademique: "2026-2027",
 
-    montantMensuel: 3000,
+    montantMensuel:
+        MONTANT_MENSUEL,
 
     mois: [
 
@@ -66,6 +103,39 @@ const situation = {
 
 
 // =====================================================
+// SITUATION UTILISÉE PAR LA PAGE
+// =====================================================
+
+let situation = {
+
+    anneeAcademique:
+        situationBase.anneeAcademique,
+
+    montantMensuel:
+        situationBase.montantMensuel,
+
+    mois:
+        situationBase.mois.map(
+            mois => ({
+                ...mois
+            })
+        )
+
+};
+
+
+// =====================================================
+// INFORMATIONS UTILISATEUR
+// =====================================================
+
+let utilisateur = null;
+
+let matricule = null;
+
+let anneeAcademique = null;
+
+
+// =====================================================
 // ÉLÉMENTS
 // =====================================================
 
@@ -113,7 +183,133 @@ function obtenirPremierMoisAPayer() {
 
     return situation.mois.find(
         mois =>
-            mois.statut === "a_payer"
+            mois.statut ===
+            "a_payer"
+    );
+
+}
+
+
+// =====================================================
+// CHARGER LES PAIEMENTS FIRESTORE
+// =====================================================
+
+async function chargerPaiementsFirestore() {
+
+
+// =====================================================
+// CHARGEMENT INITIAL
+// =====================================================
+
+paiementsList.innerHTML = `
+    <div class="paiements-loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>Chargement...</span>
+    </div>
+`;
+
+    if (
+        !matricule ||
+        !anneeAcademique
+    ) {
+
+        return;
+
+    }
+
+
+    console.log(
+        "💰 Chargement des paiements du loyer..."
+    );
+
+
+    const paiementsQuery =
+        query(
+
+            collection(
+                db,
+                COLLECTION_PAIEMENTS
+            ),
+
+            where(
+                "matricule",
+                "==",
+                matricule
+            ),
+
+            where(
+                "anneeAcademique",
+                "==",
+                anneeAcademique
+            )
+
+        );
+
+
+    const snapshot =
+        await getDocs(
+            paiementsQuery
+        );
+
+
+    console.log(
+        "💰 Paiements Firestore :",
+        snapshot.size
+    );
+
+
+    // =================================================
+    // ON REPART DE LA SITUATION DE BASE
+    // =================================================
+
+    situation = {
+
+        anneeAcademique,
+
+        montantMensuel:
+            MONTANT_MENSUEL,
+
+        mois:
+            situationBase.mois.map(
+                mois => ({
+                    ...mois
+                })
+            )
+
+    };
+
+
+    // =================================================
+    // APPLICATION DES PAIEMENTS FIRESTORE
+    // =================================================
+
+    snapshot.forEach(
+        paiementDocument => {
+
+            const paiement =
+                paiementDocument.data();
+
+
+            const moisPaye =
+                situation.mois.find(
+                    mois =>
+                        mois.nom ===
+                        paiement.mois
+                );
+
+
+            if (
+                moisPaye &&
+                paiement.statut ===
+                    "paye"
+            ) {
+
+                moisPaye.statut =
+                    "paye";
+
+            }
+
+        }
     );
 
 }
@@ -133,12 +329,15 @@ function afficherSituation() {
         situation.anneeAcademique;
 
 
-    if (premierMois) {
+    if (
+        premierMois
+    ) {
 
         montantTotalElement.textContent =
             formaterMontant(
                 situation.montantMensuel
             );
+
 
         moisAPayerElement.textContent =
             premierMois.nom;
@@ -147,6 +346,7 @@ function afficherSituation() {
 
         montantTotalElement.textContent =
             "0 FCFA";
+
 
         moisAPayerElement.textContent =
             "Aucun mois en attente";
@@ -162,14 +362,16 @@ function afficherSituation() {
 
 function afficherPaiements() {
 
-    paiementsList.innerHTML = "";
+    paiementsList.innerHTML =
+        "";
 
 
     situation.mois.forEach(
         mois => {
 
             const estPaye =
-                mois.statut === "paye";
+                mois.statut ===
+                "paye";
 
 
             const element =
@@ -177,20 +379,24 @@ function afficherPaiements() {
                     "div"
                 );
 
+
             element.className =
                 "paiement-row";
 
 
             element.innerHTML = `
 
-                <div class="paiement-mois">
+                <div
+                    class="paiement-mois"
+                >
 
                     <div
                         class="
                             paiement-status
-                            ${estPaye
-                                ? "status-paye"
-                                : "status-attente"
+                            ${
+                                estPaye
+                                    ? "status-paye"
+                                    : "status-attente"
                             }
                         "
                     >
@@ -218,9 +424,10 @@ function afficherPaiements() {
                 <div
                     class="
                         paiement-etat
-                        ${estPaye
-                            ? "etat-paye"
-                            : "etat-attente"
+                        ${
+                            estPaye
+                                ? "etat-paye"
+                                : "etat-attente"
                         }
                     "
                 >
@@ -267,7 +474,7 @@ const recapModal =
 
 
 // =====================================================
-// OUVRIR / FERMER
+// OUVRIR / FERMER MODALE
 // =====================================================
 
 function ouvrirModal(
@@ -292,6 +499,7 @@ function fermerModal(
     modal.classList.remove(
         "show"
     );
+
 
     if (
         !document.querySelector(
@@ -324,7 +532,9 @@ document
                 obtenirPremierMoisAPayer();
 
 
-            if (!premierMois) {
+            if (
+                !premierMois
+            ) {
 
                 alert(
                     "Votre situation est à jour."
@@ -363,44 +573,36 @@ document
 
 document
     .getElementById("payer-seul-btn")
-    .addEventListener(
-        "click",
-        () => {
+    .addEventListener("click", () => {
 
-            const premierMois =
-                obtenirPremierMoisAPayer();
+        const premierMois =
+            obtenirPremierMoisAPayer();
 
-            if (!premierMois) {
-
-                alert(
-                    "Aucun mois à régulariser."
-                );
-
-                return;
-            }
-
-            // Important :
-            // le paiement unique devient lui aussi
-            // une sélection valide.
-
-            moisSelectionnes = [
-                premierMois
-            ];
-
-            afficherRecap(
-                moisSelectionnes
-            );
-
-            fermerModal(
-                paiementModal
-            );
-
-            ouvrirModal(
-                recapModal
-            );
-
+        if (!premierMois) {
+            return;
         }
-    );
+
+        // IMPORTANT :
+        // Le paiement unique doit également
+        // alimenter la sélection utilisée
+        // par le bouton "Confirmer et payer".
+        moisSelectionnes = [
+            premierMois
+        ];
+
+        afficherRecap(
+            moisSelectionnes
+        );
+
+        fermerModal(
+            paiementModal
+        );
+
+        ouvrirModal(
+            recapModal
+        );
+
+    });
 
 
 // =====================================================
@@ -419,7 +621,9 @@ document
                 paiementModal
             );
 
+
             afficherSelectionMois();
+
 
             ouvrirModal(
                 plusieursModal
@@ -443,29 +647,43 @@ function afficherSelectionMois() {
             "mois-selection"
         );
 
-    container.innerHTML = "";
 
-    moisSelectionnes = [];
+    container.innerHTML =
+        "";
+
+
+    moisSelectionnes =
+        [];
+
 
     const moisAPayer =
         situation.mois.filter(
             mois =>
-                mois.statut === "a_payer"
+                mois.statut ===
+                "a_payer"
         );
 
 
     moisAPayer.forEach(
-        (mois, index) => {
+        (
+            mois,
+            index
+        ) => {
+
 
             const element =
                 document.createElement(
                     "button"
                 );
 
-            element.type = "button";
+
+            element.type =
+                "button";
+
 
             element.className =
                 "mois-option";
+
 
             element.dataset.index =
                 index;
@@ -487,6 +705,7 @@ function afficherSelectionMois() {
 
                 </div>
 
+
                 <i
                     class="
                         fa-solid
@@ -501,7 +720,20 @@ function afficherSelectionMois() {
                 "click",
                 () => {
 
-                    toggleMois(index);
+                    if (
+                        element.classList.contains(
+                            "disabled"
+                        )
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    toggleMois(
+                        index
+                    );
 
                 }
             );
@@ -515,20 +747,28 @@ function afficherSelectionMois() {
     );
 
 
-    // ==========================================
-    // LE PREMIER MOIS EST SÉLECTIONNÉ
-    // ==========================================
+    // =================================================
+    // PREMIER MOIS AUTOMATIQUEMENT SÉLECTIONNÉ
+    // =================================================
 
-    if (moisAPayer.length > 0) {
+    if (
+        moisAPayer.length > 0
+    ) {
 
-        moisSelectionnes = [
-            moisAPayer[0]
-        ];
+        moisSelectionnes =
+            [
+                moisAPayer[0]
+            ];
+
+
+        container
+            .firstElementChild
+            ?.classList.add(
+                "selected"
+            );
 
     }
 
-
-    actualiserSelectionVisuelle();
 
     mettreAJourTotal();
 
@@ -539,38 +779,43 @@ function afficherSelectionMois() {
 // TOGGLE MOIS
 // =====================================================
 
-function toggleMois(index) {
+function toggleMois(
+    index
+) {
 
     const moisAPayer =
         situation.mois.filter(
             mois =>
-                mois.statut === "a_payer"
+                mois.statut ===
+                "a_payer"
         );
 
 
-    const moisClique =
+    const nouveauMois =
         moisAPayer[index];
 
 
-    if (!moisClique) {
+    if (
+        !nouveauMois
+    ) {
+
         return;
+
     }
 
 
     const position =
         moisSelectionnes.indexOf(
-            moisClique
+            nouveauMois
         );
 
 
-    // =================================================
-    // MOIS DÉJÀ SÉLECTIONNÉ
-    // =================================================
+    if (
+        position !== -1
+    ) {
 
-    if (position !== -1) {
-
-        // On ne peut retirer qu'à partir
-        // du dernier mois sélectionné.
+        // On ne retire qu'un mois
+        // situé à la fin de la sélection.
 
         if (
             position !==
@@ -587,17 +832,10 @@ function toggleMois(index) {
             1
         );
 
-    }
+    } else {
 
-
-    // =================================================
-    // NOUVEAU MOIS
-    // =================================================
-
-    else {
-
-        // Le mois doit être exactement
-        // celui qui suit le dernier sélectionné.
+        // Sélection uniquement
+        // dans l'ordre.
 
         if (
             index !==
@@ -610,7 +848,7 @@ function toggleMois(index) {
 
 
         moisSelectionnes.push(
-            moisClique
+            nouveauMois
         );
 
     }
@@ -624,35 +862,40 @@ function toggleMois(index) {
 
 
 // =====================================================
-// VISUEL SÉLECTION
+// VISUEL + DISPONIBILITÉ DE LA SÉLECTION
 // =====================================================
 
 function actualiserSelectionVisuelle() {
 
-    document
-        .querySelectorAll(
+    const options =
+        document.querySelectorAll(
             ".mois-option"
-        )
-        .forEach(
-            (element, index) => {
-
-                const selectionne =
-                    index <
-                    moisSelectionnes.length;
-
-
-                element.classList.toggle(
-                    "selected",
-                    selectionne
-                );
-
-
-                element.classList.remove(
-                    "disabled"
-                );
-
-            }
         );
+
+    options.forEach(
+        (element, index) => {
+
+            const selectionne =
+                index <
+                moisSelectionnes.length;
+
+            const prochainDisponible =
+                index ===
+                moisSelectionnes.length;
+
+            element.classList.toggle(
+                "selected",
+                selectionne
+            );
+
+            element.classList.toggle(
+                "disabled",
+                !selectionne &&
+                !prochainDisponible
+            );
+
+        }
+    );
 
 }
 
@@ -665,8 +908,10 @@ function calculerTotal(
     mois
 ) {
 
-    return mois.length *
-        situation.montantMensuel;
+    return (
+        mois.length *
+        situation.montantMensuel
+    );
 
 }
 
@@ -702,7 +947,8 @@ document
         () => {
 
             if (
-                moisSelectionnes.length === 0
+                moisSelectionnes.length ===
+                0
             ) {
 
                 alert(
@@ -718,9 +964,11 @@ document
                 moisSelectionnes
             );
 
+
             fermerModal(
                 plusieursModal
             );
+
 
             ouvrirModal(
                 recapModal
@@ -744,7 +992,8 @@ function afficherRecap(
         );
 
 
-    recapList.innerHTML = "";
+    recapList.innerHTML =
+        "";
 
 
     mois.forEach(
@@ -796,7 +1045,102 @@ function afficherRecap(
 
 
 // =====================================================
-// CONFIRMATION
+// ENREGISTRER UN PAIEMENT FIRESTORE
+// =====================================================
+//
+// Un document = un mois payé.
+//
+// Exemple :
+//
+// paiementsLoyers/
+//     2026-2027_MATRICULE_Janvier-2027
+//
+// Cela permet d'éviter les doublons.
+//
+
+async function enregistrerPaiement(
+    mois
+) {
+
+    if (
+        !matricule ||
+        !anneeAcademique
+    ) {
+
+        throw new Error(
+            "UTILISATEUR_NON_INITIALISE"
+        );
+
+    }
+
+
+    const identifiantMois =
+        mois.nom
+            .replace(
+                /\s+/g,
+                "-"
+            )
+            .replace(
+                /[^a-zA-Z0-9À-ÿ-]/g,
+                ""
+            );
+
+
+    const documentId =
+        `${anneeAcademique}_${matricule}_${identifiantMois}`;
+
+
+    const paiementReference =
+        doc(
+            db,
+            COLLECTION_PAIEMENTS,
+            documentId
+        );
+
+
+    await setDoc(
+        paiementReference,
+        {
+
+            matricule,
+
+            anneeAcademique,
+
+            mois:
+                mois.nom,
+
+            montant:
+                situation.montantMensuel,
+
+            statut:
+                "paye",
+
+            type:
+                "loyer",
+
+            origine:
+                "campus-one",
+
+            datePaiement:
+                serverTimestamp()
+
+        },
+        {
+            merge: true
+        }
+    );
+
+
+    console.log(
+        "✅ Paiement enregistré :",
+        mois.nom
+    );
+
+}
+
+
+// =====================================================
+// CONFIRMATION / PAIEMENT
 // =====================================================
 
 document
@@ -805,68 +1149,161 @@ document
     )
     .addEventListener(
         "click",
-        () => {
+        async () => {
 
             if (
-                moisSelectionnes.length === 0
+                moisSelectionnes.length ===
+                0
             ) {
-                alert(
-                    "Aucun mois sélectionné."
-                );
 
                 return;
+
             }
 
-            const total =
-                calculerTotal(
-                    moisSelectionnes
+
+            const bouton =
+                document.getElementById(
+                    "confirmer-paiement-btn"
                 );
 
-            const confirmation =
-                confirm(
-                    `Confirmer le paiement fictif de ${formaterMontant(total)} ?`
-                );
 
-            if (!confirmation) {
-                return;
-            }
+            const selection =
+                [
+                    ...moisSelectionnes
+                ];
 
-            // ==========================================
-            // SIMULATION DU PAIEMENT
-            // ==========================================
 
-            moisSelectionnes.forEach(
-                mois => {
+            bouton.disabled =
+                true;
 
-                    mois.statut =
-                        "paye";
+
+            bouton.innerHTML = `
+
+                <i
+                    class="
+                        fa-solid
+                        fa-spinner
+                        fa-spin
+                    "
+                ></i>
+
+                Enregistrement...
+
+            `;
+
+
+            try {
+
+                // =====================================
+                // ENREGISTRER CHAQUE MOIS
+                // =====================================
+
+                for (
+                    const mois
+                    of selection
+                ) {
+
+                    await enregistrerPaiement(
+                        mois
+                    );
 
                 }
-            );
 
-            alert(
-                `Paiement effectué avec succès.\n\nMontant : ${formaterMontant(total)}`
-            );
 
-            // ==========================================
-            // ACTUALISATION
-            // ==========================================
+                // =====================================
+                // METTRE À JOUR LA SITUATION LOCALE
+                // =====================================
 
-            afficherSituation();
+                selection.forEach(
+                    moisPaye => {
 
-            afficherPaiements();
+                        const mois =
+                            situation.mois.find(
+                                element =>
+                                    element.nom ===
+                                    moisPaye.nom
+                            );
 
-            // ==========================================
-            // NETTOYAGE
-            // ==========================================
 
-            moisSelectionnes = [];
+                        if (
+                            mois
+                        ) {
 
-            fermerModal(
-                recapModal
-            );
+                            mois.statut =
+                                "paye";
+
+                        }
+
+                    }
+                );
+
+
+                // =====================================
+                // ACTUALISER L'INTERFACE
+                // =====================================
+
+                afficherSituation();
+
+                afficherPaiements();
+
+
+                fermerModal(
+                    recapModal
+                );
+
+
+                // =====================================
+                // MESSAGE
+                // =====================================
+
+                alert(
+                    selection.length === 1
+
+                        ? `Paiement de ${selection[0].nom} enregistré.`
+
+                        : `${selection.length} mois ont été enregistrés comme payés.`
+                );
+
+
+            } catch (
+                error
+            ) {
+
+                console.error(
+                    "❌ Erreur enregistrement paiement :",
+                    error
+                );
+
+
+                alert(
+                    "Impossible d'enregistrer le paiement. Veuillez réessayer."
+                );
+
+
+            } finally {
+
+                bouton.disabled =
+                    false;
+
+
+                bouton.innerHTML = `
+
+                    <i
+                        class="
+                            fa-solid
+                            fa-lock
+                        "
+                    ></i>
+
+                    Confirmer et payer
+
+                `;
+
+            }
+
         }
     );
+
 
 // =====================================================
 // RÈGLEMENT INTÉRIEUR
@@ -941,7 +1378,7 @@ document
 
 
 // =====================================================
-// CLIC SUR FOND
+// CLIC SUR LE FOND
 // =====================================================
 
 document
@@ -956,7 +1393,8 @@ document
                 event => {
 
                     if (
-                        event.target === modal
+                        event.target ===
+                        modal
                     ) {
 
                         fermerModal(
@@ -994,6 +1432,119 @@ document
 // INITIALISATION
 // =====================================================
 
-afficherSituation();
+async function initialiser(
+    firebaseUser
+) {
 
+    try {
+
+        // =============================================
+        // UTILISATEUR FIREBASE CONFIRMÉ
+        // =============================================
+
+        if (!firebaseUser) {
+
+            throw new Error(
+                "UTILISATEUR_NON_CONNECTE"
+            );
+
+        }
+
+
+        // =============================================
+        // RÉCUPÉRATION DU PROFIL CAMPUS ONE
+        // =============================================
+
+        utilisateur =
+            await getCurrentUser(
+                firebaseUser.uid
+            );
+
+
+        matricule =
+            utilisateur.profile?.matricule;
+
+
+        anneeAcademique =
+            utilisateur.anneeAcademique;
+
+
+        if (!matricule) {
+
+            throw new Error(
+                "MATRICULE_MANQUANT"
+            );
+
+        }
+
+
+        if (!anneeAcademique) {
+
+            throw new Error(
+                "ANNEE_MANQUANTE"
+            );
+
+        }
+
+
+        console.log(
+            "👤 Matricule :",
+            matricule
+        );
+
+
+        console.log(
+            "📅 Année académique :",
+            anneeAcademique
+        );
+
+
+await chargerPaiementsFirestore();
+
+afficherSituation();
 afficherPaiements();
+
+
+    } catch (error) {
+
+        console.error(
+            "❌ Erreur initialisation loyer :",
+            error
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// ATTENDRE LA RESTAURATION DE LA SESSION FIREBASE
+// =====================================================
+
+onAuthStateChanged(
+    auth,
+    async (firebaseUser) => {
+
+        if (!firebaseUser) {
+
+            console.error(
+                "❌ Aucun utilisateur Firebase connecté."
+            );
+
+            return;
+
+        }
+
+
+        console.log(
+            "🔥 Utilisateur Firebase restauré :",
+            firebaseUser.uid
+        );
+
+
+        await initialiser(
+            firebaseUser
+        );
+
+    }
+);

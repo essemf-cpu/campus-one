@@ -17,6 +17,8 @@ import affectationsAgents
     from "./data/seed/affectationsAgents.js";
 import etudiants from "./data/seed/etudiants.js";
 import hebergements from "./data/seed/hebergements.js";
+import recouvrements
+    from "./data/seed/recouvrements.js";
 
 import anneesAcademiques from "./data/seed/anneesAcademiques.js";
 import situationsAcademiques
@@ -67,6 +69,11 @@ await seedCollection(
 await seedCollection(
     "hebergements",
     hebergements
+);
+
+await seedCollection(
+    "recouvrements",
+    recouvrements
 );
 
         console.log("\n🎉 Seeder terminé avec succès !");

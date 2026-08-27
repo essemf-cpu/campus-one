@@ -100,19 +100,14 @@ service cloud.firestore {
         }
 
 
-        // =====================================================
+// =====================================================
 // ETUDIANTS
 // =====================================================
 
 match /etudiants/{documentId} {
 
     allow read:
-        if admin()
-        || agent()
-        || (
-            etudiant()
-            && documentId == monMatricule()
-        );
+        if true;
 
     allow create, update, delete:
         if false;
@@ -126,11 +121,7 @@ match /etudiants/{documentId} {
 match /agents/{documentId} {
 
     allow read:
-        if admin()
-        || (
-            agent()
-            && documentId == monMatricule()
-        );
+        if true;
 
     allow create, update, delete:
         if false;
@@ -526,6 +517,94 @@ match /notificationsAtelier/{documentId} {
             ).data.site;
 
     allow delete:
+        if false;
+}
+
+// =====================================================
+// PAIEMENTS LOYERS
+// =====================================================
+
+match /paiementsLoyers/{documentId} {
+
+    // -------------------------------------------------
+    // ÉTUDIANT
+    // -------------------------------------------------
+    //
+    // Un étudiant peut consulter uniquement
+    // ses propres paiements.
+    //
+    allow get, list:
+        if etudiant()
+        && resource.data.matricule ==
+            monMatricule();
+
+
+    // -------------------------------------------------
+    // CRÉATION D'UN PAIEMENT
+    // -------------------------------------------------
+    //
+    // L'étudiant peut enregistrer son propre paiement.
+    //
+    // Les informations essentielles sont imposées
+    // par les règles afin d'éviter qu'il puisse
+    // enregistrer un paiement au nom d'un autre étudiant.
+    //
+    allow create:
+        if etudiant()
+        && request.resource.data.matricule ==
+            monMatricule()
+        && request.resource.data.anneeAcademique is string
+        && request.resource.data.mois is string
+        && request.resource.data.montant is number
+        && request.resource.data.statut ==
+            "paye"
+        && request.resource.data.type ==
+            "loyer";
+
+
+    // -------------------------------------------------
+    // MODIFICATION
+    // -------------------------------------------------
+    //
+    // Pas de modification par l'étudiant.
+    //
+    allow update, delete:
+        if false;
+
+
+    // -------------------------------------------------
+    // AGENT / ADMIN
+    // -------------------------------------------------
+    //
+    // Le recouvrement pourra consulter les paiements.
+    //
+    allow read:
+        if agent()
+        || admin();
+
+
+    // Pour l'instant, les agents ne créent/modifient
+    // pas directement les paiements.
+    //
+    allow write:
+        if admin();
+
+}
+
+// =====================================================
+// RECOUVREMENTS
+// =====================================================
+
+match /recouvrements/{documentId} {
+
+    // Les agents du service Hébergement peuvent
+    // consulter les recouvrements.
+    allow read:
+        if agent();
+
+    // Les recouvrements ne sont pas modifiés
+    // directement depuis cette page.
+    allow create, update, delete:
         if false;
 }
       

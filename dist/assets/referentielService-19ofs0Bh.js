@@ -1,0 +1,1 @@
+import{b as e,f as t,l as n}from"./authService-D_VO4Eli.js";var r=new Map,i=new Map;async function a(a){if(r.has(a))return r.get(a);if(i.has(a))return i.get(a);let o=t(e(n,a)).then(e=>{let t=e.docs.map(e=>({id:e.id,...e.data()}));return r.set(a,t),t}).finally(()=>{i.delete(a)});return i.set(a,o),o}function o(){return a(`typesTravaux`)}export{o as t};
