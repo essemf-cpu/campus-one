@@ -5,7 +5,8 @@ import {
     query,
     where,
     getDocs,
-    onSnapshot
+    onSnapshot,
+    addDoc
 } from "firebase/firestore";
 
 import { db } from "../../../firebase/firebase.js";
@@ -26,6 +27,9 @@ const COLLECTION_RECOUVREMENTS =
 const COLLECTION_PAIEMENTS =
     "paiementsLoyers";
 
+const COLLECTION_NOTIFICATIONS =
+    "notifications";
+
 const TABLEAU_BORD_URL =
     "../dashboard/index.html";
 
@@ -45,6 +49,12 @@ let paiementsLoyers = [];
 let donneesRecouvrementOriginales = [];
 
 let unsubscribePaiementsLoyers = null;
+
+let profilAgent = null;
+
+let anneeAcademiqueCourante = "";
+
+let lectureSeuleCourante = false;
 
 
 // =====================================================
@@ -777,51 +787,137 @@ function creerSituationParDefaut(
     anneeAcademique
 ) {
 
+    /*
+     * L'année académique est du type :
+     *
+     * 2026-2027
+     * 2027-2028
+     * 2028-2029
+     *
+     * On récupère automatiquement
+     * l'année de début.
+     */
+
+    const correspondance =
+        String(
+            anneeAcademique || ""
+        ).match(
+            /^(\d{4})-(\d{4})$/
+        );
+
+
+    if (
+        !correspondance
+    ) {
+
+        console.error(
+            "❌ Année académique invalide :",
+            anneeAcademique
+        );
+
+        return {
+            id:
+                `${anneeAcademique}_${matricule}`,
+
+            matricule,
+
+            anneeAcademique,
+
+            montantMensuel:
+                3000,
+
+            mois: {},
+
+            dernierPaiement: {
+
+                date:
+                    null,
+
+                montant:
+                    0,
+
+                mois:
+                    [],
+
+                mode:
+                    null
+
+            },
+
+            statut:
+                "en_cours"
+
+        };
+
+    }
+
+
+    const anneeDebut =
+        Number(
+            correspondance[1]
+        );
+
+    const anneeFin =
+        Number(
+            correspondance[2]
+        );
+
+
+    /*
+     * Structure automatique :
+     *
+     * Novembre année de début
+     * Décembre année de début
+     * Janvier année suivante
+     * ...
+     * Juillet année suivante
+     */
+
     const moisNoms = [
 
         [
             "novembre",
-            "Novembre 2026"
+            `Novembre ${anneeDebut}`
         ],
 
         [
             "decembre",
-            "Décembre 2026"
+            `Décembre ${anneeDebut}`
         ],
 
         [
             "janvier",
-            "Janvier 2027"
+            `Janvier ${anneeFin}`
         ],
 
         [
             "fevrier",
-            "Février 2027"
+            `Février ${anneeFin}`
         ],
 
         [
             "mars",
-            "Mars 2027"
+            `Mars ${anneeFin}`
         ],
 
         [
             "avril",
-            "Avril 2027"
+            `Avril ${anneeFin}`
         ],
 
         [
             "mai",
-            "Mai 2027"
+            `Mai ${anneeFin}`
         ],
 
         [
             "juin",
-            "Juin 2027"
+            `Juin ${anneeFin}`
         ],
 
         [
             "juillet",
-            "Juillet 2027"
+            `Juillet ${anneeFin}`
         ]
 
     ];
@@ -830,26 +926,32 @@ function creerSituationParDefaut(
     const mois = {};
 
 
-    moisNoms.forEach(
-        ([cle, libelle]) => {
+moisNoms.forEach(
+    ([cle, libelle]) => {
 
-            mois[cle] = {
+        const estCodification =
+            cle === "novembre" ||
+            cle === "decembre";
 
-                libelle,
+        mois[cle] = {
 
-                statut:
-                    "a_payer",
+            libelle,
 
-                datePaiement:
-                    null,
+            statut:
+                estCodification
+                    ? "codification"
+                    : "a_payer",
 
-                montant:
-                    0
+            datePaiement:
+                null,
 
-            };
+            montant:
+                0
 
-        }
-    );
+        };
+
+    }
+);
 
 
     return {
@@ -886,6 +988,49 @@ function creerSituationParDefaut(
             "en_cours"
 
     };
+
+}
+
+// =====================================================
+// APPLIQUER LA CODIFICATION DE DÉBUT D'ANNÉE
+// =====================================================
+
+function appliquerCodificationInitiale(
+    recouvrement
+) {
+
+    if (
+        !recouvrement?.mois
+    ) {
+
+        return;
+
+    }
+
+    ["novembre", "decembre"].forEach(
+        cle => {
+
+            const mois =
+                recouvrement.mois[cle];
+
+            if (
+                mois &&
+                mois.statut !== "paye"
+            ) {
+
+                mois.statut =
+                    "codification";
+
+                mois.datePaiement =
+                    null;
+
+                mois.montant =
+                    0;
+
+            }
+
+        }
+    );
 
 }
 
@@ -941,6 +1086,10 @@ function construireLigneDepuisHebergement(
             );
 
     }
+
+    appliquerCodificationInitiale(
+    recouvrement
+);
 
 
     appliquerPaiementsReels(
@@ -1195,6 +1344,476 @@ function remplirFiltreChambres() {
             ancienneValeur;
 
     }
+
+}
+
+
+// =====================================================
+// RAPPEL — GÉNÉRER LES MOIS DE L'ANNÉE ACADÉMIQUE
+// =====================================================
+
+function obtenirMoisAcademiques(
+    anneeAcademique
+) {
+
+    const correspondance =
+        String(
+            anneeAcademique || ""
+        ).match(
+            /^(\d{4})-(\d{4})$/
+        );
+
+
+    if (
+        !correspondance
+    ) {
+
+        return [];
+
+    }
+
+
+    const anneeDebut =
+        Number(
+            correspondance[1]
+        );
+
+    const anneeFin =
+        Number(
+            correspondance[2]
+        );
+
+
+    return [
+
+        {
+            cle:
+                "novembre",
+
+            mois:
+                10,
+
+            annee:
+                anneeDebut,
+
+            libelle:
+                `Novembre ${anneeDebut}`
+        },
+
+        {
+            cle:
+                "decembre",
+
+            mois:
+                11,
+
+            annee:
+                anneeDebut,
+
+            libelle:
+                `Décembre ${anneeDebut}`
+        },
+
+        {
+            cle:
+                "janvier",
+
+            mois:
+                0,
+
+            annee:
+                anneeFin,
+
+            libelle:
+                `Janvier ${anneeFin}`
+        },
+
+        {
+            cle:
+                "fevrier",
+
+            mois:
+                1,
+
+            annee:
+                anneeFin,
+
+            libelle:
+                `Février ${anneeFin}`
+        },
+
+        {
+            cle:
+                "mars",
+
+            mois:
+                2,
+
+            annee:
+                anneeFin,
+
+            libelle:
+                `Mars ${anneeFin}`
+        },
+
+        {
+            cle:
+                "avril",
+
+            mois:
+                3,
+
+            annee:
+                anneeFin,
+
+            libelle:
+                `Avril ${anneeFin}`
+        },
+
+        {
+            cle:
+                "mai",
+
+            mois:
+                4,
+
+            annee:
+                anneeFin,
+
+            libelle:
+                `Mai ${anneeFin}`
+        },
+
+        {
+            cle:
+                "juin",
+
+            mois:
+                5,
+
+            annee:
+                anneeFin,
+
+            libelle:
+                `Juin ${anneeFin}`
+        },
+
+        {
+            cle:
+                "juillet",
+
+            mois:
+                6,
+
+            annee:
+                anneeFin,
+
+            libelle:
+                `Juillet ${anneeFin}`
+        }
+
+    ];
+
+}
+
+
+// =====================================================
+// RAPPEL — MOIS COURANT
+// =====================================================
+
+function obtenirMoisCourant() {
+
+    if (
+        !anneeAcademiqueCourante
+    ) {
+
+        return null;
+
+    }
+
+
+    const maintenant =
+        new Date();
+
+
+    const moisActuel =
+        maintenant.getMonth();
+
+
+    const anneeActuelle =
+        maintenant.getFullYear();
+
+
+    const moisAcademiques =
+        obtenirMoisAcademiques(
+            anneeAcademiqueCourante
+        );
+
+
+    const moisCorrespondant =
+        moisAcademiques.find(
+            element =>
+                element.mois ===
+                moisActuel &&
+                element.annee ===
+                anneeActuelle
+        );
+
+
+    return (
+        moisCorrespondant ||
+        null
+    );
+
+}
+
+
+// =====================================================
+// RAPPEL — PREMIER MOIS IMPAYÉ
+// =====================================================
+
+function obtenirPremierMoisImpayé(
+    ligne
+) {
+
+    if (
+        !ligne?.recouvrement?.mois
+    ) {
+
+        return null;
+
+    }
+
+
+    const moisAcademiques =
+        obtenirMoisAcademiques(
+            anneeAcademiqueCourante
+        );
+
+
+    for (
+        const moisAcademique
+        of moisAcademiques
+    ) {
+
+        const mois =
+            ligne.recouvrement.mois[
+                moisAcademique.cle
+            ];
+
+
+        if (
+            mois &&
+            mois.statut ===
+            "a_payer"
+        ) {
+
+            return {
+
+                cle:
+                    moisAcademique.cle,
+
+                mois:
+                    moisAcademique.libelle
+
+            };
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+// =====================================================
+// RAPPEL — COMPTER LES RAPPELS DU MOIS IMPAYÉ
+// =====================================================
+
+async function compterRappelsDuMois(
+    matricule,
+    moisRappel
+) {
+
+    if (
+        !moisRappel
+    ) {
+
+        return 0;
+
+    }
+
+
+    try {
+
+        const snapshot =
+            await getDocs(
+                query(
+                    collection(
+                        db,
+                        COLLECTION_NOTIFICATIONS
+                    ),
+                    where(
+                        "to",
+                        "==",
+                        String(
+                            matricule
+                        )
+                    )
+                )
+            );
+
+
+        return snapshot.docs.filter(
+            document => {
+
+                const notification =
+                    document.data();
+
+
+                return (
+
+                    notification.type ===
+                    "rappel_loyer" &&
+
+                    notification.anneeAcademique ===
+                    anneeAcademiqueCourante &&
+
+                    notification.mois ===
+                    moisRappel
+
+                );
+
+            }
+        ).length;
+
+    } catch (error) {
+
+        console.error(
+            "❌ Impossible de vérifier les rappels :",
+            error
+        );
+
+        return 0;
+
+    }
+
+}
+
+
+// =====================================================
+// RAPPEL — VÉRIFIER SI UN RAPPEL PEUT ÊTRE ENVOYÉ
+// =====================================================
+
+async function peutEnvoyerRappel(
+    ligne
+) {
+
+    // =============================================
+    // 1. ANNÉE EN LECTURE SEULE
+    // =============================================
+
+    if (
+        lectureSeuleCourante
+    ) {
+
+        return {
+
+            autorise:
+                false,
+
+            raison:
+                "Cette année académique est en lecture seule. Une nouvelle codification est en cours."
+
+        };
+
+    }
+
+
+    // =============================================
+    // 2. CHERCHER LE PREMIER MOIS IMPAYÉ
+    // =============================================
+
+    const premierMoisImpayé =
+        obtenirPremierMoisImpayé(
+            ligne
+        );
+
+
+    // =============================================
+    // 3. AUCUN IMPAYÉ
+    // =============================================
+
+    if (
+        !premierMoisImpayé
+    ) {
+
+        return {
+
+            autorise:
+                false,
+
+            raison:
+                "Aucun loyer n'est actuellement dû."
+
+        };
+
+    }
+
+
+    // =============================================
+    // 4. COMPTER LES RAPPELS POUR CE MOIS
+    // =============================================
+
+    const nombreRappels =
+        await compterRappelsDuMois(
+            ligne.matricule,
+            premierMoisImpayé.mois
+        );
+
+
+    // =============================================
+    // 5. MAXIMUM DEUX RAPPELS
+    // =============================================
+
+    if (
+        nombreRappels >=
+        2
+    ) {
+
+        return {
+
+            autorise:
+                false,
+
+            raison:
+                `Deux rappels ont déjà été envoyés pour ${premierMoisImpayé.mois}.`
+
+        };
+
+    }
+
+
+    // =============================================
+    // 6. RAPPEL AUTORISÉ
+    // =============================================
+
+    return {
+
+        autorise:
+            true,
+
+        nombreRappels,
+
+        mois:
+            premierMoisImpayé.mois,
+
+        cle:
+            premierMoisImpayé.cle
+
+    };
 
 }
 
@@ -1458,6 +2077,9 @@ function afficherRecouvrements() {
                 ligne.montantDu >
                 0;
 
+            const rappelFerme =
+                lectureSeuleCourante;
+
 
             tr.innerHTML = `
 
@@ -1535,33 +2157,47 @@ function afficherRecouvrements() {
 
                 <td>
 
-                    ${
-                        dette
+                ${
+                    !dette
 
-                            ?
+                        ?
 
-                            `
-                                <button
-                                    type="button"
-                                    class="rappel-btn"
-                                    data-matricule="${escapeHtml(
-                                        ligne.matricule
-                                    )}"
-                                >
-                                    ENVOYER
-                                </button>
-                            `
+                        `
+                            <span
+                                class="rappel-ok"
+                            >
+                                À jour
+                            </span>
+                        `
 
-                            :
+                        :
 
-                            `
-                                <span
-                                    class="rappel-ok"
-                                >
-                                    À jour
-                                </span>
-                            `
-                    }
+                        rappelFerme
+
+                        ?
+
+                        `
+                            <span
+                                class="rappel-ferme"
+                            >
+                                Rappel fermé
+                            </span>
+                        `
+
+                        :
+
+                        `
+                            <button
+                                type="button"
+                                class="rappel-btn"
+                                data-matricule="${escapeHtml(
+                                    ligne.matricule
+                                )}"
+                            >
+                                ENVOYER
+                            </button>
+                        `
+                }
 
                 </td>
 
@@ -1606,7 +2242,7 @@ function afficherRecouvrements() {
 
                 bouton.addEventListener(
                     "click",
-                    () => {
+                    async () => {
 
                         const matricule =
                             bouton.dataset
@@ -1634,9 +2270,22 @@ function afficherRecouvrements() {
                         }
 
 
-                        afficherMenuRappel(
-                            ligne
-                        );
+                        bouton.disabled =
+                            true;
+
+
+                        try {
+
+                            await afficherMenuRappel(
+                                ligne
+                            );
+
+                        } finally {
+
+                            bouton.disabled =
+                                false;
+
+                        }
 
                     }
                 );
@@ -1692,9 +2341,33 @@ function afficherRecouvrements() {
 // MENU RAPPEL
 // =====================================================
 
-function afficherMenuRappel(
+async function afficherMenuRappel(
     ligne
 ) {
+
+    /*
+     * Vérification avant même d'afficher
+     * le menu de rappel.
+     */
+
+    const controle =
+        await peutEnvoyerRappel(
+            ligne
+        );
+
+
+    if (
+        !controle.autorise
+    ) {
+
+        alert(
+            controle.raison
+        );
+
+        return;
+
+    }
+
 
     const choix =
         document.createElement(
@@ -1852,11 +2525,38 @@ function afficherMenuRappel(
             "click",
             async () => {
 
-                await envoyerNotificationRappel(
-                    ligne
-                );
+                const bouton =
+                    choix.querySelector(
+                        '[data-action="notification"]'
+                    );
 
-                fermer();
+
+                bouton.disabled =
+                    true;
+
+
+                try {
+
+                    const envoye =
+                        await envoyerNotificationRappel(
+                            ligne
+                        );
+
+
+                    if (
+                        envoye
+                    ) {
+
+                        fermer();
+
+                    }
+
+                } finally {
+
+                    bouton.disabled =
+                        false;
+
+                }
 
             }
         );
@@ -1888,34 +2588,140 @@ async function envoyerNotificationRappel(
     ligne
 ) {
 
-    console.log(
-        "📩 Notification de rappel demandée :",
-        {
+    /*
+     * Nouvelle vérification juste avant l'écriture
+     * Firestore.
+     *
+     * Cela évite qu'un agent ait deux fenêtres ouvertes
+     * et dépasse accidentellement la limite de rappels.
+     */
 
-            matricule:
-                ligne.matricule,
-
-            nom:
-                `${ligne.prenom} ${ligne.nom}`
-                    .trim(),
-
-            montantDu:
-                ligne.montantDu,
-
-            moisEnRetard:
-                ligne.moisEnRetard
-                    .map(
-                        mois =>
-                            mois.libelle
-                    )
-
-        }
-    );
+    const controle =
+        await peutEnvoyerRappel(
+            ligne
+        );
 
 
-    alert(
-        `Notification de rappel préparée pour ${ligne.matricule}.`
-    );
+    if (
+        !controle.autorise
+    ) {
+
+        alert(
+            controle.raison
+        );
+
+        return false;
+
+    }
+
+
+    const nomComplet =
+        `${ligne.prenom} ${ligne.nom}`
+            .trim();
+
+
+    const montantMensuel =
+        Number(
+            ligne.recouvrement?.montantMensuel
+        ) || 0;
+
+
+    try {
+
+        await addDoc(
+            collection(
+                db,
+                COLLECTION_NOTIFICATIONS
+            ),
+            {
+
+                anneeAcademique:
+                    anneeAcademiqueCourante,
+
+                date:
+                    Date.now(),
+
+                from:
+                    profilAgent?.uid ||
+                    profilAgent?.id ||
+                    profilAgent?.matricule ||
+                    "service-hebergement",
+
+                fromAvatar:
+                    profilAgent?.avatar ||
+                    "",
+
+                fromNom:
+                    profilAgent?.nomComplet ||
+                    profilAgent?.nom ||
+                    "Service de l'Hébergement",
+
+                seen:
+                    false,
+
+                title:
+                    "Rappel de loyer",
+
+                text:
+                    `Votre loyer du mois de ${controle.mois.toLowerCase()} reste à régulariser. Montant mensuel : ${formaterMontant(
+                        montantMensuel
+                    )}.`,
+
+                to:
+                    String(
+                        ligne.matricule
+                    ),
+
+                type:
+                    "rappel_loyer",
+
+                mois:
+                    controle.mois
+
+            }
+        );
+
+
+        console.log(
+            "📩 Rappel de loyer envoyé :",
+            {
+
+                matricule:
+                    ligne.matricule,
+
+                mois:
+                    controle.mois,
+
+                anneeAcademique:
+                    anneeAcademiqueCourante
+
+            }
+        );
+
+
+        alert(
+            `Rappel envoyé à ${nomComplet || ligne.matricule}.`
+        );
+
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "❌ Erreur lors de l'envoi du rappel :",
+            error
+        );
+
+
+        alert(
+            "Impossible d'envoyer le rappel."
+        );
+
+
+        return false;
+
+    }
 
 }
 
@@ -2013,6 +2819,18 @@ requireRole(
     }) => {
 
         try {
+
+            profilAgent =
+                profile;
+
+            anneeAcademiqueCourante =
+                anneeAcademique || "";
+
+            lectureSeuleCourante =
+            Boolean(
+                lectureSeule
+            );
+
 
             // =============================================
             // SERVICE

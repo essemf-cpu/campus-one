@@ -2,622 +2,819 @@ rules_version = '2';
 
 service cloud.firestore {
 
-    match /databases/{database}/documents {
+  match /databases/{database}/documents {
+
+    // =====================================================
+    // FONCTIONS COMMUNES
+    // =====================================================
+
+    function connecte() {
+      return request.auth != null;
+    }
+
+    function compteExiste() {
+      return connecte()
+        && exists(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        );
+    }
+
+    function compte() {
+      return get(
+        /databases/$(database)/documents/users/$(request.auth.uid)
+      );
+    }
+
+    function role(roleNom) {
+      return compteExiste()
+        && compte().data.role == roleNom;
+    }
+
+    function etudiant() {
+      return role("etudiant");
+    }
+
+    function agent() {
+      return role("agent");
+    }
+
+    function admin() {
+      return role("admin");
+    }
+
+    function monMatricule() {
+      return compte().data.matricule;
+    }
+
+    // -------------------------------------------------
+    // ID DÉTERMINISTE POUR VÉRIFIER UNE RELATION D'AMITIÉ
+    // -------------------------------------------------
+    //
+    // Un chemin Firestore ($(...)) ne peut contenir qu'UNE
+    // seule interpolation par segment : "$(a)_$(b)" n'est
+    // pas une syntaxe valide. On pré-calcule donc l'ID
+    // complet dans une fonction, puis on l'insère comme
+    // un seul $(...) dans exists()/get().
+    //
+    // -------------------------------------------------
+
+    function idAmitiePour(beneficiaireMatricule, anneeAcademique) {
+      return monMatricule() + "_" + beneficiaireMatricule + "_" + anneeAcademique;
+    }
+
+    function monProfil() {
+      return compte().data.profile;
+    }
 
 
-        // =====================================================
-        // FONCTIONS COMMUNES
-        // =====================================================
+    // =====================================================
+    // USERS
+    // =====================================================
 
-        function connecte() {
+    match /users/{uid} {
 
-            return request.auth != null;
+      allow get:
+        if connecte()
+        && request.auth.uid == uid;
 
-        }
-
-
-        function compteExiste() {
-
-            return connecte()
-                && exists(
-                    /databases/$(database)/documents/users/$(request.auth.uid)
-                );
-
-        }
-
-
-        function compte() {
-
-            return get(
-                /databases/$(database)/documents/users/$(request.auth.uid)
-            );
-
-        }
-
-
-        function role(role) {
-
-            return compteExiste()
-                && compte().data.role == role;
-
-        }
-
-
-        function etudiant() {
-
-            return role("etudiant");
-
-        }
-
-
-        function agent() {
-
-            return role("agent");
-
-        }
-
-
-        function admin() {
-
-            return role("admin");
-
-        }
-
-
-        function monMatricule() {
-
-            return compte().data.matricule;
-
-        }
-
-
-        function monProfil() {
-
-            return compte().data.profile;
-
-        }
-
-
-        // =====================================================
-        // USERS
-        // =====================================================
-
-        match /users/{uid} {
-
-            // Un utilisateur authentifié peut uniquement
-            // consulter son propre compte.
-            allow get:
-                if connecte()
-                && request.auth.uid == uid;
-
-            allow list:
-                if false;
-
-            // Le compte est créé par le serveur / processus
-            // d'administration.
-            allow create, update, delete:
-                if false;
-        }
-
-
-// =====================================================
-// ETUDIANTS
-// =====================================================
-
-match /etudiants/{documentId} {
-
-    allow read:
-        if true;
-
-    allow create, update, delete:
+      allow list:
         if false;
-}
 
-
-// =====================================================
-// AGENTS
-// =====================================================
-
-match /agents/{documentId} {
-
-    allow read:
-        if true;
-
-    allow create, update, delete:
+      allow create, update, delete:
         if false;
-}
+    }
 
 
-        // =====================================================
-        // HEBERGEMENTS
-        // =====================================================
+    // =====================================================
+    // ETUDIANTS
+    // =====================================================
 
-        match /hebergements/{documentId} {
+    match /etudiants/{documentId} {
 
-            // Etudiant :
-            // uniquement ses propres hébergements.
-            allow get, list:
-                if etudiant()
-                && resource.data.matricule ==
-                    monMatricule();
-
-            // Aucun étudiant ne peut modifier son hébergement.
-            allow create, update, delete:
-                if false;
-
-
-            // Agent :
-            // lecture autorisée pour le fonctionnement
-            // administratif actuel.
-            allow read:
-                if agent() || admin();
-
-            allow write:
-                if admin();
-        }
-
-
-        // =====================================================
-        // DEMANDES ETUDIANTS
-        // =====================================================
-
-        match /demandes_etudiants/{documentId} {
-
-            // L'étudiant ne voit que ses propres demandes.
-            allow get, list:
-                if etudiant()
-                && resource.data.matricule ==
-                    monMatricule();
-
-            // Création uniquement pour son propre matricule
-            // et avec son année académique.
-            allow create:
-                if etudiant()
-                && request.resource.data.matricule ==
-                    monMatricule()
-                && request.resource.data.anneeAcademique is string;
-
-            // Un étudiant ne peut pas modifier/supprimer
-            // une demande existante.
-            allow update, delete:
-                if false;
-
-
-            allow read:
-                if agent() || admin();
-
-            allow update, delete:
-                if agent() || admin();
-        }
-
-
-        // =====================================================
-        // FRIEND REQUESTS
-        // =====================================================
-
-        match /friendRequests/{documentId} {
-
-            // Réception
-            allow get, list:
-                if etudiant()
-                && resource.data.to ==
-                    monMatricule();
-
-            // Création par l'expéditeur.
-            allow create:
-                if etudiant()
-                && request.resource.data.from ==
-                    monMatricule()
-                && request.resource.data.anneeAcademique is string;
-
-            // Mise à jour uniquement par le destinataire
-            // pour accepter/refuser sa demande.
-            allow update:
-                if etudiant()
-                && resource.data.to ==
-                    monMatricule()
-                && request.resource.data.to ==
-                    resource.data.to
-                && request.resource.data.from ==
-                    resource.data.from
-                && request.resource.data.anneeAcademique ==
-                    resource.data.anneeAcademique;
-
-            allow delete:
-                if false;
-        }
-
-
-        // =====================================================
-        // FRIENDS
-        // =====================================================
-
-        match /friends/{documentId} {
-
-            allow get, list:
-                if etudiant()
-                && resource.data.userCarte ==
-                    monMatricule();
-
-            allow create:
-                if etudiant()
-                && request.resource.data.userCarte ==
-                    monMatricule();
-
-            allow update, delete:
-                if etudiant()
-                && resource.data.userCarte ==
-                    monMatricule();
-        }
-
-
-        // =====================================================
-        // NOTIFICATIONS
-        // =====================================================
-
-        match /notifications/{documentId} {
-
-            allow get, list:
-                if etudiant()
-                && resource.data.to ==
-                    monMatricule();
-
-            // Une notification n'est normalement pas créée
-            // directement par l'étudiant.
-            allow create:
-                if false;
-
-            // Marquage comme lue.
-            allow update:
-                if etudiant()
-                && resource.data.to ==
-                    monMatricule()
-                && request.resource.data.to ==
-                    resource.data.to
-                && request.resource.data.anneeAcademique ==
-                    resource.data.anneeAcademique;
-
-            allow delete:
-                if false;
-        }
-
-
-        // =====================================================
-        // NOTIFICATIONS RESTAURANT
-        // =====================================================
-
-        match /restaurantNotifications/{documentId} {
-
-            allow get, list:
-                if etudiant()
-                && resource.data.to ==
-                    monMatricule();
-
-            allow create:
-                if false;
-
-            allow update:
-                if etudiant()
-                && resource.data.to ==
-                    monMatricule()
-                && request.resource.data.to ==
-                    resource.data.to
-                && request.resource.data.anneeAcademique ==
-                    resource.data.anneeAcademique;
-
-            allow delete:
-                if false;
-        }
-
-
-        // =====================================================
-        // ANNEES ACADEMIQUES
-        // =====================================================
-
-        match /anneesAcademiques/{documentId} {
-
-    allow read:
+      allow read:
         if true;
 
-    allow write:
-        if admin();
-}
+      allow create, update, delete:
+        if false;
+    }
 
 
-        // =====================================================
-        // COLLECTIONS DE REFERENCE
-        // =====================================================
+    // =====================================================
+    // AGENTS
+    // =====================================================
 
-        match /sites/{documentId} {
+    match /agents/{documentId} {
 
-            allow read:
-                if connecte();
+      allow read:
+        if true;
 
-            allow write:
-                if admin();
-        }
-
-
-        match /pavillons/{documentId} {
-
-            allow read:
-                if connecte();
-
-            allow write:
-                if admin();
-        }
+      allow create, update, delete:
+        if false;
+    }
 
 
-        match /services/{documentId} {
+    // =====================================================
+    // HEBERGEMENTS
+    // =====================================================
 
-            allow read:
-                if connecte();
+    match /hebergements/{documentId} {
 
-            allow write:
-                if admin();
-        }
-
-
-        match /departements/{documentId} {
-
-            allow read:
-                if connecte();
-
-            allow write:
-                if admin();
-        }
-
-
-        match /ateliers/{documentId} {
-
-            allow read:
-                if connecte();
-
-            allow write:
-                if admin();
-        }
-
-
-        match /typesTravaux/{documentId} {
-
-            allow read:
-                if connecte();
-
-            allow write:
-                if admin();
-        }
-
-
-        // =====================================================
-        // POSTES / PERMISSIONS
-        // =====================================================
-
-        match /postes/{documentId} {
-
-            allow read:
-                if agent() || admin();
-
-            allow write:
-                if admin();
-        }
-
-
-        match /permissionsPostes/{documentId} {
-
-            allow read:
-                if agent() || admin();
-
-            allow write:
-                if admin();
-        }
-
-
-        // =====================================================
-        // AFFECTATIONS AGENTS
-        // =====================================================
-
-        match /affectationsAgents/{documentId} {
-
-            allow read:
-                if agent() || admin();
-
-            allow write:
-                if admin();
-        }
-
-
-        // =====================================================
-        // RATTACHEMENTS
-        // =====================================================
-
-        match /rattachements/{documentId} {
-
-            allow read:
-                if agent() || admin();
-
-            allow write:
-                if admin();
-        }
-
-
-        // =====================================================
-        // SITUATIONS ACADEMIQUES
-        // =====================================================
-
-        match /situationsAcademiques/{documentId} {
-
-    allow get, list:
+      allow get, list:
         if etudiant()
         && resource.data.matricule == monMatricule();
 
-    allow read:
-        if agent() || admin();
-
-    allow write:
-        if agent() || admin();
-}
-
-// =====================================================
-// BONS DE TRAVAIL
-// =====================================================
-
-match /bons/{documentId} {
-
-    // Agent et admin peuvent consulter les bons.
-    allow read:
-        if agent()
-        || admin();
-
-
-    // Création uniquement par un agent ou admin.
-    allow create:
-        if agent()
-        || admin();
-
-
-    // Modification d'un bon.
-    allow update:
-        if agent()
-        || admin();
-
-
-    // Suppression physique interdite.
-    // On utilise supprime=true.
-    allow delete:
+      allow create, update, delete:
         if false;
 
-}
-
-
-// =====================================================
-// NOTIFICATIONS ATELIER
-// =====================================================
-
-match /notificationsAtelier/{documentId} {
-
-    // Lecture uniquement des notifications
-    // correspondant au site de l'agent.
-    allow read:
+      allow read:
         if agent()
-        && resource.data.site ==
-            get(
-                /databases/$(database)/documents/agents/$(monMatricule())
-            ).data.site;
+        || admin();
 
-    // Création par le serveur / agent / admin.
-    allow create:
-        if agent() || admin();
+      allow write:
+        if admin();
+    }
 
-    // Marquage comme lue uniquement sur son site.
-    allow update:
+
+    // =====================================================
+    // DEMANDES ETUDIANTS
+    // =====================================================
+
+    match /demandes_etudiants/{documentId} {
+
+      allow get, list:
+        if etudiant()
+        && resource.data.matricule == monMatricule();
+
+      allow create:
+        if etudiant()
+        && request.resource.data.matricule == monMatricule()
+        && request.resource.data.anneeAcademique is string;
+
+      allow read:
         if agent()
-        && resource.data.site ==
-            get(
-                /databases/$(database)/documents/agents/$(monMatricule())
-            ).data.site;
+        || admin();
 
-    allow delete:
+      allow update, delete:
+        if agent()
+        || admin();
+    }
+
+
+    // =====================================================
+    // FRIEND REQUESTS
+    // =====================================================
+
+    match /friendRequests/{documentId} {
+
+      allow get, list:
+        if etudiant()
+        && (
+          resource.data.to == monMatricule()
+          ||
+          resource.data.from == monMatricule()
+        );
+
+      allow create:
+        if etudiant()
+        && request.resource.data.from == monMatricule()
+        && request.resource.data.to is string
+        && request.resource.data.to != monMatricule()
+        && request.resource.data.anneeAcademique is string
+        && request.resource.data.status == "pending"
+        && request.resource.data.seen == false;
+
+      allow update:
+        if etudiant()
+        && resource.data.to == monMatricule()
+        && request.resource.data.to == resource.data.to
+        && request.resource.data.from == resource.data.from
+        && request.resource.data.anneeAcademique ==
+           resource.data.anneeAcademique;
+
+      allow delete:
         if false;
-}
+    }
 
-// =====================================================
+
+    // =====================================================
+    // FRIENDS
+    // =====================================================
+
+    match /friends/{documentId} {
+
+      allow get, list:
+        if etudiant()
+        && resource.data.userCarte == monMatricule();
+
+      allow create:
+        if etudiant()
+        && request.resource.data.userCarte == monMatricule()
+        && request.resource.data.friendCarte is string
+        && request.resource.data.friendCarte != monMatricule()
+        && request.resource.data.anneeAcademique is string;
+
+      allow update:
+        if etudiant()
+        && resource.data.userCarte == monMatricule()
+        && request.resource.data.userCarte ==
+           resource.data.userCarte
+        && request.resource.data.friendCarte ==
+           resource.data.friendCarte
+        && request.resource.data.anneeAcademique ==
+           resource.data.anneeAcademique;
+
+      allow delete:
+        if etudiant()
+        && resource.data.userCarte == monMatricule();
+    }
+
+
+    // =====================================================
+    // NOTIFICATIONS
+    // =====================================================
+
+    match /notifications/{documentId} {
+
+      allow get, list:
+        if etudiant()
+        && resource.data.to == monMatricule();
+
+      allow read:
+        if agent()
+        || admin();
+
+      allow create:
+        if agent()
+        || admin()
+        ||
+        (
+
+          // ===============================================
+          // ETUDIANT — NOTIFICATION DE PAIEMENT LOYER
+          // ===============================================
+          //
+          // Utilisé par "payer pour un ami" : le payeur crée
+          // 2 notifications, une pour lui-même (confirmation)
+          // et une pour le bénéficiaire. On restreint
+          // strictement au type "loyer" et on vérifie que
+          // le destinataire est bien soi-même OU un ami
+          // (relation d'amitié active), pour empêcher tout
+          // spam de notification vers un tiers arbitraire.
+          //
+          // ===============================================
+
+          etudiant()
+          && request.resource.data.type == "loyer"
+          && request.resource.data.from == monMatricule()
+          && request.resource.data.seen == false
+          && request.resource.data.anneeAcademique is string
+          && (
+
+            // NOTIFICATION À MOI-MÊME
+            request.resource.data.to == monMatricule()
+
+            ||
+
+            // NOTIFICATION À UN AMI VÉRIFIÉ
+            (
+              request.resource.data.to is string
+              && request.resource.data.to != monMatricule()
+              && exists(
+                /databases/$(database)/documents/friends/$(idAmitiePour(request.resource.data.to, request.resource.data.anneeAcademique))
+              )
+              && get(
+                /databases/$(database)/documents/friends/$(idAmitiePour(request.resource.data.to, request.resource.data.anneeAcademique))
+              ).data.userCarte == monMatricule()
+              && get(
+                /databases/$(database)/documents/friends/$(idAmitiePour(request.resource.data.to, request.resource.data.anneeAcademique))
+              ).data.friendCarte == request.resource.data.to
+            )
+
+          )
+
+        );
+
+      allow update:
+        if etudiant()
+        && resource.data.to == monMatricule()
+        && request.resource.data.to == resource.data.to
+        && request.resource.data.anneeAcademique ==
+           resource.data.anneeAcademique;
+
+      allow delete:
+        if false;
+    }
+
+
+    // =====================================================
+    // NOTIFICATIONS RESTAURANT
+    // =====================================================
+
+    match /restaurantNotifications/{documentId} {
+
+      allow get, list:
+        if etudiant()
+        && resource.data.to == monMatricule();
+
+      allow create:
+        if false;
+
+      allow update:
+        if etudiant()
+        && resource.data.to == monMatricule()
+        && request.resource.data.to == resource.data.to
+        && request.resource.data.anneeAcademique ==
+           resource.data.anneeAcademique;
+
+      allow delete:
+        if false;
+    }
+
+
+    // =====================================================
+    // ANNEES ACADEMIQUES
+    // =====================================================
+
+    match /anneesAcademiques/{documentId} {
+
+      allow read:
+        if true;
+
+      allow write:
+        if admin();
+    }
+
+
+    // =====================================================
+    // COLLECTIONS DE REFERENCE
+    // =====================================================
+
+    match /sites/{documentId} {
+
+      allow read:
+        if connecte();
+
+      allow write:
+        if admin();
+    }
+
+    match /pavillons/{documentId} {
+
+      allow read:
+        if connecte();
+
+      allow write:
+        if admin();
+    }
+
+    match /services/{documentId} {
+
+      allow read:
+        if connecte();
+
+      allow write:
+        if admin();
+    }
+
+    match /departements/{documentId} {
+
+      allow read:
+        if connecte();
+
+      allow write:
+        if admin();
+    }
+
+    match /ateliers/{documentId} {
+
+      allow read:
+        if connecte();
+
+      allow write:
+        if admin();
+    }
+
+    match /typesTravaux/{documentId} {
+
+      allow read:
+        if connecte();
+
+      allow write:
+        if admin();
+    }
+
+
+    // =====================================================
+    // POSTES / PERMISSIONS
+    // =====================================================
+
+    match /postes/{documentId} {
+
+      allow read:
+        if agent()
+        || admin();
+
+      allow write:
+        if admin();
+    }
+
+    match /permissionsPostes/{documentId} {
+
+      allow read:
+        if agent()
+        || admin();
+
+      allow write:
+        if admin();
+    }
+
+
+    // =====================================================
+    // AFFECTATIONS AGENTS
+    // =====================================================
+
+    match /affectationsAgents/{documentId} {
+
+      allow read:
+        if agent()
+        || admin();
+
+      allow write:
+        if admin();
+    }
+
+
+    // =====================================================
+    // RATTACHEMENTS
+    // =====================================================
+
+    match /rattachements/{documentId} {
+
+      allow read:
+        if agent()
+        || admin();
+
+      allow write:
+        if admin();
+    }
+
+
+    // =====================================================
+    // SITUATIONS ACADEMIQUES
+    // =====================================================
+
+    match /situationsAcademiques/{documentId} {
+
+      allow get, list:
+        if etudiant()
+        && resource.data.matricule == monMatricule();
+
+      allow read:
+        if agent()
+        || admin();
+
+      allow write:
+        if agent()
+        || admin();
+    }
+
+
+    // =====================================================
+    // BONS DE TRAVAIL
+    // =====================================================
+
+    match /bons/{documentId} {
+
+      allow read:
+        if agent()
+        || admin();
+
+      allow create:
+        if agent()
+        || admin();
+
+      allow update:
+        if agent()
+        || admin();
+
+      allow delete:
+        if false;
+    }
+
+
+    // =====================================================
+    // NOTIFICATIONS ATELIER
+    // =====================================================
+
+    match /notificationsAtelier/{documentId} {
+
+      allow read:
+        if agent()
+        && resource.data.site ==
+           get(
+             /databases/$(database)/documents/agents/$(monMatricule())
+           ).data.site;
+
+      allow create:
+        if agent()
+        || admin();
+
+      allow update:
+        if agent()
+        && resource.data.site ==
+           get(
+             /databases/$(database)/documents/agents/$(monMatricule())
+           ).data.site;
+
+      allow delete:
+        if false;
+    }
+
+
+    // =====================================================
 // PAIEMENTS LOYERS
 // =====================================================
 
 match /paiementsLoyers/{documentId} {
 
-    // -------------------------------------------------
-    // ÉTUDIANT
-    // -------------------------------------------------
+  // ---------------------------------------------------
+  // ETUDIANT — LECTURE D'UN PAIEMENT
+  // ---------------------------------------------------
+  //
+  // Un étudiant peut consulter :
+  //
+  // 1. son propre paiement ;
+  // 2. un paiement qu'il a lui-même effectué pour un ami ;
+  // 3. un document inexistant.
+  //
+  // ---------------------------------------------------
+
+allow get:
+  if etudiant()
+  && (
+    
+    // ===============================================
+    // DOCUMENT INEXISTANT
+    // ===============================================
+
+    resource == null
+
+    ||
+
+    // ===============================================
+    // MON PROPRE PAIEMENT
+    // ===============================================
+
+    (
+      resource.data.matricule == monMatricule()
+      &&
+      resource.data.beneficiaireMatricule == monMatricule()
+    )
+
+    ||
+
+    // ===============================================
+    // PAIEMENT QUE J'AI EFFECTUÉ POUR UN AMI
+    // ===============================================
+
+    (
+      resource.data.paiementPourAmi == true
+      &&
+      resource.data.payeurMatricule == monMatricule()
+      &&
+      resource.data.friendDocumentId is string
+      &&
+      exists(
+        /databases/$(database)/documents/friends/$(resource.data.friendDocumentId)
+      )
+      &&
+      get(
+        /databases/$(database)/documents/friends/$(resource.data.friendDocumentId)
+      ).data.userCarte == monMatricule()
+      &&
+      get(
+        /databases/$(database)/documents/friends/$(resource.data.friendDocumentId)
+      ).data.friendCarte == resource.data.beneficiaireMatricule
+      &&
+      get(
+        /databases/$(database)/documents/friends/$(resource.data.friendDocumentId)
+      ).data.anneeAcademique == resource.data.anneeAcademique
+    )
+
+    ||
+
+    // ===============================================
+    // CONSULTATION DE LA SITUATION D'UN AMI
+    // ===============================================
     //
-    // Un étudiant peut consulter uniquement
-    // ses propres paiements.
+    // Permet de lire le paiement d'un ami même quand ce
+    // paiement n'a pas été fait par moi (ex: l'ami a payé
+    // lui-même son propre mois). On vérifie l'existence
+    // d'une relation d'amitié active via l'ID déterministe
+    // "userCarte_friendCarte_anneeAcademique".
     //
-    allow get, list:
-        if etudiant()
-        && resource.data.matricule ==
-            monMatricule();
+    // ===============================================
+
+    (
+      exists(
+        /databases/$(database)/documents/friends/$(idAmitiePour(resource.data.beneficiaireMatricule, resource.data.anneeAcademique))
+      )
+      &&
+      get(
+        /databases/$(database)/documents/friends/$(idAmitiePour(resource.data.beneficiaireMatricule, resource.data.anneeAcademique))
+      ).data.userCarte == monMatricule()
+      &&
+      get(
+        /databases/$(database)/documents/friends/$(idAmitiePour(resource.data.beneficiaireMatricule, resource.data.anneeAcademique))
+      ).data.friendCarte == resource.data.beneficiaireMatricule
+    )
+
+  );
 
 
-    // -------------------------------------------------
-    // CRÉATION D'UN PAIEMENT
-    // -------------------------------------------------
-    //
-    // L'étudiant peut enregistrer son propre paiement.
-    //
-    // Les informations essentielles sont imposées
-    // par les règles afin d'éviter qu'il puisse
-    // enregistrer un paiement au nom d'un autre étudiant.
-    //
-    allow create:
-        if etudiant()
+  // ---------------------------------------------------
+  // ETUDIANT — LISTE
+  // ---------------------------------------------------
+  //
+  // IMPORTANT : pour un "list" (query), Firestore exige
+  // que chaque condition porte sur un champ réellement
+  // filtré (where(...)) dans la requête envoyée par le
+  // client, sinon il refuse toute la requête (même si
+  // elle ne renverrait aucun résultat).
+  //
+  // La requête de "chargerSituationBeneficiaire" filtre
+  // sur "matricule" (pas "beneficiaireMatricule") :
+  //   where("matricule", "==", beneficiaireMatricule)
+  //
+  // La règle doit donc, elle aussi, raisonner sur
+  // "resource.data.matricule" — jamais sur
+  // "beneficiaireMatricule" ici, même si les deux champs
+  // contiennent la même valeur dans les documents.
+  //
+  // ---------------------------------------------------
+
+  allow list:
+    if etudiant()
+    && (
+
+      // MA PROPRE LISTE
+      resource.data.matricule == monMatricule()
+
+      ||
+
+      // PAIEMENT QUE J'AI EFFECTUÉ POUR UN AMI
+      (
+        resource.data.paiementPourAmi == true
+        &&
+        resource.data.payeurMatricule == monMatricule()
+      )
+
+      ||
+
+      // CONSULTATION DE LA SITUATION D'UN AMI
+      (
+        exists(
+          /databases/$(database)/documents/friends/$(idAmitiePour(resource.data.matricule, resource.data.anneeAcademique))
+        )
+        &&
+        get(
+          /databases/$(database)/documents/friends/$(idAmitiePour(resource.data.matricule, resource.data.anneeAcademique))
+        ).data.userCarte == monMatricule()
+        &&
+        get(
+          /databases/$(database)/documents/friends/$(idAmitiePour(resource.data.matricule, resource.data.anneeAcademique))
+        ).data.friendCarte == resource.data.matricule
+      )
+
+    );
+
+
+  // ---------------------------------------------------
+  // ETUDIANT — CREATION
+  // ---------------------------------------------------
+
+  allow create:
+    if etudiant()
+
+    && request.resource.data.payeurMatricule ==
+       monMatricule()
+
+    && request.resource.data.matricule is string
+
+    && request.resource.data.beneficiaireMatricule is string
+
+    && request.resource.data.matricule ==
+       request.resource.data.beneficiaireMatricule
+
+    && request.resource.data.anneeAcademique is string
+
+    && request.resource.data.mois is string
+
+    && request.resource.data.montant is number
+
+    && request.resource.data.statut == "paye"
+
+    && request.resource.data.type == "loyer"
+
+    && (
+
+      // -----------------------------------------------
+      // PAIEMENT PERSONNEL
+      // -----------------------------------------------
+
+      (
+        request.resource.data.paiementPourAmi == false
+
         && request.resource.data.matricule ==
-            monMatricule()
-        && request.resource.data.anneeAcademique is string
-        && request.resource.data.mois is string
-        && request.resource.data.montant is number
-        && request.resource.data.statut ==
-            "paye"
-        && request.resource.data.type ==
-            "loyer";
+           monMatricule()
+      )
+
+      ||
+
+      // -----------------------------------------------
+      // PAIEMENT POUR UN AMI
+      // -----------------------------------------------
+
+      (
+        request.resource.data.paiementPourAmi == true
+
+        && request.resource.data.matricule !=
+           monMatricule()
+
+        && request.resource.data.friendDocumentId is string
+
+        && exists(
+          /databases/$(database)/documents/friends/$(request.resource.data.friendDocumentId)
+        )
+
+        && get(
+          /databases/$(database)/documents/friends/$(request.resource.data.friendDocumentId)
+        ).data.userCarte ==
+           monMatricule()
+
+        && get(
+          /databases/$(database)/documents/friends/$(request.resource.data.friendDocumentId)
+        ).data.friendCarte ==
+           request.resource.data.beneficiaireMatricule
+
+        && get(
+          /databases/$(database)/documents/friends/$(request.resource.data.friendDocumentId)
+        ).data.anneeAcademique ==
+           request.resource.data.anneeAcademique
+      )
+    );
 
 
-    // -------------------------------------------------
-    // MODIFICATION
-    // -------------------------------------------------
-    //
-    // Pas de modification par l'étudiant.
-    //
-    allow update, delete:
-        if false;
+  // ---------------------------------------------------
+  // ETUDIANT — MODIFICATION / SUPPRESSION
+  // ---------------------------------------------------
+
+  allow update, delete:
+    if false;
 
 
-    // -------------------------------------------------
-    // AGENT / ADMIN
-    // -------------------------------------------------
-    //
-    // Le recouvrement pourra consulter les paiements.
-    //
-    allow read:
-        if agent()
-        || admin();
+  // ---------------------------------------------------
+  // AGENT / ADMIN — LECTURE
+  // ---------------------------------------------------
+
+  allow read:
+    if agent()
+    || admin();
 
 
-    // Pour l'instant, les agents ne créent/modifient
-    // pas directement les paiements.
-    //
-    allow write:
-        if admin();
+  // ---------------------------------------------------
+  // ADMIN — ECRITURE
+  // ---------------------------------------------------
 
+  allow write:
+    if admin();
 }
 
-// =====================================================
-// RECOUVREMENTS
-// =====================================================
 
-match /recouvrements/{documentId} {
+    // =====================================================
+    // RECOUVREMENTS
+    // =====================================================
 
-    // Les agents du service Hébergement peuvent
-    // consulter les recouvrements.
-    allow read:
+    match /recouvrements/{documentId} {
+
+      allow read:
         if agent();
 
-    // Les recouvrements ne sont pas modifiés
-    // directement depuis cette page.
-    allow create, update, delete:
+      allow create, update, delete:
         if false;
-}
-      
-
-        // =====================================================
-        // TOUT LE RESTE : REFUSÉ
-        // =====================================================
-
-        match /{document=**} {
-
-            allow read, write:
-                if false;
-        }
-
     }
+
+
+    // =====================================================
+    // TOUT LE RESTE : REFUSE
+    // =====================================================
+
+    match /{document=**} {
+
+      allow read, write:
+        if false;
+    }
+
+  }
+
 }

@@ -536,6 +536,36 @@ export async function acceptFriendRequestService(
 
 
     // =================================================
+    // ID DÉTERMINISTE DE LA RELATION D'AMITIÉ
+    // =================================================
+    //
+    // Avant : ID aléatoire (.doc()) → impossible de vérifier
+    // côté règles Firestore ("exists()"/"get()" ont besoin
+    // d'un chemin connu à l'avance) qu'une relation d'amitié
+    // existe entre deux matricules pour une année donnée.
+    //
+    // Maintenant : ID reconstructible à partir de
+    // (userCarte, friendCarte, anneeAcademique), ce qui
+    // permet à firestore.rules de vérifier la relation avec
+    // exists() sans passer par une query.
+    //
+    // =================================================
+
+    const anneeAcademiqueAmitie =
+        requestData.anneeAcademique ||
+        null;
+
+    function creerIdAmitie(
+        userCarte,
+        friendCarte
+    ) {
+
+        return `${userCarte}_${friendCarte}_${anneeAcademiqueAmitie}`;
+
+    }
+
+
+    // =================================================
     // CRÉER LES DEUX CÔTÉS
     // =================================================
 
@@ -546,7 +576,12 @@ export async function acceptFriendRequestService(
         const friendA =
             db
                 .collection("friends")
-                .doc();
+                .doc(
+                    creerIdAmitie(
+                        matricule,
+                        requestData.from
+                    )
+                );
 
 
         batch.set(
@@ -572,8 +607,7 @@ export async function acceptFriendRequestService(
                     "",
 
                 anneeAcademique:
-                    requestData.anneeAcademique ||
-                    null
+                    anneeAcademiqueAmitie
 
             }
         );
@@ -582,7 +616,12 @@ export async function acceptFriendRequestService(
         const friendB =
             db
                 .collection("friends")
-                .doc();
+                .doc(
+                    creerIdAmitie(
+                        requestData.from,
+                        matricule
+                    )
+                );
 
 
         batch.set(
@@ -608,8 +647,7 @@ export async function acceptFriendRequestService(
                     "",
 
                 anneeAcademique:
-                    requestData.anneeAcademique ||
-                    null
+                    anneeAcademiqueAmitie
 
             }
         );

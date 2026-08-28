@@ -1223,22 +1223,39 @@ function afficherResume() {
     }
 
 
-    if (
-        situationPaiementElement
-    ) {
+if (
+    situationPaiementElement
+) {
 
-        situationPaiementElement.textContent =
-            montantDu === 0
-                ? "À jour"
-                : "Montant dû";
+    const nombreMoisRestants =
+        Object.values(
+            recouvrement?.mois || {}
+        )
+        .filter(
+            mois =>
+                mois &&
+                mois.statut ===
+                "a_payer"
+        )
+        .length;
 
 
-        situationPaiementElement.className =
-            montantDu === 0
-                ? "status"
-                : "status status-due";
+    situationPaiementElement.textContent =
+        nombreMoisRestants === 0
+            ? "À jour"
+            : `${nombreMoisRestants} mois restant${
+                nombreMoisRestants > 1
+                    ? "s"
+                    : ""
+              } à régulariser`;
 
-    }
+
+    situationPaiementElement.className =
+        nombreMoisRestants === 0
+            ? "status"
+            : "status status-due";
+
+}
 
 }
 

@@ -138,6 +138,18 @@
 
             </button>
 
+            <button
+                id="payer-ami-btn"
+                class="
+                    action-button
+                    action-button-secondary
+                "
+                type="button"
+            >
+                <i class="fa-solid fa-user-group"></i>
+                Payer pour un ami
+            </button>
+
 
             <button
                 id="reglement-btn"
@@ -157,6 +169,158 @@
         </section>
 
     </main>
+
+    <!-- =====================================================
+     MODAL PAYER POUR UN AMI
+===================================================== -->
+
+<div
+    id="ami-modal"
+    class="modal"
+>
+
+    <div class="modal-content modal-large">
+
+        <button
+            id="close-ami-modal"
+            class="modal-close"
+            type="button"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+
+        <div class="modal-icon">
+            <i class="fa-solid fa-user-group"></i>
+        </div>
+
+
+        <h2>
+            Payer pour un ami
+        </h2>
+
+
+        <p class="modal-description">
+            Sélectionnez l'ami pour lequel vous souhaitez
+            régler le loyer.
+        </p>
+
+
+        <!-- =================================================
+             ZONE SANS AMI
+        ================================================= -->
+
+        <div
+            id="aucun-ami-message"
+            class="aucun-ami-message"
+            style="display:none;"
+        >
+
+            <i class="fa-solid fa-user-group"></i>
+
+            <strong>
+                Aucun ami enregistré
+            </strong>
+
+            <p>
+                Vous devez d'abord avoir un ami
+                pour pouvoir payer son loyer.
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             ZONE AVEC AMIS
+        ================================================= -->
+
+        <div
+            id="ami-selection-zone"
+            style="display:none;"
+        >
+
+            <label
+                for="ami-select"
+                class="section-label"
+            >
+                Choisir un ami
+            </label>
+
+
+            <select
+                id="ami-select"
+                class="ami-select"
+            >
+
+                <option value="">
+                    Sélectionner un ami
+                </option>
+
+            </select>
+
+
+            <div class="ami-search-separator">
+                <span>ou</span>
+            </div>
+
+
+            <label
+                for="ami-search"
+                class="section-label"
+            >
+                Rechercher par numéro de carte
+            </label>
+
+
+            <div class="ami-search-wrapper">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="ami-search"
+                    placeholder="Numéro de carte"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div
+                id="ami-search-results"
+                class="ami-search-results"
+            ></div>
+
+
+            <!-- =================================================
+                 AMI SÉLECTIONNÉ
+            ================================================= -->
+
+            <div
+                id="ami-selected"
+                class="ami-selected"
+                style="display:none;"
+            ></div>
+
+
+            <button
+                id="continuer-ami-btn"
+                class="
+                    action-button
+                    action-button-primary
+                "
+                type="button"
+                disabled
+            >
+                Continuer
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 
     <!-- =====================================================

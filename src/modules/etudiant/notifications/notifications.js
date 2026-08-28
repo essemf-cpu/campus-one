@@ -1092,7 +1092,7 @@ async function accepterDemande(
 
         const response =
             await fetch(
-                "http://192.168.1.10:3000/api/auth/friend-request/accept",
+                "http://192.168.1.6:3000/api/auth/friend-request/accept",
                 {
 
                     method:
@@ -1230,7 +1230,7 @@ async function refuserDemande(
 
         const response =
             await fetch(
-                "http://192.168.1.10:3000/api/auth/friend-request/reject",
+                "http://192.168.1.6:3000/api/auth/friend-request/reject",
                 {
 
                     method:
