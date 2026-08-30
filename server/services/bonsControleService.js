@@ -26,6 +26,7 @@ const CAUSE_NEGLIGE = "Négligé";
 
 async function createNotificationAtelier({
     site,
+    anneeAcademique,
     type,
     titre,
     message,
@@ -49,6 +50,8 @@ async function createNotificationAtelier({
         .add({
 
             site,
+
+            anneeAcademique,
 
             type,
 
@@ -108,7 +111,9 @@ function obtenirDateDuBon(bon) {
                     date.getTime()
                 )
             ) {
+
                 return date;
+
             }
         }
     }
@@ -133,7 +138,9 @@ function obtenirDateDuBon(bon) {
                 date.getTime()
             )
         ) {
+
             return date;
+
         }
     }
 
@@ -153,7 +160,9 @@ function obtenirDateDuBon(bon) {
             date.getTime()
         )
     ) {
+
         return null;
+
     }
 
 
@@ -177,16 +186,22 @@ async function envoyerRappelBon(
         bon.archive === true ||
         bon.supprime === true
     ) {
+
         return false;
+
     }
 
 
-    // Éviter les doubles rappels
+    // =================================================
+    // ÉVITER LES DOUBLES RAPPELS
+    // =================================================
 
     if (
         bon.rappelEnvoye === true
     ) {
+
         return false;
+
     }
 
 
@@ -195,8 +210,8 @@ async function envoyerRappelBon(
         site:
             bon.site,
 
-            anneeAcademique:
-             bon.anneeAcademique,
+        anneeAcademique:
+            bon.anneeAcademique,
 
         type:
             "rappel_bon",
@@ -247,7 +262,9 @@ async function marquerBonNeglige(
         bon.archive === true ||
         bon.supprime === true
     ) {
+
         return false;
+
     }
 
 
@@ -282,8 +299,8 @@ async function marquerBonNeglige(
         site:
             bon.site,
 
-            anneeAcademique:
-             bon.anneeAcademique,
+        anneeAcademique:
+            bon.anneeAcademique,
 
         type:
             "bon_neglige",
@@ -305,7 +322,26 @@ async function marquerBonNeglige(
 
 
 // =====================================================
-// CONTRÔLE AUTOMATIQUE
+// CONTRÔLE AUTOMATIQUE DES BONS
+// =====================================================
+//
+// RÈGLE :
+//
+// J = date du bon
+//
+// J
+// → bon actif
+//
+// J + 1
+// → si terminé / non terminé : archivage
+// → si encore actif : rappel
+//
+// J + 2
+// → si toujours actif :
+//      non terminé
+//      cause = Négligé
+//      archivage
+//
 // =====================================================
 
 export async function controlerDelaisBonsServeur() {
@@ -336,11 +372,14 @@ export async function controlerDelaisBonsServeur() {
 
     const resultats = {
 
-        rappels: 0,
+        rappels:
+            0,
 
-        archives: 0,
+        archives:
+            0,
 
-        negliges: 0
+        negliges:
+            0
 
     };
 
@@ -368,12 +407,14 @@ export async function controlerDelaisBonsServeur() {
             bon.archive === true ||
             bon.supprime === true
         ) {
+
             continue;
+
         }
 
 
         // =================================================
-        // DATE
+        // DATE DU BON
         // =================================================
 
         const dateBon =
@@ -383,7 +424,9 @@ export async function controlerDelaisBonsServeur() {
 
 
         if (!dateBon) {
+
             continue;
+
         }
 
 
@@ -413,6 +456,14 @@ export async function controlerDelaisBonsServeur() {
         // =================================================
         // BON TERMINÉ / NON TERMINÉ
         // =================================================
+        //
+        // Le bon reste visible pendant la journée
+        // où son statut devient terminé/non terminé.
+        //
+        // À partir du lendemain :
+        // → archivage
+        //
+        // =================================================
 
         if (
             bon.statut ===
@@ -440,6 +491,7 @@ export async function controlerDelaisBonsServeur() {
 
 
                 resultats.archives++;
+
             }
 
 
@@ -454,7 +506,9 @@ export async function controlerDelaisBonsServeur() {
         if (
             differenceJours <= 0
         ) {
+
             continue;
+
         }
 
 
@@ -474,7 +528,9 @@ export async function controlerDelaisBonsServeur() {
 
 
             if (rappel) {
+
                 resultats.rappels++;
+
             }
 
 
@@ -498,7 +554,9 @@ export async function controlerDelaisBonsServeur() {
 
 
             if (neglige) {
+
                 resultats.negliges++;
+
             }
         }
     }
@@ -507,8 +565,33 @@ export async function controlerDelaisBonsServeur() {
     return resultats;
 }
 
+
 // =====================================================
 // CONTRÔLE AUTOMATIQUE DES DEMANDES ÉTUDIANTES
+// =====================================================
+//
+// RÈGLES :
+//
+// TERMINÉ
+// → reste visible 24 h
+// → puis historique
+//
+// NON TERMINÉ
+// → reste visible 24 h
+// → puis historique
+//
+// FORCLOS
+// → reste visible 24 h
+// → puis historique
+//
+// EN COURS
+// → reste visible 48 h
+// → puis devient automatiquement
+//   NON TERMINÉ
+// → cause :
+//   Demande non terminée dans les temps prévus
+// → puis historique
+//
 // =====================================================
 
 export async function controlerDelaisDemandesEtudiants() {
@@ -518,16 +601,21 @@ export async function controlerDelaisDemandesEtudiants() {
             .collection("demandes_etudiants")
             .get();
 
+
     const maintenant =
         new Date();
 
-    const limite =
-        new Date(
-            maintenant.getTime() -
-            (48 * 60 * 60 * 1000)
-        );
 
-    let nonTraitees = 0;
+    const resultats = {
+
+        archives:
+            0,
+
+        nonTraitees:
+            0
+
+    };
+
 
     for (
         const documentSnapshot
@@ -535,22 +623,25 @@ export async function controlerDelaisDemandesEtudiants() {
     ) {
 
         const demande = {
+
             id:
                 documentSnapshot.id,
 
             ...documentSnapshot.data()
+
         };
 
 
         // =================================================
-        // SEULEMENT LES DEMANDES EN ATTENTE
+        // DEMANDES DÉJÀ ARCHIVÉES
         // =================================================
 
         if (
-            demande.statut !==
-            "en_attente"
+            demande.archive === true
         ) {
+
             continue;
+
         }
 
 
@@ -561,14 +652,18 @@ export async function controlerDelaisDemandesEtudiants() {
         if (
             !demande.date
         ) {
+
             continue;
+
         }
 
 
         let dateDemande;
 
 
-        // Firebase Timestamp
+        // =================================================
+        // FIREBASE TIMESTAMP
+        // =================================================
 
         if (
             typeof demande.date.toDate ===
@@ -581,7 +676,9 @@ export async function controlerDelaisDemandesEtudiants() {
         }
 
 
-        // Date JS / autre format
+        // =================================================
+        // AUTRE FORMAT
+        // =================================================
 
         else {
 
@@ -598,52 +695,175 @@ export async function controlerDelaisDemandesEtudiants() {
                 dateDemande.getTime()
             )
         ) {
+
+            continue;
+
+        }
+
+
+        // =================================================
+        // ÂGE EN HEURES
+        // =================================================
+
+        const ageHeures =
+            (
+                maintenant.getTime() -
+                dateDemande.getTime()
+            ) /
+            (
+                1000 *
+                60 *
+                60
+            );
+
+
+        // =================================================
+        // TERMINÉ / NON TERMINÉ / FORCLOS
+        // =================================================
+        //
+        // Ces statuts restent visibles 24 h.
+        //
+        // =================================================
+
+        if (
+            demande.statut === "termine" ||
+            demande.statut === "non_termine" ||
+            demande.statut === "forclos"
+        ) {
+
+            if (
+                ageHeures >= 24
+            ) {
+
+                await db
+                    .collection("demandes_etudiants")
+                    .doc(demande.id)
+                    .update({
+
+                        archive:
+                            true,
+
+                        archivedAt:
+                            FieldValue.serverTimestamp()
+
+                    });
+
+
+                resultats.archives++;
+
+            }
+
+
             continue;
         }
 
 
         // =================================================
-        // PLUS DE 48 HEURES
+        // EN COURS
+        // =================================================
+        //
+        // 48 h maximum.
+        //
         // =================================================
 
         if (
-            dateDemande <=
-            limite
+            demande.statut === "en_cours"
         ) {
 
-            await db
-                .collection(
-                    "demandes_etudiants"
-                )
-                .doc(
-                    demande.id
-                )
-                .update({
+            if (
+                ageHeures >= 48
+            ) {
 
-                    statut:
-                        "non_termine",
+                await db
+                    .collection("demandes_etudiants")
+                    .doc(demande.id)
+                    .update({
 
-                    cause:
-                        "Demande non traitée, merci de reformuler",
+                        statut:
+                            "non_termine",
 
-                    feedbackAutorise:
-                        false,
+                        cause:
+                            "Demande non terminée dans les temps prévus",
 
-                    nonTraiteeAutomatiquementAt:
-                        FieldValue.serverTimestamp()
+                        feedbackAutorise:
+                            false,
 
-                });
+                        notificationVue:
+                            true,
+
+                        archive:
+                            true,
+
+                        archivedAt:
+                            FieldValue.serverTimestamp(),
+
+                        nonTraiteeAutomatiquementAt:
+                            FieldValue.serverTimestamp()
+
+                    });
 
 
-            nonTraitees++;
+                resultats.nonTraitees++;
 
+            }
+
+
+            continue;
         }
 
+
+        // =================================================
+        // EN ATTENTE
+        // =================================================
+        //
+        // Une demande encore en attente depuis 48 h
+        // devient également non terminée.
+        //
+        // =================================================
+
+        if (
+            demande.statut === "en_attente"
+        ) {
+
+            if (
+                ageHeures >= 48
+            ) {
+
+                await db
+                    .collection("demandes_etudiants")
+                    .doc(demande.id)
+                    .update({
+
+                        statut:
+                            "non_termine",
+
+                        cause:
+                            "Demande non terminée dans les temps prévus",
+
+                        feedbackAutorise:
+                            false,
+
+                        notificationVue:
+                            true,
+
+                        archive:
+                            true,
+
+                        archivedAt:
+                            FieldValue.serverTimestamp(),
+
+                        nonTraiteeAutomatiquementAt:
+                            FieldValue.serverTimestamp()
+
+                    });
+
+
+                resultats.nonTraitees++;
+
+            }
+        }
     }
 
 
-    return {
-        nonTraitees
-    };
-
+    return resultats;
 }

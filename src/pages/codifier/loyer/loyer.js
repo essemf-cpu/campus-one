@@ -2243,6 +2243,92 @@ async function envoyerNotificationsPaiementAmi({
 
 
 // =====================================================
+// NOTIFICATION PAIEMENT PERSONNEL
+// =====================================================
+//
+// Envoie une notification à moi-même quand je paie mon
+// propre loyer (pas pour un ami).
+//
+// =====================================================
+
+async function envoyerNotificationPaiementPersonnel({
+    moisPayes,
+    montantTotal
+}) {
+
+    if (
+        !matricule ||
+        !anneeAcademique
+    ) {
+        return;
+    }
+
+    const listeMois =
+        moisPayes.join(", ");
+
+    const montantFormate =
+        formaterMontant(
+            montantTotal
+        );
+
+    try {
+
+        await addDoc(
+            collection(
+                db,
+                "notifications"
+            ),
+            {
+                to:
+                    matricule,
+
+                type:
+                    "loyer",
+
+                title:
+                    "Paiement effectué",
+
+                text:
+                    `Vous avez payé votre loyer (${listeMois}) — ${montantFormate}.`,
+
+                from:
+                    matricule,
+
+                fromNom:
+                    utilisateur?.profile?.prenom
+                        ? `${utilisateur.profile.prenom} ${utilisateur.profile.nom || ""}`.trim()
+                        : matricule,
+
+                fromAvatar:
+                    "",
+
+                date:
+                    Date.now(),
+
+                seen:
+                    false,
+
+                anneeAcademique
+            }
+        );
+
+        console.log(
+            "✅ Notification de paiement personnel envoyée."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "❌ Erreur envoi notification paiement personnel :",
+            error
+        );
+
+    }
+
+}
+
+
+// =====================================================
 // CONFIRMER PAIEMENT
 // =====================================================
 
@@ -2427,6 +2513,20 @@ document
 
                             }
 
+                        }
+                    );
+
+                    await envoyerNotificationPaiementPersonnel(
+                        {
+                            moisPayes:
+                                selection.map(
+                                    mois => mois.nom
+                                ),
+
+                            montantTotal:
+                                calculerTotal(
+                                    selection
+                                )
                         }
                     );
 

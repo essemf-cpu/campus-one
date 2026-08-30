@@ -18,9 +18,151 @@ import {
 } from "../../../services/bonsService.js";
 
 import {
+    createNotificationHebergement
+} from "../../../services/hebergementnotificationsservice.js";
+
+import {
     getTypesTravaux
 } from "../../../services/referentielService.js";
 
+
+// =====================================================
+// OUTILS DATE
+// =====================================================
+
+function obtenirDateLocaleISO(
+    date = new Date()
+) {
+
+    const annee =
+        date.getFullYear();
+
+    const mois =
+        String(
+            date.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+    const jour =
+        String(
+            date.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+    return `${annee}-${mois}-${jour}`;
+}
+
+
+function obtenirDateDemainISO() {
+
+    const demain =
+        new Date();
+
+    demain.setDate(
+        demain.getDate() + 1
+    );
+
+    return obtenirDateLocaleISO(
+        demain
+    );
+}
+
+
+function dateBonAutorisee(
+    date
+) {
+
+    if (!date) {
+        return false;
+    }
+
+    const aujourdHui =
+        obtenirDateLocaleISO();
+
+    const demain =
+        obtenirDateDemainISO();
+
+    return (
+        date === aujourdHui ||
+        date === demain
+    );
+}
+
+
+// =====================================================
+// FORMATAGE DATE
+// =====================================================
+
+function formaterDate(
+    timestamp
+) {
+
+    if (!timestamp) {
+        return "-";
+    }
+
+    let date;
+
+    if (
+        typeof timestamp.toDate ===
+        "function"
+    ) {
+
+        date =
+            timestamp.toDate();
+
+    }
+
+    else if (
+        timestamp instanceof Date
+    ) {
+
+        date =
+            timestamp;
+
+    }
+
+    else {
+
+        date =
+            new Date(
+                timestamp
+            );
+
+    }
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "-";
+    }
+
+    return new Intl.DateTimeFormat(
+        "fr-FR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        }
+    ).format(
+        date
+    );
+}
+
+
+// =====================================================
+// RÔLE HÉBERGEMENT
+// =====================================================
 
 requireRole(
     "agent",
@@ -38,7 +180,9 @@ requireRole(
             lectureSeule
         );
 
-        console.log("1 - requireRole OK");
+        console.log(
+            "1 - requireRole OK"
+        );
 
 
         // =====================================================
@@ -49,29 +193,45 @@ requireRole(
             profile.service !==
             "Service de l'Hébergement"
         ) {
+
             return;
+
         }
 
-        console.log("2 - service OK");
+        console.log(
+            "2 - service OK"
+        );
 
 
         // =====================================================
         // SIDEBAR
         // =====================================================
 
-        await loadSidebar(profile);
+        await loadSidebar(
+            profile
+        );
 
-        console.log("3 - sidebar chargée");
+        console.log(
+            "3 - sidebar chargée"
+        );
 
 
         // =====================================================
         // TITRE
         // =====================================================
 
-        document
-            .getElementById("page-title")
-            .textContent =
-                profile.affectation;
+        const pageTitle =
+            document.getElementById(
+                "page-title"
+            );
+
+        if (pageTitle) {
+
+            pageTitle.textContent =
+                profile.affectation ||
+                "";
+
+        }
 
 
         // =====================================================
@@ -79,7 +239,11 @@ requireRole(
         // =====================================================
 
         const typeSelect =
-            document.getElementById("type");
+            document.getElementById(
+                "type"
+            );
+
+        let typesTravaux = [];
 
         if (typeSelect) {
 
@@ -87,18 +251,19 @@ requireRole(
                 "4 - select trouvé"
             );
 
-            const types =
+            typesTravaux =
                 await getTypesTravaux();
 
             console.log(
                 "5 - types récupérés",
-                types
+                typesTravaux
             );
 
-            typeSelect.innerHTML = "";
+            typeSelect.innerHTML =
+                "";
 
-            types.forEach(
-                (type) => {
+            typesTravaux.forEach(
+                type => {
 
                     typeSelect.innerHTML += `
                         <option value="${type.id}">
@@ -109,15 +274,34 @@ requireRole(
             );
         }
 
+        else {
+
+            typesTravaux =
+                await getTypesTravaux();
+
+        }
+
+
+        const typesTravauxMap =
+            new Map(
+                typesTravaux.map(
+                    type => [
+                        type.id,
+                        type.nom
+                    ]
+                )
+            );
+
 
         // =====================================================
-        // DEMANDES DES ÉTUDIANTS
+        // DEMANDES
         // =====================================================
 
         const demandesBody =
             document.getElementById(
                 "demandes-body"
             );
+
 
         if (!demandesBody) {
 
@@ -126,11 +310,12 @@ requireRole(
             );
 
             return;
+
         }
 
 
         // =====================================================
-        // IDENTIFIER LE PAVILLON DE L'AGENT
+        // IDENTIFICATION PAVILLON
         // =====================================================
 
         const siteAgent =
@@ -143,6 +328,7 @@ requireRole(
                     ""
                 )
                 .trim();
+
 
         console.log(
             "🏢 Site agent :",
@@ -161,34 +347,23 @@ requireRole(
         ) {
 
             demandesBody.innerHTML = `
+
                 <tr class="empty-row">
+
                     <td colspan="9">
+
                         Impossible de déterminer
                         le site ou le pavillon.
+
                     </td>
+
                 </tr>
+
             `;
 
             return;
+
         }
-
-
-        // =====================================================
-        // RÉFÉRENTIEL DES TYPES DE TRAVAUX
-        // =====================================================
-
-        const typesTravaux =
-            await getTypesTravaux();
-
-        const typesTravauxMap =
-            new Map(
-                typesTravaux.map(
-                    type => [
-                        type.id,
-                        type.nom
-                    ]
-                )
-            );
 
 
         // =====================================================
@@ -225,7 +400,7 @@ requireRole(
 
 
         // =====================================================
-        // CACHE DES DEMANDES
+        // CACHE
         // =====================================================
 
         const demandesCache =
@@ -233,47 +408,97 @@ requireRole(
 
 
         // =====================================================
-        // ÉCOUTE TEMPS RÉEL DES DEMANDES
+        // ÉCOUTE TEMPS RÉEL
         // =====================================================
 
         onSnapshot(
 
             demandesQuery,
 
-            (snapshot) => {
+            snapshot => {
 
                 console.log(
                     "📋 Demandes mises à jour :",
                     snapshot.size
                 );
 
-                demandesBody.innerHTML = "";
 
-                let demandesActives = 0;
+                demandesBody.innerHTML =
+                    "";
+
+
+                let demandesActives =
+                    0;
 
 
                 snapshot.forEach(
-                    (documentSnapshot) => {
+                    documentSnapshot => {
 
-                        const demande =
-                            documentSnapshot.data();
+                        const demande = {
 
-                        const demandeId =
-                            documentSnapshot.id;
+                            id:
+                                documentSnapshot.id,
+
+                            ...documentSnapshot.data()
+
+                        };
 
 
                         demandesCache.set(
-                            demandeId,
+                            demande.id,
                             demande
                         );
 
 
+                        // =================================================
+                        // NE PAS AFFICHER LES DEMANDES ARCHIVÉES
+                        // =================================================
+
                         if (
-                            demande.statut &&
-                            demande.statut !== "en_attente" &&
-                            demande.statut !== "en_cours"
+                            demande.archive === true
                         ) {
+
                             return;
+
+                        }
+
+
+                        // =================================================
+                        // STATUTS AFFICHÉS SUR LA PAGE
+                        // =================================================
+                        //
+                        // en_attente
+                        // en_cours
+                        // termine
+                        // non_termine
+                        // forclos
+                        //
+                        // Les trois derniers restent donc
+                        // visibles jusqu'à leur archivage
+                        // automatique par le serveur.
+                        //
+                        // =================================================
+
+                        const statutsVisibles = [
+
+                            "en_attente",
+                            "en_cours",
+                            "termine",
+                            "non_termine",
+                            "forclos"
+
+                        ];
+
+
+                        if (
+                            !statutsVisibles.includes(
+                                demande.statut ||
+                                "en_attente"
+                            )
+                        ) {
+
+                            return;
+
                         }
 
 
@@ -285,17 +510,21 @@ requireRole(
                                 .trim();
 
 
-                        let actions = "";
+                        let actions =
+                            "";
 
 
-                        // =============================================
+                        // =================================================
                         // EN ATTENTE
-                        // =============================================
+                        // =================================================
 
                         if (
                             !lectureSeule &&
-                            (demande.statut || "en_attente") ===
+                            (
+                                demande.statut ||
                                 "en_attente"
+                            ) ===
+                            "en_attente"
                         ) {
 
                             actions = `
@@ -305,7 +534,7 @@ requireRole(
                                     <button
                                         type="button"
                                         class="demande-action-btn demande-action-encours"
-                                        data-id="${demandeId}"
+                                        data-id="${demande.id}"
                                         data-action="encours"
                                     >
                                         En cours
@@ -314,7 +543,7 @@ requireRole(
                                     <button
                                         type="button"
                                         class="demande-action-btn demande-action-forclos"
-                                        data-id="${demandeId}"
+                                        data-id="${demande.id}"
                                         data-action="forclos"
                                     >
                                         Forclos
@@ -323,7 +552,7 @@ requireRole(
                                     <button
                                         type="button"
                                         class="demande-action-btn demande-action-bon"
-                                        data-id="${demandeId}"
+                                        data-id="${demande.id}"
                                         data-action="bon"
                                     >
                                         Rédiger un bon
@@ -332,16 +561,18 @@ requireRole(
                                 </div>
 
                             `;
+
                         }
 
 
-                        // =============================================
+                        // =================================================
                         // EN COURS
-                        // =============================================
+                        // =================================================
 
                         else if (
                             !lectureSeule &&
-                            demande.statut === "en_cours"
+                            demande.statut ===
+                            "en_cours"
                         ) {
 
                             actions = `
@@ -351,7 +582,7 @@ requireRole(
                                     <button
                                         type="button"
                                         class="demande-action-btn demande-action-termine"
-                                        data-id="${demandeId}"
+                                        data-id="${demande.id}"
                                         data-action="termine"
                                     >
                                         Terminée
@@ -360,7 +591,7 @@ requireRole(
                                     <button
                                         type="button"
                                         class="demande-action-btn demande-action-nontermine"
-                                        data-id="${demandeId}"
+                                        data-id="${demande.id}"
                                         data-action="nontermine"
                                     >
                                         Non terminée
@@ -369,7 +600,7 @@ requireRole(
                                     <button
                                         type="button"
                                         class="demande-action-btn demande-action-bon"
-                                        data-id="${demandeId}"
+                                        data-id="${demande.id}"
                                         data-action="bon"
                                     >
                                         Rédiger un bon
@@ -378,8 +609,73 @@ requireRole(
                                 </div>
 
                             `;
+
                         }
 
+
+                        // =================================================
+                        // DEMANDE TERMINÉE
+                        // =================================================
+
+                        else if (
+                            demande.statut ===
+                            "termine"
+                        ) {
+
+                            actions = `
+
+                                <span class="demande-statut-info">
+                                    Terminée
+                                </span>
+
+                            `;
+
+                        }
+
+
+                        // =================================================
+                        // DEMANDE NON TERMINÉE
+                        // =================================================
+
+                        else if (
+                            demande.statut ===
+                            "non_termine"
+                        ) {
+
+                            actions = `
+
+                                <span class="demande-statut-info">
+                                    Non terminée
+                                </span>
+
+                            `;
+
+                        }
+
+
+                        // =================================================
+                        // DEMANDE FORCLOSE
+                        // =================================================
+
+                        else if (
+                            demande.statut ===
+                            "forclos"
+                        ) {
+
+                            actions = `
+
+                                <span class="demande-statut-info">
+                                    Forclos
+                                </span>
+
+                            `;
+
+                        }
+
+
+                        // =================================================
+                        // LIGNE
+                        // =================================================
 
                         demandesBody.innerHTML += `
 
@@ -434,6 +730,10 @@ requireRole(
                 );
 
 
+                // =====================================================
+                // AUCUNE DEMANDE
+                // =====================================================
+
                 if (
                     demandesActives === 0
                 ) {
@@ -451,17 +751,19 @@ requireRole(
                         </tr>
 
                     `;
+
                 }
 
             },
 
 
-            (error) => {
+            error => {
 
                 console.error(
                     "❌ Erreur écoute demandes :",
                     error
                 );
+
 
                 demandesBody.innerHTML = `
 
@@ -477,6 +779,7 @@ requireRole(
                     </tr>
 
                 `;
+
             }
 
         );
@@ -493,80 +796,7 @@ requireRole(
 
 
         // =====================================================
-        // DATE AUTORISÉE
-        // =====================================================
-        //
-        // Un bon peut être daté :
-        //
-        // - aujourd'hui
-        // - demain
-        //
-        // Interdit :
-        //
-        // - toute date passée
-        // - après-demain et au-delà
-        //
-        // =====================================================
-
-        function obtenirDateLocaleISO(
-            date = new Date()
-        ) {
-
-            const annee =
-                date.getFullYear();
-
-            const mois =
-                String(
-                    date.getMonth() + 1
-                ).padStart(2, "0");
-
-            const jour =
-                String(
-                    date.getDate()
-                ).padStart(2, "0");
-
-            return `${annee}-${mois}-${jour}`;
-        }
-
-
-        function obtenirDateDemainISO() {
-
-            const demain =
-                new Date();
-
-            demain.setDate(
-                demain.getDate() + 1
-            );
-
-            return obtenirDateLocaleISO(
-                demain
-            );
-        }
-
-
-        function dateBonAutorisee(
-            date
-        ) {
-
-            if (!date) {
-                return false;
-            }
-
-            const aujourdHui =
-                obtenirDateLocaleISO();
-
-            const demain =
-                obtenirDateDemainISO();
-
-            return (
-                date === aujourdHui ||
-                date === demain
-            );
-        }
-
-
-        // =====================================================
-        // INITIALISER LA DATE DU FORMULAIRE
+        // INITIALISATION DATE
         // =====================================================
 
         const dateInputInitial =
@@ -574,7 +804,10 @@ requireRole(
                 "date"
             );
 
-        if (dateInputInitial) {
+
+        if (
+            dateInputInitial
+        ) {
 
             dateInputInitial.value =
                 obtenirDateLocaleISO();
@@ -584,22 +817,27 @@ requireRole(
 
             dateInputInitial.max =
                 obtenirDateDemainISO();
+
         }
 
 
+        // =====================================================
+        // SOUMISSION BON
+        // =====================================================
+
         bonForm?.addEventListener(
             "submit",
-            async (event) => {
+            async event => {
 
                 event.preventDefault();
 
 
-                // =================================================
-                // LECTURE SEULE
-                // =================================================
+                if (
+                    lectureSeule
+                ) {
 
-                if (lectureSeule) {
                     return;
+
                 }
 
 
@@ -607,13 +845,11 @@ requireRole(
 
                     const date =
                         document
-                            .getElementById("date")
+                            .getElementById(
+                                "date"
+                            )
                             ?.value;
 
-
-                    // =================================================
-                    // CONTRÔLE DE DATE
-                    // =================================================
 
                     if (
                         !dateBonAutorisee(
@@ -626,61 +862,78 @@ requireRole(
                         );
 
                         return;
+
                     }
 
 
                     const type =
                         document
-                            .getElementById("type")
+                            .getElementById(
+                                "type"
+                            )
                             ?.value;
+
 
                     const description =
                         document
-                            .getElementById("description")
+                            .getElementById(
+                                "description"
+                            )
                             ?.value
                             .trim();
+
 
                     const chambre =
                         document
-                            .getElementById("chambre")
+                            .getElementById(
+                                "chambre"
+                            )
                             ?.value
                             .trim();
 
-
-                    // =================================================
-                    // PRÉCISIONS DE LOCALISATION
-                    // =================================================
 
                     const localisation =
                         document
-                            .getElementById("localisation")
+                            .getElementById(
+                                "localisation"
+                            )
                             ?.value
                             .trim();
+
 
                     const niveau =
                         document
-                            .getElementById("niveau")
+                            .getElementById(
+                                "niveau"
+                            )
                             ?.value
                             .trim();
+
 
                     const cote =
                         document
-                            .getElementById("cote")
+                            .getElementById(
+                                "cote"
+                            )
                             ?.value
                             .trim();
 
-
-                    // =================================================
-                    // CRÉATION DU BON
-                    // =================================================
 
                     await createBon({
 
                         date,
-                            heureEnvoi: new Date().toLocaleTimeString("fr-FR", {
-                                hour: "2-digit",
-                                minute: "2-digit"
-                            }),
+
+                        heureEnvoi:
+                            new Date()
+                                .toLocaleTimeString(
+                                    "fr-FR",
+                                    {
+                                        hour:
+                                            "2-digit",
+                                        minute:
+                                            "2-digit"
+                                    }
+                                ),
 
                         site:
                             profile.site,
@@ -721,6 +974,69 @@ requireRole(
                     });
 
 
+                    // =================================================
+                    // SI LE BON EST LIÉ À UNE DEMANDE
+                    // =================================================
+                    //
+                    // La demande ne doit pas disparaître
+                    // immédiatement.
+                    //
+                    // Elle passe simplement en cours.
+                    // Son archivage est géré automatiquement
+                    // par le serveur.
+                    //
+                    // =================================================
+
+                    const demandeId =
+                        bonForm.dataset.demandeId;
+
+
+                    if (
+                        demandeId
+                    ) {
+
+                        try {
+
+                            await updateDoc(
+
+                                doc(
+                                    db,
+                                    "demandes_etudiants",
+                                    demandeId
+                                ),
+
+                                {
+
+                                    statut:
+                                        "en_cours",
+
+                                    cause:
+                                        "",
+
+                                    feedbackAutorise:
+                                        false,
+
+                                    notificationVue:
+                                        true
+
+                                }
+
+                            );
+
+                        } catch (
+                            erreurDemande
+                        ) {
+
+                            console.error(
+                                "❌ Erreur mise à jour demande après création du bon :",
+                                erreurDemande
+                            );
+
+                        }
+
+                    }
+
+
                     alert(
                         "Bon envoyé avec succès."
                     );
@@ -732,7 +1048,7 @@ requireRole(
 
 
                     // =================================================
-                    // DATE PAR DÉFAUT APRÈS RESET
+                    // DATE APRÈS RESET
                     // =================================================
 
                     const dateInput =
@@ -740,7 +1056,10 @@ requireRole(
                             "date"
                         );
 
-                    if (dateInput) {
+
+                    if (
+                        dateInput
+                    ) {
 
                         dateInput.value =
                             obtenirDateLocaleISO();
@@ -750,11 +1069,12 @@ requireRole(
 
                         dateInput.max =
                             obtenirDateDemainISO();
+
                     }
 
 
                     // =================================================
-                    // NETTOYAGE DES CHAMPS DE PRÉCISION
+                    // NETTOYAGE
                     // =================================================
 
                     const localisationInput =
@@ -773,25 +1093,44 @@ requireRole(
                         );
 
 
-                    if (localisationInput) {
-                        localisationInput.value = "";
-                    }
+                    if (
+                        localisationInput
+                    ) {
 
-                    if (niveauInput) {
-                        niveauInput.value = "";
-                    }
+                        localisationInput.value =
+                            "";
 
-                    if (coteInput) {
-                        coteInput.value = "";
                     }
 
 
-                } catch (error) {
+                    if (
+                        niveauInput
+                    ) {
+
+                        niveauInput.value =
+                            "";
+
+                    }
+
+
+                    if (
+                        coteInput
+                    ) {
+
+                        coteInput.value =
+                            "";
+
+                    }
+
+                } catch (
+                    error
+                ) {
 
                     console.error(
                         "❌ Création du bon :",
                         error
                     );
+
 
                     alert(
                         "Impossible de créer le bon."
@@ -804,20 +1143,23 @@ requireRole(
 
 
         // =====================================================
-        // ACTIONS DES DEMANDES ÉTUDIANTS
+        // ACTIONS DEMANDES
         // =====================================================
 
         demandesBody.addEventListener(
             "click",
-            async (event) => {
+            async event => {
 
-                if (lectureSeule) {
+                if (
+                    lectureSeule
+                ) {
 
                     console.warn(
                         "🔒 Action bloquée : session en lecture seule."
                     );
 
                     return;
+
                 }
 
 
@@ -828,7 +1170,9 @@ requireRole(
 
 
                 if (!button) {
+
                     return;
+
                 }
 
 
@@ -844,11 +1188,14 @@ requireRole(
                 // =================================================
 
                 if (
-                    action === "bon"
+                    action ===
+                    "bon"
                 ) {
 
                     const demande =
-                        demandesCache.get(id);
+                        demandesCache.get(
+                            id
+                        );
 
 
                     if (!demande) {
@@ -858,6 +1205,7 @@ requireRole(
                         );
 
                         return;
+
                     }
 
 
@@ -870,7 +1218,10 @@ requireRole(
                             "date"
                         );
 
-                    if (dateInput) {
+
+                    if (
+                        dateInput
+                    ) {
 
                         dateInput.value =
                             obtenirDateLocaleISO();
@@ -893,16 +1244,20 @@ requireRole(
                             "type"
                         );
 
-                    if (typeInput) {
+
+                    if (
+                        typeInput
+                    ) {
 
                         typeInput.value =
-                            demande.type || "";
+                            demande.type ||
+                            "";
 
                     }
 
 
                     // =================================================
-                    // DESCRIPTION / PROBLÈME
+                    // DESCRIPTION
                     // =================================================
 
                     const descriptionInput =
@@ -910,10 +1265,14 @@ requireRole(
                             "description"
                         );
 
-                    if (descriptionInput) {
+
+                    if (
+                        descriptionInput
+                    ) {
 
                         descriptionInput.value =
-                            demande.probleme || "";
+                            demande.probleme ||
+                            "";
 
                     }
 
@@ -927,21 +1286,31 @@ requireRole(
                             "chambre"
                         );
 
-                    if (chambreInput) {
+
+                    if (
+                        chambreInput
+                    ) {
 
                         const localisation =
                             String(
-                                demande.localisation || ""
+                                demande.localisation ||
+                                ""
                             )
                             .trim()
                             .toLowerCase();
 
+
                         const concerneChambre =
-                            localisation === "chambre";
+                            localisation ===
+                            "chambre";
+
 
                         chambreInput.value =
                             concerneChambre
-                                ? (demande.chambre || "")
+                                ? (
+                                    demande.chambre ||
+                                    ""
+                                )
                                 : "";
 
                     }
@@ -956,16 +1325,20 @@ requireRole(
                             "localisation"
                         );
 
-                    if (localisationInput) {
+
+                    if (
+                        localisationInput
+                    ) {
 
                         localisationInput.value =
-                            demande.localisation || "";
+                            demande.localisation ||
+                            "";
 
                     }
 
 
                     // =================================================
-                    // NIVEAU / ÉTAGE
+                    // NIVEAU
                     // =================================================
 
                     const niveauInput =
@@ -973,7 +1346,10 @@ requireRole(
                             "niveau"
                         );
 
-                    if (niveauInput) {
+
+                    if (
+                        niveauInput
+                    ) {
 
                         niveauInput.value =
                             demande.niveau ||
@@ -992,7 +1368,10 @@ requireRole(
                             "cote"
                         );
 
-                    if (coteInput) {
+
+                    if (
+                        coteInput
+                    ) {
 
                         coteInput.value =
                             demande.cote ||
@@ -1002,10 +1381,12 @@ requireRole(
 
 
                     // =================================================
-                    // LIER LE BON À LA DEMANDE
+                    // LIEN DEMANDE
                     // =================================================
 
-                    if (bonForm) {
+                    if (
+                        bonForm
+                    ) {
 
                         bonForm.dataset.demandeId =
                             id;
@@ -1014,7 +1395,7 @@ requireRole(
 
 
                     // =================================================
-                    // ALLER AU FORMULAIRE
+                    // SCROLL
                     // =================================================
 
                     document
@@ -1033,42 +1414,84 @@ requireRole(
 
 
                     return;
+
                 }
 
 
                 // =================================================
-                // VALIDATION ACTION
+                // VALIDATION
                 // =================================================
 
                 if (
                     !id ||
                     !action
                 ) {
+
                     return;
+
                 }
 
-
-                // =================================================
-                // EMPÊCHE LES DOUBLES CLICS
-                // =================================================
 
                 if (
                     button.disabled
                 ) {
+
                     return;
+
                 }
 
-                button.disabled = true;
+
+                button.disabled =
+                    true;
 
 
                 try {
+
+                    const demandePourNotification =
+                        demandesCache.get(
+                            id
+                        );
+
+
+                    function messagePourNotification(
+                        cause
+                    ) {
+
+                        const details =
+                            [
+
+                                `${demandePourNotification?.prenom || ""} ${demandePourNotification?.nom || ""}`
+                                    .trim(),
+
+                                demandePourNotification?.localisation,
+
+                                demandePourNotification?.chambre
+                                    ? `Chambre ${demandePourNotification.chambre}`
+                                    : ""
+
+                            ].filter(
+                                Boolean
+                            );
+
+
+                        const base =
+                            `${demandePourNotification?.probleme || "Demande d'intervention"} — ${details.join(" · ")}`;
+
+
+                        return cause
+                            ? `${base} (${cause})`
+                            : base;
+
+                    }
+
 
                     // =================================================
                     // EN COURS
                     // =================================================
 
                     if (
-                        action === "encours"
+                        action ===
+                        "encours"
                     ) {
 
                         await updateDoc(
@@ -1080,6 +1503,7 @@ requireRole(
                             ),
 
                             {
+
                                 statut:
                                     "en_cours",
 
@@ -1091,9 +1515,11 @@ requireRole(
 
                                 notificationVue:
                                     true
+
                             }
 
                         );
+
                     }
 
 
@@ -1102,7 +1528,8 @@ requireRole(
                     // =================================================
 
                     else if (
-                        action === "forclos"
+                        action ===
+                        "forclos"
                     ) {
 
                         await updateDoc(
@@ -1114,6 +1541,7 @@ requireRole(
                             ),
 
                             {
+
                                 statut:
                                     "forclos",
 
@@ -1125,9 +1553,52 @@ requireRole(
 
                                 notificationVue:
                                     true
+
                             }
 
                         );
+
+
+                        try {
+
+                            await createNotificationHebergement({
+
+                                site:
+                                    demandePourNotification?.site,
+
+                                pavillon:
+                                    demandePourNotification?.pavillon,
+
+                                anneeAcademique:
+                                    demandePourNotification?.anneeAcademique,
+
+                                type:
+                                    "demande_forclose",
+
+                                titre:
+                                    "Demande forclose",
+
+                                message:
+                                    messagePourNotification(
+                                        "déjà formulée par un(e) colocataire"
+                                    ),
+
+                                demandeId:
+                                    id
+
+                            });
+
+                        } catch (
+                            error
+                        ) {
+
+                            console.error(
+                                "❌ Erreur création notification hébergement :",
+                                error
+                            );
+
+                        }
+
                     }
 
 
@@ -1136,7 +1607,8 @@ requireRole(
                     // =================================================
 
                     else if (
-                        action === "termine"
+                        action ===
+                        "termine"
                     ) {
 
                         await updateDoc(
@@ -1148,6 +1620,7 @@ requireRole(
                             ),
 
                             {
+
                                 statut:
                                     "termine",
 
@@ -1156,9 +1629,50 @@ requireRole(
 
                                 feedbackAutorise:
                                     true
+
                             }
 
                         );
+
+
+                        try {
+
+                            await createNotificationHebergement({
+
+                                site:
+                                    demandePourNotification?.site,
+
+                                pavillon:
+                                    demandePourNotification?.pavillon,
+
+                                anneeAcademique:
+                                    demandePourNotification?.anneeAcademique,
+
+                                type:
+                                    "demande_terminee",
+
+                                titre:
+                                    "Demande terminée",
+
+                                message:
+                                    messagePourNotification(),
+
+                                demandeId:
+                                    id
+
+                            });
+
+                        } catch (
+                            error
+                        ) {
+
+                            console.error(
+                                "❌ Erreur création notification hébergement :",
+                                error
+                            );
+
+                        }
+
                     }
 
 
@@ -1167,7 +1681,8 @@ requireRole(
                     // =================================================
 
                     else if (
-                        action === "nontermine"
+                        action ===
+                        "nontermine"
                     ) {
 
                         await updateDoc(
@@ -1179,6 +1694,7 @@ requireRole(
                             ),
 
                             {
+
                                 statut:
                                     "non_termine",
 
@@ -1187,23 +1703,72 @@ requireRole(
 
                                 feedbackAutorise:
                                     false
+
                             }
 
                         );
+
+
+                        try {
+
+                            await createNotificationHebergement({
+
+                                site:
+                                    demandePourNotification?.site,
+
+                                pavillon:
+                                    demandePourNotification?.pavillon,
+
+                                anneeAcademique:
+                                    demandePourNotification?.anneeAcademique,
+
+                                type:
+                                    "demande_non_terminee",
+
+                                titre:
+                                    "Demande non terminée",
+
+                                message:
+                                    messagePourNotification(
+                                        "stock de matériel"
+                                    ),
+
+                                demandeId:
+                                    id
+
+                            });
+
+                        } catch (
+                            error
+                        ) {
+
+                            console.error(
+                                "❌ Erreur création notification hébergement :",
+                                error
+                            );
+
+                        }
+
                     }
 
-                } catch (error) {
+                } catch (
+                    error
+                ) {
 
                     console.error(
                         "❌ Erreur action demande :",
                         error
                     );
 
-                    button.disabled = false;
+
+                    button.disabled =
+                        false;
+
 
                     alert(
                         "Impossible de modifier la demande."
                     );
+
                 }
 
             }
@@ -1211,7 +1776,7 @@ requireRole(
 
 
         // =====================================================
-        // SUIVI DES BONS — TEMPS RÉEL
+        // SUIVI DES BONS
         // =====================================================
 
         const bonsBody =
@@ -1220,45 +1785,61 @@ requireRole(
             );
 
 
-        if (!bonsBody) {
+        if (
+            !bonsBody
+        ) {
 
             console.error(
                 "❌ bons-body introuvable"
             );
 
             return;
+
         }
 
 
         // =====================================================
-        // REQUÊTE TEMPS RÉEL DES BONS
+        // REQUÊTE BONS
         // =====================================================
 
         const bonsQuery =
             query(
-                collection(db, "bons"),
 
-                where("site", "==", siteAgent),
+                collection(
+                    db,
+                    "bons"
+                ),
 
-                where("pavillon", "==", pavillonAgent),
+                where(
+                    "site",
+                    "==",
+                    siteAgent
+                ),
+
+                where(
+                    "pavillon",
+                    "==",
+                    pavillonAgent
+                ),
 
                 where(
                     "anneeAcademique",
                     "==",
                     anneeAcademique
                 )
+
             );
 
 
         // =====================================================
-        // ÉCOUTE TEMPS RÉEL DES BONS
+        // ÉCOUTE BONS
         // =====================================================
 
         onSnapshot(
 
             bonsQuery,
 
-            (snapshot) => {
+            snapshot => {
 
                 console.log(
                     "🔄 Bons mis à jour en temps réel :",
@@ -1280,12 +1861,18 @@ requireRole(
                         )
                         .filter(
                             bon =>
-                                bon.supprime !== true
+                                bon.supprime !== true &&
+                                bon.archive !== true
                         );
 
 
                 // =================================================
-                // DATE DU JOUR — LOCALE
+                // AFFICHER LES BONS DU JOUR
+                // =================================================
+                //
+                // On conserve le fonctionnement :
+                // cette page affiche les bons du jour.
+                //
                 // =================================================
 
                 const aujourdHui =
@@ -1300,31 +1887,25 @@ requireRole(
                     );
 
 
-                // =================================================
-                // TRI
-                // =================================================
-
                 bonsDuJour.sort(
                     (a, b) =>
                         String(
-                            b.date || ""
+                            b.createdAt || ""
                         ).localeCompare(
                             String(
-                                a.date || ""
+                                a.createdAt || ""
                             )
                         )
                 );
 
 
-                bonsBody.innerHTML = "";
+                bonsBody.innerHTML =
+                    "";
 
-
-                // =================================================
-                // AUCUN BON
-                // =================================================
 
                 if (
-                    bonsDuJour.length === 0
+                    bonsDuJour.length ===
+                    0
                 ) {
 
                     bonsBody.innerHTML = `
@@ -1342,6 +1923,42 @@ requireRole(
                     `;
 
                     return;
+
+                }
+
+
+                function obtenirLibelleStatut(
+                    statut
+                ) {
+
+                    switch (
+                        statut
+                    ) {
+
+                        case "envoye":
+                            return "Envoyé";
+
+                        case "recu":
+                            return "Reçu";
+
+                        case "en_cours":
+                            return "En cours";
+
+                        case "termine":
+                            return "Terminé";
+
+                        case "non_termine":
+                            return "Non terminé";
+
+                        case "forclos":
+                            return "Forclos";
+
+                        default:
+                            return statut ||
+                                "-";
+
+                    }
+
                 }
 
 
@@ -1350,12 +1967,15 @@ requireRole(
                 // =================================================
 
                 bonsDuJour.forEach(
-                    (bon) => {
+                    bon => {
 
                         const boutonSuppression =
                             !lectureSeule &&
-                            bon.statut === "envoye"
+                            bon.statut ===
+                            "envoye"
+
                                 ? `
+
                                     <button
                                         type="button"
                                         class="bon-delete-btn"
@@ -1363,7 +1983,9 @@ requireRole(
                                     >
                                         Supprimer
                                     </button>
+
                                 `
+
                                 : "";
 
 
@@ -1376,7 +1998,9 @@ requireRole(
                                 </td>
 
                                 <td>
-                                    ${formaterDate(bon.date)}
+                                    ${formaterDate(
+                                        bon.createdAt
+                                    )}
                                 </td>
 
                                 <td>
@@ -1416,7 +2040,9 @@ requireRole(
                                 </td>
 
                                 <td>
-                                    ${bon.statut || "-"}
+                                    ${obtenirLibelleStatut(
+                                        bon.statut
+                                    )}
                                 </td>
 
                                 <td>
@@ -1426,48 +2052,25 @@ requireRole(
                             </tr>
 
                         `;
+
                     }
                 );
-
-
-
-function formaterDate(date) {
-
-    if (!date) {
-        return "-";
-    }
-
-    const d = new Date(date);
-
-    if (Number.isNaN(d.getTime())) {
-        return date;
-    }
-
-    return new Intl.DateTimeFormat(
-        "fr-FR",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    ).format(d);
-}
 
 
                 // =================================================
                 // ACTION SUPPRESSION
                 // =================================================
 
-                if (!lectureSeule) {
+                if (
+                    !lectureSeule
+                ) {
 
                     bonsBody
                         .querySelectorAll(
                             ".bon-delete-btn"
                         )
                         .forEach(
-                            (button) => {
+                            button => {
 
                                 button.addEventListener(
                                     "click",
@@ -1477,27 +2080,21 @@ function formaterDate(date) {
                                             button.dataset.bonId;
 
 
-                                        if (!bonId) {
-                                            return;
-                                        }
-
-
                                         if (
-                                            lectureSeule
+                                            !bonId
                                         ) {
 
-                                            console.warn(
-                                                "🔒 Suppression bloquée : session en lecture seule."
-                                            );
-
                                             return;
+
                                         }
 
 
                                         if (
                                             button.disabled
                                         ) {
+
                                             return;
+
                                         }
 
 
@@ -1510,7 +2107,9 @@ function formaterDate(date) {
                                         if (
                                             !confirmation
                                         ) {
+
                                             return;
+
                                         }
 
 
@@ -1524,23 +2123,24 @@ function formaterDate(date) {
                                                 bonId
                                             );
 
-                                            // Pas de refresh manuel :
-                                            // onSnapshot actualise automatiquement.
-
-
-                                        } catch (error) {
+                                        } catch (
+                                            error
+                                        ) {
 
                                             console.error(
                                                 "❌ Suppression du bon :",
                                                 error
                                             );
 
+
                                             button.disabled =
                                                 false;
+
 
                                             alert(
                                                 "Impossible de supprimer le bon."
                                             );
+
                                         }
 
                                     }
@@ -1548,12 +2148,13 @@ function formaterDate(date) {
 
                             }
                         );
+
                 }
 
             },
 
 
-            (error) => {
+            error => {
 
                 console.error(
                     "❌ Erreur écoute temps réel des bons :",
@@ -1575,6 +2176,7 @@ function formaterDate(date) {
                     </tr>
 
                 `;
+
             }
 
         );
@@ -1587,6 +2189,7 @@ function formaterDate(date) {
         console.log(
             "6 - page prête"
         );
+
 
         document.body.classList.add(
             "loaded"

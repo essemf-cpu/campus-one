@@ -532,6 +532,54 @@ service cloud.firestore {
 
 
     // =====================================================
+    // NOTIFICATIONS HÉBERGEMENT
+    // =====================================================
+    //
+    // Créées par createNotificationHebergement
+    // (src/services/hebergementNotificationsService.js),
+    // appelée :
+    // - côté ÉTUDIANT (reclamation.js) à la création d'une
+    //   demande -> type "nouvelle_demande"
+    // - côté AGENT (demandes.js) lors d'un changement de
+    //   statut -> "demande_terminee" / "demande_non_terminee"
+    //   / "demande_forclose"
+    //
+    // =====================================================
+
+    match /notificationsHebergement/{documentId} {
+
+      allow read:
+        if agent()
+        && resource.data.site ==
+           get(
+             /databases/$(database)/documents/agents/$(monMatricule())
+           ).data.site;
+
+      allow create:
+        if agent()
+        || admin()
+        ||
+        (
+          etudiant()
+          && request.resource.data.type == "nouvelle_demande"
+          && request.resource.data.site is string
+          && request.resource.data.pavillon is string
+          && request.resource.data.anneeAcademique is string
+        );
+
+      allow update:
+        if agent()
+        && resource.data.site ==
+           get(
+             /databases/$(database)/documents/agents/$(monMatricule())
+           ).data.site;
+
+      allow delete:
+        if false;
+    }
+
+
+    // =====================================================
 // PAIEMENTS LOYERS
 // =====================================================
 

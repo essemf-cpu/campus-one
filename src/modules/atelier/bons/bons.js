@@ -32,7 +32,6 @@ function formaterDate(dateValue) {
 
     let dateObjet;
 
-    // Firestore Timestamp
     if (
         dateValue &&
         typeof dateValue.toDate === "function"
@@ -42,7 +41,6 @@ function formaterDate(dateValue) {
 
     }
 
-    // Date JavaScript
     else if (
         dateValue instanceof Date
     ) {
@@ -51,19 +49,10 @@ function formaterDate(dateValue) {
 
     }
 
-    // Chaîne de caractères
     else {
 
         const valeur =
             String(dateValue).trim();
-
-        /*
-         * Format :
-         * 2026-08-22
-         * 2026-08-22T14:35
-         * 2026-08-22T14:35:00
-         * 2026-08-22T14:35:00.000Z
-         */
 
         const correspondance =
             valeur.match(
@@ -81,7 +70,6 @@ function formaterDate(dateValue) {
             const annee =
                 correspondance[1];
 
-            // Si aucune heure n'est enregistrée
             if (
                 correspondance[4] === undefined ||
                 correspondance[5] === undefined
@@ -103,7 +91,6 @@ function formaterDate(dateValue) {
 
     }
 
-
     if (
         !dateObjet ||
         Number.isNaN(
@@ -114,7 +101,6 @@ function formaterDate(dateValue) {
         return String(dateValue);
 
     }
-
 
     const dateFormatee =
         new Intl.DateTimeFormat(
@@ -128,7 +114,6 @@ function formaterDate(dateValue) {
             dateObjet
         );
 
-
     const heureFormatee =
         new Intl.DateTimeFormat(
             "fr-FR",
@@ -140,7 +125,6 @@ function formaterDate(dateValue) {
         ).format(
             dateObjet
         );
-
 
     return `${dateFormatee} à ${heureFormatee}`;
 
@@ -163,6 +147,7 @@ function obtenirNomType(
         bon.type ||
         "-"
     );
+
 }
 
 
@@ -227,6 +212,7 @@ requireRole(
                 );
 
             return;
+
         }
 
 
@@ -264,6 +250,7 @@ requireRole(
                 profile?.site
                     ? ` ${profile.site}`
                     : "";
+
         }
 
 
@@ -287,6 +274,7 @@ requireRole(
             );
 
             return;
+
         }
 
 
@@ -300,14 +288,18 @@ requireRole(
         if (!siteAtelier) {
 
             bonsBody.innerHTML = `
+
                 <tr class="empty-row">
 
                     <td colspan="12">
+
                         Impossible de déterminer
                         le site de l'Atelier.
+
                     </td>
 
                 </tr>
+
             `;
 
             document.body.classList.add(
@@ -315,6 +307,7 @@ requireRole(
             );
 
             return;
+
         }
 
 
@@ -351,6 +344,7 @@ requireRole(
                 "❌ Erreur chargement référentiel :",
                 error
             );
+
         }
 
 
@@ -402,12 +396,24 @@ requireRole(
                                         documentSnapshot.id,
 
                                     ...documentSnapshot.data()
+
                                 })
                             );
 
 
                     // =================================================
                     // UNIQUEMENT LES BONS ACTIFS
+                    //
+                    // IMPORTANT :
+                    //
+                    // Un bon terminé ou non terminé
+                    // N'est PAS retiré ici.
+                    //
+                    // Il reste donc affiché pendant
+                    // la période où archive === false.
+                    //
+                    // Le serveur se charge ensuite
+                    // de l'archiver automatiquement.
                     // =================================================
 
                     const bonsActifs =
@@ -417,13 +423,17 @@ requireRole(
                                 if (
                                     bon.supprime === true
                                 ) {
+
                                     return false;
+
                                 }
 
                                 if (
                                     bon.archive === true
                                 ) {
+
                                     return false;
+
                                 }
 
                                 return (
@@ -435,8 +445,16 @@ requireRole(
                                         STATUTS_BON.RECU ||
 
                                     bon.statut ===
-                                        STATUTS_BON.EN_COURS
+                                        STATUTS_BON.EN_COURS ||
+
+                                    bon.statut ===
+                                        STATUTS_BON.TERMINE ||
+
+                                    bon.statut ===
+                                        STATUTS_BON.NON_TERMINE
+
                                 );
+
                             }
                         );
 
@@ -461,6 +479,7 @@ requireRole(
                             return dateB.localeCompare(
                                 dateA
                             );
+
                         }
                     );
 
@@ -483,16 +502,21 @@ requireRole(
                     ) {
 
                         bonsBody.innerHTML = `
+
                             <tr class="empty-row">
 
                                 <td colspan="12">
+
                                     Aucun bon de travail reçu.
+
                                 </td>
 
                             </tr>
+
                         `;
 
                         return;
+
                     }
 
 
@@ -546,7 +570,9 @@ requireRole(
                                 statutClasse =
                                     "statut-envoye";
 
-                            } else if (
+                            }
+
+                            else if (
                                 bon.statut ===
                                 STATUTS_BON.RECU
                             ) {
@@ -557,7 +583,9 @@ requireRole(
                                 statutClasse =
                                     "statut-recu";
 
-                            } else if (
+                            }
+
+                            else if (
                                 bon.statut ===
                                 STATUTS_BON.EN_COURS
                             ) {
@@ -567,6 +595,33 @@ requireRole(
 
                                 statutClasse =
                                     "statut-en-cours";
+
+                            }
+
+                            else if (
+                                bon.statut ===
+                                STATUTS_BON.TERMINE
+                            ) {
+
+                                statutLabel =
+                                    "Terminé";
+
+                                statutClasse =
+                                    "statut-termine";
+
+                            }
+
+                            else if (
+                                bon.statut ===
+                                STATUTS_BON.NON_TERMINE
+                            ) {
+
+                                statutLabel =
+                                    "Non terminé";
+
+                                statutClasse =
+                                    "statut-non-termine";
+
                             }
 
 
@@ -583,9 +638,13 @@ requireRole(
                             ) {
 
                                 actions = `
+
                                     <span class="lecture-seule">
+
                                         Lecture seule
+
                                     </span>
+
                                 `;
 
                             }
@@ -601,6 +660,7 @@ requireRole(
                             ) {
 
                                 actions = `
+
                                     <div class="bon-actions">
 
                                         <button
@@ -609,10 +669,13 @@ requireRole(
                                             data-id="${bon.id}"
                                             data-action="recu"
                                         >
+
                                             Reçu
+
                                         </button>
 
                                     </div>
+
                                 `;
 
                             }
@@ -628,6 +691,7 @@ requireRole(
                             ) {
 
                                 actions = `
+
                                     <div class="bon-actions">
 
                                         <button
@@ -636,10 +700,13 @@ requireRole(
                                             data-id="${bon.id}"
                                             data-action="encours"
                                         >
+
                                             En cours
+
                                         </button>
 
                                     </div>
+
                                 `;
 
                             }
@@ -655,6 +722,7 @@ requireRole(
                             ) {
 
                                 actions = `
+
                                     <div class="bon-actions">
 
                                         <button
@@ -663,7 +731,9 @@ requireRole(
                                             data-id="${bon.id}"
                                             data-action="termine"
                                         >
+
                                             Terminée
+
                                         </button>
 
                                         <button
@@ -672,17 +742,27 @@ requireRole(
                                             data-id="${bon.id}"
                                             data-action="nontermine"
                                         >
+
                                             Non terminée
+
                                         </button>
 
                                     </div>
+
                                 `;
+
                             }
 
 
                             // =================================================
-                            // LIGNE
+                            // TERMINÉ / NON TERMINÉ
+                            //
+                            // Aucun bouton d'action.
+                            //
+                            // Le bon reste affiché tant que
+                            // archive === false.
                             // =================================================
+
 
                             bonsBody.innerHTML += `
 
@@ -770,7 +850,9 @@ requireRole(
                                         <span
                                             class="statut-badge ${statutClasse}"
                                         >
+
                                             ${statutLabel}
+
                                         </span>
 
                                     </td>
@@ -779,14 +861,18 @@ requireRole(
                                     <!-- ACTION -->
 
                                     <td>
+
                                         ${actions}
+
                                     </td>
 
                                 </tr>
 
                             `;
+
                         }
                     );
+
                 },
 
 
@@ -815,7 +901,9 @@ requireRole(
                         </tr>
 
                     `;
+
                 }
+
             );
 
 
@@ -827,10 +915,6 @@ requireRole(
             "click",
             async (event) => {
 
-                // =================================================
-                // LECTURE SEULE
-                // =================================================
-
                 if (
                     lectureSeule
                 ) {
@@ -840,12 +924,9 @@ requireRole(
                     );
 
                     return;
+
                 }
 
-
-                // =================================================
-                // BOUTON
-                // =================================================
 
                 const button =
                     event.target.closest(
@@ -854,7 +935,9 @@ requireRole(
 
 
                 if (!button) {
+
                     return;
+
                 }
 
 
@@ -869,7 +952,9 @@ requireRole(
                     !bonId ||
                     !action
                 ) {
+
                     return;
+
                 }
 
 
@@ -880,7 +965,9 @@ requireRole(
                 if (
                     button.disabled
                 ) {
+
                     return;
+
                 }
 
                 button.disabled =
@@ -907,7 +994,9 @@ requireRole(
                             "",
 
                             profile
+
                         );
+
                     }
 
 
@@ -929,7 +1018,9 @@ requireRole(
                             "",
 
                             profile
+
                         );
+
                     }
 
 
@@ -951,7 +1042,9 @@ requireRole(
                             "",
 
                             profile
+
                         );
+
                     }
 
 
@@ -964,286 +1057,59 @@ requireRole(
                         "nontermine"
                     ) {
 
-                        const modal =
-                            document.getElementById(
-                                "cause-modal"
+                        const cause =
+                            prompt(
+                                "Indiquez la cause du travail non terminé :"
                             );
 
-                        const select =
-                            document.getElementById(
-                                "cause-select"
-                            );
-
-                        const autreContainer =
-                            document.getElementById(
-                                "autre-cause-container"
-                            );
-
-                        const autreInput =
-                            document.getElementById(
-                                "autre-cause"
-                            );
-
-                        const confirmButton =
-                            document.getElementById(
-                                "confirm-cause"
-                            );
-
-                        const cancelButton =
-                            document.getElementById(
-                                "cancel-cause"
-                            );
-
-                        const closeButton =
-                            document.getElementById(
-                                "close-cause-modal"
-                            );
-
-
-                        // =================================================
-                        // VÉRIFICATION MODALE
-                        // =================================================
 
                         if (
-                            !modal ||
-                            !select ||
-                            !confirmButton
+                            cause ===
+                            null
                         ) {
 
-                            console.error(
-                                "❌ Modale de cause introuvable."
+                            button.disabled =
+                                false;
+
+                            return;
+
+                        }
+
+
+                        const causeFinale =
+                            cause.trim();
+
+
+                        if (
+                            !causeFinale
+                        ) {
+
+                            alert(
+                                "Veuillez préciser la cause."
                             );
 
                             button.disabled =
                                 false;
 
                             return;
+
                         }
 
 
-                        // =================================================
-                        // RESET
-                        // =================================================
+                        await updateBonStatut(
 
-                        select.value =
-                            "";
+                            bonId,
 
-                        if (autreInput) {
+                            STATUTS_BON.NON_TERMINE,
 
-                            autreInput.value =
-                                "";
-                        }
+                            causeFinale,
 
-                        if (autreContainer) {
+                            profile
 
-                            autreContainer.hidden =
-                                true;
-                        }
-
-
-                        // =================================================
-                        // OUVERTURE
-                        // =================================================
-
-                        modal.hidden =
-                            false;
-
-
-                        // =================================================
-                        // FERMETURE
-                        // =================================================
-
-                        const fermerModal =
-                            () => {
-
-                                modal.hidden =
-                                    true;
-
-                                button.disabled =
-                                    false;
-
-                                select.value =
-                                    "";
-
-                                if (autreInput) {
-
-                                    autreInput.value =
-                                        "";
-                                }
-
-                                if (autreContainer) {
-
-                                    autreContainer.hidden =
-                                        true;
-                                }
-
-                                select.removeEventListener(
-                                    "change",
-                                    gererAutre
-                                );
-                            };
-
-
-                        // =================================================
-                        // AUTRE
-                        // =================================================
-
-                        const gererAutre =
-                            () => {
-
-                                if (
-                                    autreContainer
-                                ) {
-
-                                    autreContainer.hidden =
-                                        select.value !==
-                                        "Autre";
-                                }
-
-
-                                if (
-                                    select.value ===
-                                    "Autre"
-                                ) {
-
-                                    autreInput?.focus();
-                                }
-                            };
-
-
-                        select.addEventListener(
-                            "change",
-                            gererAutre
                         );
 
-
-                        // =================================================
-                        // ANNULER
-                        // =================================================
-
-                        cancelButton?.addEventListener(
-                            "click",
-                            fermerModal,
-                            {
-                                once:
-                                    true
-                            }
-                        );
-
-
-                        closeButton?.addEventListener(
-                            "click",
-                            fermerModal,
-                            {
-                                once:
-                                    true
-                            }
-                        );
-
-
-                        // =================================================
-                        // CONFIRMER
-                        // =================================================
-
-                        confirmButton.onclick =
-                            async () => {
-
-                                if (
-                                    !select.value
-                                ) {
-
-                                    alert(
-                                        "Veuillez sélectionner une cause."
-                                    );
-
-                                    return;
-                                }
-
-
-                                let cause =
-                                    select.value;
-
-
-                                // =================================================
-                                // AUTRE
-                                // =================================================
-
-                                if (
-                                    cause ===
-                                    "Autre"
-                                ) {
-
-                                    cause =
-                                        autreInput
-                                            ?.value
-                                            ?.trim() ||
-                                        "";
-
-
-                                    if (
-                                        !cause
-                                    ) {
-
-                                        alert(
-                                            "Veuillez préciser la cause."
-                                        );
-
-                                        autreInput?.focus();
-
-                                        return;
-                                    }
-                                }
-
-
-                                // =================================================
-                                // DÉSACTIVER
-                                // =================================================
-
-                                confirmButton.disabled =
-                                    true;
-
-
-                                try {
-
-                                    await updateBonStatut(
-
-                                        bonId,
-
-                                        STATUTS_BON.NON_TERMINE,
-
-                                        cause,
-
-                                        profile
-                                    );
-
-
-                                    modal.hidden =
-                                        true;
-
-                                    button.disabled =
-                                        false;
-
-                                } catch (
-                                    error
-                                ) {
-
-                                    console.error(
-                                        "❌ Erreur bon non terminé :",
-                                        error
-                                    );
-
-                                    alert(
-                                        "Impossible d'enregistrer la cause."
-                                    );
-
-                                    confirmButton.disabled =
-                                        false;
-
-                                    button.disabled =
-                                        false;
-                                }
-                            };
                     }
+
 
                 } catch (
                     error
@@ -1260,6 +1126,7 @@ requireRole(
                     alert(
                         "Impossible de modifier le bon."
                     );
+
                 }
 
             }
@@ -1280,7 +1147,9 @@ requireRole(
                 ) {
 
                     unsubscribe();
+
                 }
+
             }
         );
 

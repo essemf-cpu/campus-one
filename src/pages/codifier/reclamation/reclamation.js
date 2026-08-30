@@ -14,6 +14,10 @@ import {
 
 import { db } from "../../../firebase/firebase.js";
 
+import {
+    createNotificationHebergement
+} from "../../../services/hebergementnotificationsservice.js";
+
 
 requireRole(
     "etudiant",
@@ -1437,7 +1441,8 @@ requireRole(
                     // ENREGISTREMENT
                     // =========================================
 
-                    await addDoc(
+                    const demandeReference =
+                        await addDoc(
                         collection(
                             db,
                             "demandes_etudiants"
@@ -1498,6 +1503,55 @@ requireRole(
 
                         }
                     );
+
+
+                    // =========================================
+                    // NOTIFICATION HÉBERGEMENT
+                    // =========================================
+
+                    const detailsNotification =
+                        [
+                            `${profile.prenom || ""} ${profile.nom || ""}`.trim(),
+                            lieu,
+                            hebergement.chambre
+                                ? `Chambre ${hebergement.chambre}`
+                                : ""
+                        ].filter(Boolean);
+
+                    try {
+
+                        await createNotificationHebergement({
+
+                            site:
+                                hebergement.site,
+
+                            pavillon:
+                                hebergement.pavillon,
+
+                            anneeAcademique,
+
+                            type:
+                                "nouvelle_demande",
+
+                            titre:
+                                "Nouvelle demande étudiante",
+
+                            message:
+                                `${problemeSelectionne} — ${detailsNotification.join(" · ")}`,
+
+                            demandeId:
+                                demandeReference.id
+
+                        });
+
+                    } catch (error) {
+
+                        console.error(
+                            "❌ Erreur création notification hébergement :",
+                            error
+                        );
+
+                    }
 
 
                     alert(

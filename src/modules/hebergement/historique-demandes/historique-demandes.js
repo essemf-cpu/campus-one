@@ -1,10 +1,5 @@
 import { requireRole } from "../../../auth/authGuard.js";
-
 import { loadSidebar } from "../components/sidebar.js";
-
-import {
-    getTypesTravaux
-} from "../../../services/referentielService.js";
 
 import {
     collection,
@@ -15,199 +10,1016 @@ import {
 
 import { db } from "../../../firebase/firebase.js";
 
+import {
+    getTypesTravaux
+} from "../../../services/referentielService.js";
+
+
+// =====================================================
+// VARIABLES
+// =====================================================
+
+let demandesHistoriques = [];
+
+let termeRecherche = "";
+
+let modeTri = "recent";
+
+let typeSelectionne = "tous";
+
+let statutSelectionne = "tous";
+
+let periodeSelectionnee = "toutes";
+
+let anneeSelectionnee = "toutes";
+
+let moisSelectionne = "tous";
+
+
+// =====================================================
+// OBTENIR DATE
+// =====================================================
+
+function obtenirDate(demande) {
+
+    const valeur =
+        demande?.createdAt ||
+        demande?.date ||
+        demande?.archivedAt;
+
+
+    if (!valeur) {
+        return new Date(0);
+    }
+
+
+    if (
+        typeof valeur.toDate ===
+        "function"
+    ) {
+
+        return valeur.toDate();
+
+    }
+
+
+    const date =
+        new Date(valeur);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return new Date(0);
+
+    }
+
+
+    return date;
+}
+
+
+// =====================================================
+// FORMATER DATE
+// =====================================================
+
+function formaterDate(date) {
+
+    if (
+        !date ||
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "-";
+
+    }
+
+
+    return new Intl.DateTimeFormat(
+        "fr-FR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        }
+    ).format(date);
+
+}
+
+
+// =====================================================
+// NOM TYPE
+// =====================================================
+
+let typesTravauxMap =
+    new Map();
+
+
+function obtenirNomType(demande) {
+
+    return (
+        typesTravauxMap.get(
+            demande.type
+        ) ||
+        demande.type ||
+        "-"
+    );
+
+}
+
+
+// =====================================================
+// STATUT
+// =====================================================
+
+function obtenirStatut(demande) {
+
+    switch (
+        demande?.statut
+    ) {
+
+        case "termine":
+            return "Terminé";
+
+        case "non_termine":
+            return "Non terminé";
+
+        case "forclos":
+            return "Forclos";
+
+        case "en_cours":
+            return "En cours";
+
+        case "en_attente":
+            return "En attente";
+
+        default:
+            return demande?.statut || "-";
+
+    }
+
+}
+
+
+// =====================================================
+// DATE DANS PÉRIODE
+// =====================================================
+
+function dateDansPeriode(date) {
+
+    if (
+        !date ||
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return false;
+
+    }
+
+
+    if (
+        periodeSelectionnee ===
+        "toutes"
+    ) {
+
+        return true;
+
+    }
+
+
+    const maintenant =
+        new Date();
+
+
+    // =================================================
+    // AUJOURD'HUI
+    // =================================================
+
+    if (
+        periodeSelectionnee ===
+        "aujourd_hui"
+    ) {
+
+        return (
+            date.getFullYear() ===
+                maintenant.getFullYear() &&
+
+            date.getMonth() ===
+                maintenant.getMonth() &&
+
+            date.getDate() ===
+                maintenant.getDate()
+        );
+
+    }
+
+
+    // =================================================
+    // CETTE SEMAINE
+    // =================================================
+
+    if (
+        periodeSelectionnee ===
+        "cette_semaine"
+    ) {
+
+        const debut =
+            new Date(
+                maintenant
+            );
+
+        const jour =
+            debut.getDay();
+
+        const difference =
+            jour === 0
+                ? 6
+                : jour - 1;
+
+
+        debut.setDate(
+            debut.getDate() -
+            difference
+        );
+
+        debut.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+        const fin =
+            new Date(
+                debut
+            );
+
+        fin.setDate(
+            fin.getDate() + 7
+        );
+
+
+        return (
+            date >= debut &&
+            date < fin
+        );
+
+    }
+
+
+    // =================================================
+    // CE MOIS
+    // =================================================
+
+    if (
+        periodeSelectionnee ===
+        "ce_mois"
+    ) {
+
+        return (
+            date.getFullYear() ===
+                maintenant.getFullYear() &&
+
+            date.getMonth() ===
+                maintenant.getMonth()
+        );
+
+    }
+
+
+    // =================================================
+    // CETTE ANNÉE
+    // =================================================
+
+    if (
+        periodeSelectionnee ===
+        "cette_annee"
+    ) {
+
+        return (
+            date.getFullYear() ===
+            maintenant.getFullYear()
+        );
+
+    }
+
+
+    // =================================================
+    // MOIS CHOISI
+    // =================================================
+
+    if (
+        periodeSelectionnee ===
+        "choisir_mois"
+    ) {
+
+        if (
+            moisSelectionne ===
+            "tous" ||
+            anneeSelectionnee ===
+            "toutes"
+        ) {
+
+            return true;
+
+        }
+
+
+        return (
+            date.getFullYear() ===
+                Number(
+                    anneeSelectionnee
+                ) &&
+
+            date.getMonth() ===
+                Number(
+                    moisSelectionne
+                )
+        );
+
+    }
+
+
+    // =================================================
+    // ANNÉE CHOISIE
+    // =================================================
+
+    if (
+        periodeSelectionnee ===
+        "choisir_annee"
+    ) {
+
+        if (
+            anneeSelectionnee ===
+            "toutes"
+        ) {
+
+            return true;
+
+        }
+
+
+        return (
+            date.getFullYear() ===
+            Number(
+                anneeSelectionnee
+            )
+        );
+
+    }
+
+
+    return true;
+
+}
+
+
+// =====================================================
+// REMPLIR ANNÉES
+// =====================================================
+
+function remplirAnnees() {
+
+    const anneeSelect =
+        document.getElementById(
+            "annee"
+        );
+
+
+    if (!anneeSelect) {
+        return;
+    }
+
+
+    const annees =
+        [
+            ...new Set(
+                demandesHistoriques
+                    .map(
+                        demande =>
+                            obtenirDate(
+                                demande
+                            ).getFullYear()
+                    )
+                    .filter(
+                        annee =>
+                            annee > 1970
+                    )
+            )
+        ]
+        .sort(
+            (a, b) =>
+                b - a
+        );
+
+
+    const valeurActuelle =
+        anneeSelect.value;
+
+
+    anneeSelect.innerHTML = `
+
+        <option value="toutes">
+            Toutes les années
+        </option>
+
+    `;
+
+
+    annees.forEach(
+        annee => {
+
+            anneeSelect.innerHTML += `
+
+                <option value="${annee}">
+                    ${annee}
+                </option>
+
+            `;
+
+        }
+    );
+
+
+    if (
+        annees.includes(
+            Number(
+                valeurActuelle
+            )
+        )
+    ) {
+
+        anneeSelect.value =
+            valeurActuelle;
+
+    }
+
+}
+
+
+// =====================================================
+// RÔLE
+// =====================================================
 
 requireRole(
     "agent",
-    async ({ profile }) => {
+    async ({
+        profile,
+        permissions,
+        affectation,
+        posteId,
+        anneeAcademique,
+        lectureSeule
+    }) => {
 
-        // =====================================================
-        // VÉRIFICATION SERVICE
-        // =====================================================
-
-        if (
-            profile.service !==
-            "Service de l'Hébergement"
-        ) {
-            return;
-        }
-
-
-        // =====================================================
-        // SIDEBAR
-        // =====================================================
-
-        await loadSidebar(profile);
+        console.log(
+            "🔐 MODE LECTURE SEULE =",
+            lectureSeule
+        );
 
 
-        // =====================================================
-        // TITRE
-        // =====================================================
-
-        const pageTitle =
-            document.getElementById(
-                "page-title"
-            );
-
-        if (pageTitle) {
-
-            pageTitle.textContent =
-                profile.affectation || "";
-
-        }
+        await loadSidebar(
+            profile
+        );
 
 
         // =====================================================
-        // TABLEAU
+        // ÉLÉMENTS
         // =====================================================
 
         const tbody =
             document.getElementById(
                 "historique-body"
+            ) ||
+            document.getElementById(
+                "demandes-body"
             );
+
+
+        const searchInput =
+            document.getElementById(
+                "search"
+            ) ||
+            document.getElementById(
+                "recherche"
+            );
+
+
+        const sortSelect =
+            document.getElementById(
+                "sort"
+            );
+
+
+        const typeSelect =
+            document.getElementById(
+                "type-filter"
+            ) ||
+            document.getElementById(
+                "type"
+            );
+
+
+        const statutSelect =
+            document.getElementById(
+                "statut-filter"
+            ) ||
+            document.getElementById(
+                "statut"
+            );
+
+
+        const periodeSelect =
+            document.getElementById(
+                "periode"
+            );
+
+
+        const anneeSelect =
+            document.getElementById(
+                "annee"
+            );
+
+
+        const moisSelect =
+            document.getElementById(
+                "mois"
+            );
+
+
+        const moisContainer =
+            document.getElementById(
+                "mois-container"
+            );
+
+
+        const anneeContainer =
+            document.getElementById(
+                "annee-container"
+            );
+
 
         if (!tbody) {
 
             console.error(
-                "❌ historique-body introuvable"
+                "❌ Corps du tableau historique introuvable."
             );
 
             return;
+
         }
 
 
         // =====================================================
-        // FILTRES
+        // TYPES
         // =====================================================
-
-        const searchInput =
-            document.getElementById(
-                "historique-search"
-            );
-
-        const sortSelect =
-            document.getElementById(
-                "historique-sort"
-            );
-
-        const typeSelect =
-            document.getElementById(
-                "historique-type"
-            );
-
-        const statutSelect =
-            document.getElementById(
-                "historique-statut"
-            );
-
-        const periodeSelect =
-            document.getElementById(
-                "historique-periode"
-            );
-
-        const anneeContainer =
-            document.getElementById(
-                "historique-annee-container"
-            );
-
-        const anneeSelect =
-            document.getElementById(
-                "historique-annee"
-            );
-
-        const moisContainer =
-            document.getElementById(
-                "historique-mois-container"
-            );
-
-        const moisSelect =
-            document.getElementById(
-                "historique-mois"
-            );
-
-
-        // =====================================================
-        // ÉTAT LOCAL
-        // =====================================================
-
-        let demandesHistoriques = [];
-
-        let termeRecherche = "";
-
-        let modeTri =
-            "recent";
-
-        let typeSelectionne =
-            "tous";
-
-        let statutSelectionne =
-            "tous";
-
-        let periodeSelectionnee =
-            "toutes";
-
-        let anneeSelectionnee =
-            "";
-
-        let moisSelectionne =
-            "";
-
-
-        // =====================================================
-        // RÉFÉRENTIEL DES TYPES
-        // =====================================================
-
-        let typesTravaux = [];
 
         try {
 
-            typesTravaux =
+            const types =
                 await getTypesTravaux();
+
+
+            typesTravauxMap =
+                new Map(
+                    types.map(
+                        type => [
+                            type.id,
+                            type.nom
+                        ]
+                    )
+                );
+
 
         } catch (error) {
 
             console.error(
-                "❌ Erreur récupération types de travaux :",
+                "❌ Erreur chargement types :",
                 error
             );
 
         }
 
 
-        const typesTravauxMap =
-            new Map();
+        // =====================================================
+        // AFFICHAGE
+        // =====================================================
+
+        function afficherHistorique() {
+
+            let resultats =
+                [
+                    ...demandesHistoriques
+                ];
 
 
-        typesTravaux.forEach(
-            type => {
+            // =================================================
+            // RECHERCHE
+            // =================================================
 
-                typesTravauxMap.set(
-                    type.id,
-                    type.nom
-                );
+            const recherche =
+                termeRecherche
+                    .trim()
+                    .toLowerCase();
+
+
+            if (recherche) {
+
+                resultats =
+                    resultats.filter(
+                        demande => {
+
+                            const texte = [
+
+                                demande.prenom,
+
+                                demande.nom,
+
+                                demande.matricule,
+
+                                demande.chambre,
+
+                                demande.localisation,
+
+                                demande.niveau,
+
+                                demande.cote,
+
+                                demande.probleme,
+
+                                demande.description,
+
+                                demande.cause,
+
+                                obtenirNomType(
+                                    demande
+                                ),
+
+                                obtenirStatut(
+                                    demande
+                                )
+
+                            ]
+                                .filter(
+                                    Boolean
+                                )
+                                .join(
+                                    " "
+                                )
+                                .toLowerCase();
+
+
+                            return texte.includes(
+                                recherche
+                            );
+
+                        }
+                    );
 
             }
-        );
 
 
-        // =====================================================
-        // REMPLIR FILTRE TYPE
-        // =====================================================
+            // =================================================
+            // TYPE
+            // =================================================
 
-        if (typeSelect) {
+            if (
+                typeSelectionne !==
+                "tous"
+            ) {
 
-            typeSelect.innerHTML = `
-                <option value="tous">
-                    Tous les types
-                </option>
-            `;
+                resultats =
+                    resultats.filter(
+                        demande =>
+                            demande.type ===
+                            typeSelectionne
+                    );
 
-            typesTravaux.forEach(
-                type => {
+            }
 
-                    typeSelect.innerHTML += `
-                        <option value="${type.id}">
-                            ${type.nom}
-                        </option>
+
+            // =================================================
+            // STATUT
+            // =================================================
+
+            if (
+                statutSelectionne !==
+                "tous"
+            ) {
+
+                resultats =
+                    resultats.filter(
+                        demande =>
+                            demande.statut ===
+                            statutSelectionne
+                    );
+
+            }
+
+
+            // =================================================
+            // PÉRIODE
+            // =================================================
+
+            resultats =
+                resultats.filter(
+                    demande =>
+                        dateDansPeriode(
+                            obtenirDate(
+                                demande
+                            )
+                        )
+                );
+
+
+            // =================================================
+            // TRI
+            // =================================================
+
+            resultats.sort(
+                (a, b) => {
+
+                    const dateA =
+                        obtenirDate(a);
+
+                    const dateB =
+                        obtenirDate(b);
+
+
+                    if (
+                        modeTri ===
+                        "ancien"
+                    ) {
+
+                        return (
+                            dateA -
+                            dateB
+                        );
+
+                    }
+
+
+                    return (
+                        dateB -
+                        dateA
+                    );
+
+                }
+            );
+
+
+            // =================================================
+            // AUCUN
+            // =================================================
+
+            if (
+                resultats.length ===
+                0
+            ) {
+
+                tbody.innerHTML = `
+
+                    <tr class="empty-row">
+
+                        <td colspan="12">
+
+                            ${
+                                recherche ||
+                                typeSelectionne !== "tous" ||
+                                statutSelectionne !== "tous" ||
+                                periodeSelectionnee !== "toutes"
+
+                                    ?
+
+                                "Aucune demande ne correspond aux critères sélectionnés."
+
+                                    :
+
+                                "Aucun historique disponible."
+                            }
+
+                        </td>
+
+                    </tr>
+
+                `;
+
+                return;
+
+            }
+
+
+            tbody.innerHTML =
+                "";
+
+
+            // =================================================
+            // AFFICHAGE
+            // =================================================
+
+            resultats.forEach(
+                demande => {
+
+                    const date =
+                        obtenirDate(
+                            demande
+                        );
+
+
+                    const dateAffichee =
+                        formaterDate(
+                            date
+                        );
+
+
+                    const nomComplet =
+                        `${demande.prenom || ""} ${demande.nom || ""}`
+                            .trim();
+
+
+                    const type =
+                        obtenirNomType(
+                            demande
+                        );
+
+
+                    const statut =
+                        obtenirStatut(
+                            demande
+                        );
+
+
+                    // =================================================
+                    // ÉVALUATION
+                    // =================================================
+
+                    let evaluation =
+                        "-";
+
+
+                    if (
+                        demande.statut ===
+                        "termine"
+                    ) {
+
+                        evaluation =
+                            "En attente";
+
+
+                        if (
+                            demande.evaluation ===
+                            1
+                        ) {
+
+                            evaluation =
+                                "⭐";
+
+                        }
+
+                        else if (
+                            demande.evaluation ===
+                            2
+                        ) {
+
+                            evaluation =
+                                "⭐⭐";
+
+                        }
+
+                        else if (
+                            demande.evaluation ===
+                            3
+                        ) {
+
+                            evaluation =
+                                "⭐⭐⭐";
+
+                        }
+
+                    }
+
+
+                    // =================================================
+                    // COMMENTAIRE
+                    // =================================================
+
+                    let commentaire =
+                        "-";
+
+
+                    if (
+                        demande.commentaire ===
+                        "insatisfait"
+                    ) {
+
+                        commentaire =
+                            "Insatisfait";
+
+                    }
+
+                    else if (
+                        demande.commentaire ===
+                        "satisfait"
+                    ) {
+
+                        commentaire =
+                            "Satisfait";
+
+                    }
+
+                    else if (
+                        demande.commentaire ===
+                        "tres_satisfait"
+                    ) {
+
+                        commentaire =
+                            "Très satisfait";
+
+                    }
+
+                    else if (
+                        demande.commentaire
+                    ) {
+
+                        commentaire =
+                            demande.commentaire;
+
+                    }
+
+
+                    // =================================================
+                    // LIGNE
+                    // =================================================
+
+                    tbody.innerHTML += `
+
+                        <tr>
+
+                            <td>
+                                ${dateAffichee}
+                            </td>
+
+                            <td>
+                                ${nomComplet || "-"}
+                            </td>
+
+                            <td>
+                                ${type}
+                            </td>
+
+                            <td>
+                                ${demande.localisation || "-"}
+                            </td>
+
+                            <td>
+                                ${demande.niveau || "-"}
+                            </td>
+
+                            <td>
+                                ${demande.cote || "-"}
+                            </td>
+
+                            <td>
+                                ${demande.chambre || "-"}
+                            </td>
+
+                            <td>
+                                ${
+                                    demande.description ||
+                                    demande.probleme ||
+                                    "-"
+                                }
+                            </td>
+
+                            <td>
+                                ${statut}
+                            </td>
+
+                            <td>
+                                ${demande.cause || "-"}
+                            </td>
+
+                            <td>
+                                ${evaluation}
+                            </td>
+
+                            <td>
+                                ${commentaire}
+                            </td>
+
+                        </tr>
+
                     `;
 
                 }
@@ -217,1011 +1029,12 @@ requireRole(
 
 
         // =====================================================
-        // DATE FIRESTORE / JAVASCRIPT
-        // =====================================================
-
-        const obtenirDate =
-            demande => {
-
-                if (
-                    demande?.date &&
-                    typeof demande.date.toDate ===
-                    "function"
-                ) {
-
-                    return demande.date.toDate();
-
-                }
-
-
-                if (
-                    demande?.date instanceof Date
-                ) {
-
-                    return demande.date;
-
-                }
-
-
-                if (
-                    demande?.date
-                ) {
-
-                    const date =
-                        new Date(
-                            demande.date
-                        );
-
-                    if (
-                        !Number.isNaN(
-                            date.getTime()
-                        )
-                    ) {
-
-                        return date;
-
-                    }
-
-                }
-
-
-                return new Date(0);
-
-            };
-
-
-        // =====================================================
-        // FORMAT DATE + HEURE
-        // JMA
-        // =====================================================
-
-        const formaterDate =
-            date => {
-
-                if (
-                    !date ||
-                    date.getTime() === 0
-                ) {
-
-                    return "-";
-
-                }
-
-
-                const jour =
-                    String(
-                        date.getDate()
-                    ).padStart(
-                        2,
-                        "0"
-                    );
-
-
-                const mois =
-                    String(
-                        date.getMonth() + 1
-                    ).padStart(
-                        2,
-                        "0"
-                    );
-
-
-                const annee =
-                    date.getFullYear();
-
-
-                const heure =
-                    String(
-                        date.getHours()
-                    ).padStart(
-                        2,
-                        "0"
-                    );
-
-
-                const minute =
-                    String(
-                        date.getMinutes()
-                    ).padStart(
-                        2,
-                        "0"
-                    );
-
-
-                return (
-                    `${jour}/${mois}/${annee}` +
-                    ` à ${heure}:${minute}`
-                );
-
-            };
-
-
-        // =====================================================
-        // NOM DU TYPE
-        // =====================================================
-
-        const obtenirNomType =
-            demande => {
-
-                return (
-                    typesTravauxMap.get(
-                        demande.type
-                    ) ||
-                    demande.type ||
-                    "-"
-                );
-
-            };
-
-
-        // =====================================================
-        // STATUT
-        // =====================================================
-
-        const obtenirStatut =
-            demande => {
-
-                if (
-                    demande.statut ===
-                    "termine"
-                ) {
-
-                    return "Terminée";
-
-                }
-
-
-                if (
-                    demande.statut ===
-                    "forclos"
-                ) {
-
-                    return "Forclos";
-
-                }
-
-
-                if (
-                    demande.statut ===
-                    "non_termine"
-                ) {
-
-                    return "Non terminée";
-
-                }
-
-
-                if (
-                    demande.statut ===
-                    "en_cours"
-                ) {
-
-                    return "En cours";
-
-                }
-
-
-                return "En attente";
-
-            };
-
-
-        // =====================================================
-        // NORMALISER DÉBUT DE JOUR
-        // =====================================================
-
-        const debutJour =
-            date => {
-
-                const resultat =
-                    new Date(date);
-
-                resultat.setHours(
-                    0,
-                    0,
-                    0,
-                    0
-                );
-
-                return resultat;
-
-            };
-
-
-        // =====================================================
-        // NORMALISER FIN DE JOUR
-        // =====================================================
-
-        const finJour =
-            date => {
-
-                const resultat =
-                    new Date(date);
-
-                resultat.setHours(
-                    23,
-                    59,
-                    59,
-                    999
-                );
-
-                return resultat;
-
-            };
-
-
-        // =====================================================
-        // FILTRE PÉRIODE
-        // =====================================================
-
-        const dateDansPeriode =
-            date => {
-
-                if (
-                    periodeSelectionnee ===
-                    "toutes"
-                ) {
-
-                    return true;
-
-                }
-
-
-                const maintenant =
-                    new Date();
-
-
-                // =============================================
-                // AUJOURD'HUI
-                // =============================================
-
-                if (
-                    periodeSelectionnee ===
-                    "aujourd_hui"
-                ) {
-
-                    return (
-                        date >=
-                        debutJour(
-                            maintenant
-                        ) &&
-
-                        date <=
-                        finJour(
-                            maintenant
-                        )
-                    );
-
-                }
-
-
-                // =============================================
-                // HIER
-                // =============================================
-
-                if (
-                    periodeSelectionnee ===
-                    "hier"
-                ) {
-
-                    const hier =
-                        new Date(
-                            maintenant
-                        );
-
-                    hier.setDate(
-                        hier.getDate() - 1
-                    );
-
-                    return (
-                        date >=
-                        debutJour(
-                            hier
-                        ) &&
-
-                        date <=
-                        finJour(
-                            hier
-                        )
-                    );
-
-                }
-
-
-                // =============================================
-                // CETTE SEMAINE
-                // =============================================
-
-                if (
-                    periodeSelectionnee ===
-                    "semaine"
-                ) {
-
-                    const debut =
-                        new Date(
-                            maintenant
-                        );
-
-                    const jour =
-                        debut.getDay();
-
-                    const difference =
-                        jour === 0
-                            ? 6
-                            : jour - 1;
-
-                    debut.setDate(
-                        debut.getDate() -
-                        difference
-                    );
-
-
-                    const fin =
-                        new Date(
-                            debut
-                        );
-
-                    fin.setDate(
-                        fin.getDate() + 6
-                    );
-
-
-                    return (
-                        date >=
-                        debutJour(
-                            debut
-                        ) &&
-
-                        date <=
-                        finJour(
-                            fin
-                        )
-                    );
-
-                }
-
-
-                // =============================================
-                // CE MOIS
-                // =============================================
-
-                if (
-                    periodeSelectionnee ===
-                    "mois"
-                ) {
-
-                    return (
-                        date.getMonth() ===
-                        maintenant.getMonth() &&
-
-                        date.getFullYear() ===
-                        maintenant.getFullYear()
-                    );
-
-                }
-
-
-                // =============================================
-                // MOIS CHOISI
-                // =============================================
-
-                if (
-                    periodeSelectionnee ===
-                    "choisir_mois"
-                ) {
-
-                    if (
-                        anneeSelectionnee === "" ||
-                        moisSelectionne === ""
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    return (
-                        date.getFullYear() ===
-                        Number(
-                            anneeSelectionnee
-                        ) &&
-
-                        date.getMonth() ===
-                        Number(
-                            moisSelectionne
-                        )
-                    );
-
-                }
-
-
-                // =============================================
-                // CETTE ANNÉE
-                // =============================================
-
-                if (
-                    periodeSelectionnee ===
-                    "annee"
-                ) {
-
-                    return (
-                        date.getFullYear() ===
-                        maintenant.getFullYear()
-                    );
-
-                }
-
-
-                // =============================================
-                // ANNÉE CHOISIE
-                // =============================================
-
-                if (
-                    periodeSelectionnee ===
-                    "choisir_annee"
-                ) {
-
-                    if (
-                        anneeSelectionnee === ""
-                    ) {
-
-                        return false;
-
-                    }
-
-
-                    return (
-                        date.getFullYear() ===
-                        Number(
-                            anneeSelectionnee
-                        )
-                    );
-
-                }
-
-
-                return true;
-
-            };
-
-
-        // =====================================================
-        // ANNÉES DISPONIBLES
-        // =====================================================
-
-        const remplirAnnees =
-            () => {
-
-                if (!anneeSelect) {
-                    return;
-                }
-
-
-                const annees =
-                    [
-                        ...new Set(
-                            demandesHistoriques
-                                .map(
-                                    demande =>
-                                        obtenirDate(
-                                            demande
-                                        ).getFullYear()
-                                )
-                                .filter(
-                                    annee =>
-                                        annee > 1970
-                                )
-                        )
-                    ]
-                    .sort(
-                        (a, b) =>
-                            b - a
-                    );
-
-
-                const valeurActuelle =
-                    anneeSelect.value;
-
-
-                anneeSelect.innerHTML = `
-                    <option value="">
-                        Choisir une année
-                    </option>
-                `;
-
-
-                annees.forEach(
-                    annee => {
-
-                        anneeSelect.innerHTML += `
-                            <option value="${annee}">
-                                ${annee}
-                            </option>
-                        `;
-
-                    }
-                );
-
-
-                if (
-                    annees.includes(
-                        Number(
-                            valeurActuelle
-                        )
-                    )
-                ) {
-
-                    anneeSelect.value =
-                        valeurActuelle;
-
-                }
-
-            };
-
-
-        // =====================================================
-        // AFFICHAGE
-        // =====================================================
-
-        const afficherHistorique =
-            () => {
-
-                let resultats =
-                    [
-                        ...demandesHistoriques
-                    ];
-
-
-                // =============================================
-                // RECHERCHE
-                // =============================================
-
-                const recherche =
-                    termeRecherche
-                        .trim()
-                        .toLowerCase();
-
-
-                if (recherche) {
-
-                    resultats =
-                        resultats.filter(
-                            demande => {
-
-                                const nom =
-                                    `${demande.prenom || ""} ${demande.nom || ""}`;
-
-
-                                const type =
-                                    obtenirNomType(
-                                        demande
-                                    );
-
-
-                                const statut =
-                                    obtenirStatut(
-                                        demande
-                                    );
-
-
-                                const contenu = [
-
-                                    nom,
-
-                                    demande.matricule,
-
-                                    demande.localisation,
-
-                                    demande.niveau,
-
-                                    demande.cote,
-
-                                    demande.chambre,
-
-                                    type,
-
-                                    demande.probleme,
-
-                                    demande.description,
-
-                                    statut,
-
-                                    demande.cause,
-
-                                    demande.commentaire
-
-                                ]
-                                    .filter(Boolean)
-                                    .join(" ")
-                                    .toLowerCase();
-
-
-                                return contenu.includes(
-                                    recherche
-                                );
-
-                            }
-                        );
-
-                }
-
-
-                // =============================================
-                // TYPE
-                // =============================================
-
-                if (
-                    typeSelectionne !==
-                    "tous"
-                ) {
-
-                    resultats =
-                        resultats.filter(
-                            demande =>
-                                demande.type ===
-                                typeSelectionne
-                        );
-
-                }
-
-
-                // =============================================
-                // STATUT
-                // =============================================
-
-                if (
-                    statutSelectionne !==
-                    "tous"
-                ) {
-
-                    resultats =
-                        resultats.filter(
-                            demande =>
-                                demande.statut ===
-                                statutSelectionne
-                        );
-
-                }
-
-
-                // =============================================
-                // PÉRIODE
-                // =============================================
-
-                resultats =
-                    resultats.filter(
-                        demande =>
-                            dateDansPeriode(
-                                obtenirDate(
-                                    demande
-                                )
-                            )
-                    );
-
-
-                // =============================================
-                // TRI
-                // =============================================
-
-                resultats.sort(
-                    (a, b) => {
-
-                        const dateA =
-                            obtenirDate(a);
-
-                        const dateB =
-                            obtenirDate(b);
-
-
-                        if (
-                            modeTri ===
-                            "ancien"
-                        ) {
-
-                            return (
-                                dateA -
-                                dateB
-                            );
-
-                        }
-
-
-                        return (
-                            dateB -
-                            dateA
-                        );
-
-                    }
-                );
-
-
-                // =============================================
-                // AUCUN RÉSULTAT
-                // =============================================
-
-                if (
-                    resultats.length === 0
-                ) {
-
-                    tbody.innerHTML = `
-
-                        <tr class="empty-row">
-
-                            <td colspan="12">
-
-                                ${
-                                    recherche ||
-                                    typeSelectionne !== "tous" ||
-                                    statutSelectionne !== "tous" ||
-                                    periodeSelectionnee !== "toutes"
-
-                                        ?
-
-                                    "Aucune demande ne correspond aux critères sélectionnés."
-
-                                        :
-
-                                    "Aucun historique disponible."
-                                }
-
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                    return;
-
-                }
-
-
-                // =============================================
-                // AFFICHAGE
-                // =============================================
-
-                tbody.innerHTML = "";
-
-
-                resultats.forEach(
-                    demande => {
-
-                        const date =
-                            obtenirDate(
-                                demande
-                            );
-
-
-                        const dateAffichee =
-                            formaterDate(
-                                date
-                            );
-
-
-                        const nomComplet =
-                            `${demande.prenom || ""} ${demande.nom || ""}`
-                                .trim();
-
-
-                        const type =
-                            obtenirNomType(
-                                demande
-                            );
-
-
-                        const statut =
-                            obtenirStatut(
-                                demande
-                            );
-
-
-                        // =====================================
-                        // ÉVALUATION
-                        // =====================================
-
-                        let evaluation =
-                            "-";
-
-
-                        if (
-                            demande.statut ===
-                            "termine"
-                        ) {
-
-                            evaluation =
-                                "En attente";
-
-
-                            if (
-                                demande.evaluation ===
-                                1
-                            ) {
-
-                                evaluation =
-                                    "⭐";
-
-                            }
-
-                            else if (
-                                demande.evaluation ===
-                                2
-                            ) {
-
-                                evaluation =
-                                    "⭐⭐";
-
-                            }
-
-                            else if (
-                                demande.evaluation ===
-                                3
-                            ) {
-
-                                evaluation =
-                                    "⭐⭐⭐";
-
-                            }
-
-                        }
-
-
-                        // =====================================
-                        // COMMENTAIRE
-                        // =====================================
-
-                        let commentaire =
-                            "-";
-
-
-                        if (
-                            demande.commentaire ===
-                            "insatisfait"
-                        ) {
-
-                            commentaire =
-                                "Insatisfait";
-
-                        }
-
-                        else if (
-                            demande.commentaire ===
-                            "satisfait"
-                        ) {
-
-                            commentaire =
-                                "Satisfait";
-
-                        }
-
-                        else if (
-                            demande.commentaire ===
-                            "tres_satisfait"
-                        ) {
-
-                            commentaire =
-                                "Très satisfait";
-
-                        }
-
-                        else if (
-                            demande.commentaire
-                        ) {
-
-                            commentaire =
-                                demande.commentaire;
-
-                        }
-
-
-                        // =====================================
-                        // LIGNE
-                        // =====================================
-
-                        tbody.innerHTML += `
-
-                            <tr>
-
-                                <!-- 1 — DATE ET HEURE -->
-
-                                <td>
-                                    ${dateAffichee}
-                                </td>
-
-
-                                <!-- 2 — NOM -->
-
-                                <td>
-                                    ${nomComplet || "-"}
-                                </td>
-
-
-                                <!-- 3 — TYPE -->
-
-                                <td>
-                                    ${type}
-                                </td>
-
-
-                                <!-- 4 — LOCALISATION -->
-
-                                <td>
-                                    ${demande.localisation || "-"}
-                                </td>
-
-
-                                <!-- 5 — NIVEAU -->
-
-                                <td>
-                                    ${demande.niveau || "-"}
-                                </td>
-
-
-                                <!-- 6 — CÔTÉ -->
-
-                                <td>
-                                    ${demande.cote || "-"}
-                                </td>
-
-
-                                <!-- 7 — CHAMBRE -->
-
-                                <td>
-                                    ${demande.chambre || "-"}
-                                </td>
-
-
-                                <!-- 8 — DESCRIPTION -->
-
-                                <td>
-                                    ${
-                                        demande.description ||
-                                        demande.probleme ||
-                                        "-"
-                                    }
-                                </td>
-
-
-                                <!-- 9 — STATUT -->
-
-                                <td>
-                                    ${statut}
-                                </td>
-
-
-                                <!-- 10 — CAUSE -->
-
-                                <td>
-                                    ${demande.cause || "-"}
-                                </td>
-
-
-                                <!-- 11 — ÉVALUATION -->
-
-                                <td>
-                                    ${evaluation}
-                                </td>
-
-
-                                <!-- 12 — COMMENTAIRE -->
-
-                                <td>
-                                    ${commentaire}
-                                </td>
-
-                            </tr>
-
-                        `;
-
-                    }
-                );
-
-            };
-
-
-        // =====================================================
         // RECHERCHE
         // =====================================================
 
-        if (searchInput) {
+        if (
+            searchInput
+        ) {
 
             searchInput.addEventListener(
                 "input",
@@ -1242,7 +1055,9 @@ requireRole(
         // TRI
         // =====================================================
 
-        if (sortSelect) {
+        if (
+            sortSelect
+        ) {
 
             sortSelect.addEventListener(
                 "change",
@@ -1263,7 +1078,9 @@ requireRole(
         // TYPE
         // =====================================================
 
-        if (typeSelect) {
+        if (
+            typeSelect
+        ) {
 
             typeSelect.addEventListener(
                 "change",
@@ -1284,7 +1101,9 @@ requireRole(
         // STATUT
         // =====================================================
 
-        if (statutSelect) {
+        if (
+            statutSelect
+        ) {
 
             statutSelect.addEventListener(
                 "change",
@@ -1305,7 +1124,9 @@ requireRole(
         // PÉRIODE
         // =====================================================
 
-        if (periodeSelect) {
+        if (
+            periodeSelect
+        ) {
 
             periodeSelect.addEventListener(
                 "change",
@@ -1315,11 +1136,9 @@ requireRole(
                         periodeSelect.value;
 
 
-                    // =========================================
-                    // MOIS
-                    // =========================================
-
-                    if (moisContainer) {
+                    if (
+                        moisContainer
+                    ) {
 
                         moisContainer.hidden =
                             periodeSelectionnee !==
@@ -1328,18 +1147,15 @@ requireRole(
                     }
 
 
-                    // =========================================
-                    // ANNÉE
-                    // =========================================
-
-                    if (anneeContainer) {
+                    if (
+                        anneeContainer
+                    ) {
 
                         anneeContainer.hidden =
                             periodeSelectionnee !==
-                            "choisir_mois" &&
-
+                                "choisir_mois" &&
                             periodeSelectionnee !==
-                            "choisir_annee";
+                                "choisir_annee";
 
                     }
 
@@ -1356,7 +1172,9 @@ requireRole(
         // ANNÉE
         // =====================================================
 
-        if (anneeSelect) {
+        if (
+            anneeSelect
+        ) {
 
             anneeSelect.addEventListener(
                 "change",
@@ -1377,7 +1195,9 @@ requireRole(
         // MOIS
         // =====================================================
 
-        if (moisSelect) {
+        if (
+            moisSelect
+        ) {
 
             moisSelect.addEventListener(
                 "change",
@@ -1401,14 +1221,6 @@ requireRole(
         const siteAgent =
             profile.site;
 
-
-        /*
-         * Le pavillon sert uniquement à filtrer
-         * les demandes appartenant à l'affectation
-         * de l'agent.
-         *
-         * Il n'est PAS affiché comme colonne.
-         */
 
         const pavillonAgent =
             profile.affectation
@@ -1455,6 +1267,7 @@ requireRole(
             document.body.classList.add(
                 "loaded"
             );
+
 
             return;
 
@@ -1516,9 +1329,27 @@ requireRole(
                                 documentSnapshot.data();
 
 
-                            // =================================
+                            // =================================================
                             // HISTORIQUE UNIQUEMENT
-                            // =================================
+                            // =================================================
+                            //
+                            // Une demande terminée / non terminée / forclose
+                            // reste sur la page des demandes pendant sa durée.
+                            //
+                            // Elle n'entre dans l'historique que lorsque
+                            // archive === true.
+                            //
+                            // =================================================
+
+                            if (
+                                demande.archive !==
+                                true
+                            ) {
+
+                                return;
+
+                            }
+
 
                             if (
                                 demande.statut !==
@@ -1555,23 +1386,11 @@ requireRole(
                     );
 
 
-                    // =============================================
-                    // ANNÉES
-                    // =============================================
-
                     remplirAnnees();
 
 
-                    // =============================================
-                    // AFFICHAGE
-                    // =============================================
-
                     afficherHistorique();
 
-
-                    // =============================================
-                    // LOADER
-                    // =============================================
 
                     document.body.classList.add(
                         "loaded"
@@ -1614,7 +1433,7 @@ requireRole(
 
 
         // =====================================================
-        // NETTOYAGE LISTENER
+        // NETTOYAGE
         // =====================================================
 
         window.addEventListener(

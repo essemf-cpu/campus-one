@@ -1,3 +1,7 @@
+// =====================================================
+// services/bonsService.js
+// =====================================================
+
 import {
     collection,
     addDoc,
@@ -57,79 +61,29 @@ export async function createBon({
         !agentMatricule ||
         !anneeAcademique
     ) {
-        throw new Error(
-            "DONNEES_BON_INCOMPLETES"
-        );
+        throw new Error("DONNEES_BON_INCOMPLETES");
     }
 
-
-    // =================================================
-    // CONTRÔLE DE LA DATE DU BON
-    // =================================================
-    //
-    // Seules deux dates sont autorisées :
-    //
-    // aujourd'hui  → OK
-    // demain       → OK
-    //
-    // hier         → INTERDIT
-    // après-demain → INTERDIT
-    //
-    // =================================================
-
-    const dateBon =
-        obtenirDateDuBon({
-            date
-        });
+    const dateBon = obtenirDateDuBon({ date });
 
     if (!dateBon) {
-
-        throw new Error(
-            "DATE_BON_INVALIDE"
-        );
+        throw new Error("DATE_BON_INVALIDE");
     }
 
+    const maintenant = new Date();
 
-    const maintenant =
-        new Date();
+    const aujourdHui = new Date(maintenant);
+    aujourdHui.setHours(0, 0, 0, 0);
 
-    const aujourdHui =
-        new Date(
-            maintenant
-        );
-
-    aujourdHui.setHours(
-        0,
-        0,
-        0,
-        0
-    );
-
-
-    const demain =
-        new Date(
-            aujourdHui
-        );
-
-    demain.setDate(
-        demain.getDate() + 1
-    );
-
+    const demain = new Date(aujourdHui);
+    demain.setDate(demain.getDate() + 1);
 
     if (
         dateBon.getTime() !== aujourdHui.getTime() &&
         dateBon.getTime() !== demain.getTime()
     ) {
-
-        throw new Error(
-            "DATE_BON_NON_AUTORISEE"
-        );
+        throw new Error("DATE_BON_NON_AUTORISEE");
     }
-
-
-    // =================================================
-    // DONNÉES DU BON
-    // =================================================
 
     const bon = {
 
@@ -143,22 +97,11 @@ export async function createBon({
         localisation,
         niveau,
         cote,
-
         chambre,
 
-        // =================================================
-        // STATUT INITIAL
-        // =================================================
+        statut: STATUTS_BON.ENVOYE,
 
-        statut:
-            STATUTS_BON.ENVOYE,
-
-        cause:
-            "",
-
-        // =================================================
-        // TRAÇABILITÉ
-        // =================================================
+        cause: "",
 
         par:
             agentNom ||
@@ -166,85 +109,37 @@ export async function createBon({
 
         agentMatricule,
 
-        // =================================================
-        // LIEN DEMANDE ÉTUDIANT
-        // =================================================
-
         demandeId:
             demandeId || null,
 
-        // =================================================
-        // SUPPRESSION LOGIQUE
-        // =================================================
+        supprime: false,
 
-        supprime:
-            false,
+        archive: false,
 
-        // =================================================
-        // ARCHIVAGE
-        // =================================================
-
-        archive:
-            false,
-
-        archivedAt:
-            null,
-
-        // =================================================
-        // DATE DE CRÉATION
-        // =================================================
+        archivedAt: null,
 
         createdAt:
             serverTimestamp(),
 
-        // =================================================
-        // DATES DE TRAITEMENT ATELIER
-        // =================================================
+        atelierReceptionAt: null,
 
-        atelierReceptionAt:
-            null,
+        atelierPriseEnChargeAt: null,
 
-        atelierPriseEnChargeAt:
-            null,
+        atelierTermineAt: null,
 
-        atelierTermineAt:
-            null,
+        atelierNonTermineAt: null,
 
-        atelierNonTermineAt:
-            null,
+        rappelEnvoye: false,
 
-        // =================================================
-        // RAPPEL / NÉGLIGÉ
-        // =================================================
+        rappelAt: null,
 
-        rappelEnvoye:
-            false,
-
-        rappelAt:
-            null,
-
-        negligeAt:
-            null
+        negligeAt: null
     };
 
-
-    // =====================================================
-    // ENREGISTREMENT FIRESTORE
-    // =====================================================
-
-    const reference =
-        await addDoc(
-            collection(
-                db,
-                "bons"
-            ),
-            bon
-        );
-
-
-    // =====================================================
-    // NOTIFICATION : NOUVEAU BON
-    // =====================================================
+    const reference = await addDoc(
+        collection(db, "bons"),
+        bon
+    );
 
     await createNotificationAtelier({
 
@@ -252,32 +147,25 @@ export async function createBon({
 
         anneeAcademique,
 
-        type:
-            "nouveau_bon",
+        type: "nouveau_bon",
 
-        titre:
-            "Nouveau bon reçu",
+        titre: "Nouveau bon reçu",
 
         message:
             `Un nouveau bon de travail a été reçu pour le pavillon ${pavillon}.`,
 
-        bonId:
-            reference.id
+        bonId: reference.id
     });
 
-
     return {
-
-        id:
-            reference.id,
-
+        id: reference.id,
         ...bon
     };
 }
 
 
 // =====================================================
-// CRÉER UNE NOTIFICATION ATELIER
+// NOTIFICATION ATELIER
 // =====================================================
 
 export async function createNotificationAtelier({
@@ -304,40 +192,28 @@ export async function createNotificationAtelier({
     const notification = {
 
         site,
-
         anneeAcademique,
-
         type,
-
         titre,
-
         message,
-
         bonId,
 
-        lu:
-            false,
+        lu: false,
 
         createdAt:
             serverTimestamp()
     };
 
-
-    const reference =
-        await addDoc(
-            collection(
-                db,
-                "notificationsAtelier"
-            ),
-            notification
-        );
-
+    const reference = await addDoc(
+        collection(
+            db,
+            "notificationsAtelier"
+        ),
+        notification
+    );
 
     return {
-
-        id:
-            reference.id,
-
+        id: reference.id,
         ...notification
     };
 }
@@ -355,104 +231,59 @@ export async function getBons({
 
     const contraintes = [];
 
-
     if (site) {
-
         contraintes.push(
-            where(
-                "site",
-                "==",
-                site
-            )
+            where("site", "==", site)
         );
     }
 
-
     if (pavillon) {
-
         contraintes.push(
-            where(
-                "pavillon",
-                "==",
-                pavillon
-            )
+            where("pavillon", "==", pavillon)
         );
     }
 
     if (anneeAcademique) {
-
-    contraintes.push(
-        where(
-            "anneeAcademique",
-            "==",
-            anneeAcademique
-        )
-    );
-}
-
-
-    let requete;
-
-
-    if (
-        contraintes.length > 0
-    ) {
-
-        requete =
-            query(
-                collection(
-                    db,
-                    "bons"
-                ),
-                ...contraintes
-            );
-
-    } else {
-
-        requete =
-            query(
-                collection(
-                    db,
-                    "bons"
-                )
-            );
+        contraintes.push(
+            where(
+                "anneeAcademique",
+                "==",
+                anneeAcademique
+            )
+        );
     }
 
+    const requete =
+        contraintes.length > 0
+            ? query(
+                collection(db, "bons"),
+                ...contraintes
+            )
+            : query(
+                collection(db, "bons")
+            );
 
     const snapshot =
-        await getDocs(
-            requete
-        );
+        await getDocs(requete);
 
-
-    let bons =
+    const bons =
         snapshot.docs
-            .map(
-                document => ({
-
-                    id:
-                        document.id,
-
-                    ...document.data()
-                })
-            )
+            .map(document => ({
+                id: document.id,
+                ...document.data()
+            }))
             .filter(
                 bon =>
                     bon.supprime !== true
             );
 
-
     bons.sort(
         (a, b) =>
-            String(
-                b.date || ""
-            ).localeCompare(
-                String(
-                    a.date || ""
+            String(b.date || "")
+                .localeCompare(
+                    String(a.date || "")
                 )
-            )
     );
-
 
     return bons;
 }
@@ -462,52 +293,31 @@ export async function getBons({
 // RÉCUPÉRER UN BON
 // =====================================================
 
-export async function getBon(
-    bonId
-) {
+export async function getBon(bonId) {
 
     if (!bonId) {
-
-        throw new Error(
-            "BON_ID_MANQUANT"
-        );
+        throw new Error("BON_ID_MANQUANT");
     }
-
 
     const reference =
-        doc(
-            db,
-            "bons",
-            bonId
-        );
-
+        doc(db, "bons", bonId);
 
     const snapshot =
-        await getDoc(
-            reference
-        );
-
+        await getDoc(reference);
 
     if (!snapshot.exists()) {
-
-        throw new Error(
-            "BON_NOT_FOUND"
-        );
+        throw new Error("BON_NOT_FOUND");
     }
 
-
     return {
-
-        id:
-            snapshot.id,
-
+        id: snapshot.id,
         ...snapshot.data()
     };
 }
 
 
 // =====================================================
-// MODIFIER LE STATUT D'UN BON
+// MODIFIER LE STATUT
 // =====================================================
 
 export async function updateBonStatut(
@@ -518,64 +328,27 @@ export async function updateBonStatut(
 ) {
 
     if (!bonId) {
-
-        throw new Error(
-            "BON_ID_MANQUANT"
-        );
+        throw new Error("BON_ID_MANQUANT");
     }
-
 
     const reference =
-        doc(
-            db,
-            "bons",
-            bonId
-        );
-
+        doc(db, "bons", bonId);
 
     const snapshot =
-        await getDoc(
-            reference
-        );
-
+        await getDoc(reference);
 
     if (!snapshot.exists()) {
-
-        throw new Error(
-            "BON_NOT_FOUND"
-        );
+        throw new Error("BON_NOT_FOUND");
     }
 
-
-    const bon =
-        snapshot.data();
-
-
-    // =================================================
-    // VÉRIFICATION DU STATUT
-    // =================================================
+    const bon = snapshot.data();
 
     const statutsAutorises =
-        Object.values(
-            STATUTS_BON
-        );
+        Object.values(STATUTS_BON);
 
-
-    if (
-        !statutsAutorises.includes(
-            statut
-        )
-    ) {
-
-        throw new Error(
-            "STATUT_BON_INVALIDE"
-        );
+    if (!statutsAutorises.includes(statut)) {
+        throw new Error("STATUT_BON_INVALIDE");
     }
-
-
-    // =================================================
-    // DONNÉES COMMUNES
-    // =================================================
 
     const modification = {
 
@@ -594,7 +367,7 @@ export async function updateBonStatut(
 
 
     // =================================================
-    // RÉCEPTION
+    // REÇU
     // =================================================
 
     if (
@@ -614,7 +387,7 @@ export async function updateBonStatut(
 
 
     // =================================================
-    // PRISE EN CHARGE
+    // EN COURS
     // =================================================
 
     if (
@@ -635,6 +408,10 @@ export async function updateBonStatut(
 
     // =================================================
     // TERMINÉ
+    //
+    // IMPORTANT :
+    // PAS D'ARCHIVAGE ICI.
+    // Le bon reste visible 24 h.
     // =================================================
 
     if (
@@ -650,34 +427,16 @@ export async function updateBonStatut(
             modification
         );
 
-
-        await createNotificationAtelier({
-
-            site:
-                bon.site,
-
-             anneeAcademique:
-                bon.anneeAcademique,
-
-            type:
-                "bon_termine",
-
-            titre:
-                "Bon terminé",
-
-            message:
-                `Vous avez terminé le travail du bon de type ${bon.type} du pavillon ${bon.pavillon}.`,
-
-            bonId
-        });
-
-
         return;
     }
 
 
     // =================================================
     // NON TERMINÉ
+    //
+    // IMPORTANT :
+    // PAS D'ARCHIVAGE ICI.
+    // Le bon reste visible 24 h.
     // =================================================
 
     if (
@@ -686,43 +445,18 @@ export async function updateBonStatut(
     ) {
 
         if (!cause) {
-
             throw new Error(
                 "CAUSE_NON_TERMINE_MANQUANTE"
             );
         }
 
-
         modification.atelierNonTermineAt =
             serverTimestamp();
-
 
         await updateDoc(
             reference,
             modification
         );
-
-
-        await createNotificationAtelier({
-
-            site:
-                bon.site,
-
-             anneeAcademique:
-                bon.anneeAcademique,
-
-            type:
-                "bon_non_termine",
-
-            titre:
-                "Bon non terminé",
-
-            message:
-                `Vous avez indiqué que le travail du bon de type ${bon.type} du pavillon ${bon.pavillon} n'est pas terminé. Cause : ${cause}.`,
-
-            bonId
-        });
-
 
         return;
     }
@@ -749,52 +483,29 @@ export async function archiverBon(
 ) {
 
     if (!bonId) {
-
-        throw new Error(
-            "BON_ID_MANQUANT"
-        );
+        throw new Error("BON_ID_MANQUANT");
     }
-
 
     const reference =
-        doc(
-            db,
-            "bons",
-            bonId
-        );
-
+        doc(db, "bons", bonId);
 
     const snapshot =
-        await getDoc(
-            reference
-        );
-
+        await getDoc(reference);
 
     if (!snapshot.exists()) {
-
-        throw new Error(
-            "BON_NOT_FOUND"
-        );
+        throw new Error("BON_NOT_FOUND");
     }
 
-
-    const bon =
-        snapshot.data();
-
+    const bon = snapshot.data();
 
     const modification = {
 
-        archive:
-            true,
+        archive: true,
 
         archivedAt:
             serverTimestamp()
     };
 
-
-    // =================================================
-    // CAS NÉGLIGÉ
-    // =================================================
 
     if (
         cause ===
@@ -810,26 +521,21 @@ export async function archiverBon(
         modification.negligeAt =
             serverTimestamp();
 
-
         await updateDoc(
             reference,
             modification
         );
 
-
         await createNotificationAtelier({
 
-            site:
-                bon.site,
+            site: bon.site,
 
-             anneeAcademique:
+            anneeAcademique:
                 bon.anneeAcademique,
 
-            type:
-                "bon_neglige",
+            type: "bon_neglige",
 
-            titre:
-                "Bon négligé",
+            titre: "Bon négligé",
 
             message:
                 `Le bon de type ${bon.type} du pavillon ${bon.pavillon} n'a pas été finalisé dans le délai prévu. Il a été classé comme négligé.`,
@@ -837,14 +543,8 @@ export async function archiverBon(
             bonId
         });
 
-
         return;
     }
-
-
-    // =================================================
-    // ARCHIVAGE NORMAL
-    // =================================================
 
     await updateDoc(
         reference,
@@ -857,73 +557,44 @@ export async function archiverBon(
 // SUPPRESSION LOGIQUE
 // =====================================================
 
-export async function deleteBon(
-    bonId
-) {
+export async function deleteBon(bonId) {
 
     if (!bonId) {
-
-        throw new Error(
-            "BON_ID_MANQUANT"
-        );
+        throw new Error("BON_ID_MANQUANT");
     }
-
 
     const reference =
-        doc(
-            db,
-            "bons",
-            bonId
-        );
-
+        doc(db, "bons", bonId);
 
     const snapshot =
-        await getDoc(
-            reference
-        );
-
+        await getDoc(reference);
 
     if (!snapshot.exists()) {
-
-        throw new Error(
-            "BON_NOT_FOUND"
-        );
+        throw new Error("BON_NOT_FOUND");
     }
 
-
-    const bon =
-        snapshot.data();
-
-
-    // =================================================
-    // SEUL UN BON ENVOYÉ PEUT ÊTRE SUPPRIMÉ
-    // =================================================
+    const bon = snapshot.data();
 
     if (
         bon.statut !==
         STATUTS_BON.ENVOYE
     ) {
-
         throw new Error(
             "BON_NON_SUPPRIMABLE"
         );
     }
 
-
     await updateDoc(
-
         reference,
-
         {
-            supprime:
-                true
+            supprime: true
         }
     );
 }
 
 
 // =====================================================
-// RAPPEL D'UN BON EN ATTENTE
+// RAPPEL
 // =====================================================
 
 export async function envoyerRappelBon(
@@ -931,42 +602,23 @@ export async function envoyerRappelBon(
 ) {
 
     if (!bonId) {
-
-        throw new Error(
-            "BON_ID_MANQUANT"
-        );
+        throw new Error("BON_ID_MANQUANT");
     }
-
 
     const reference =
-        doc(
-            db,
-            "bons",
-            bonId
-        );
-
+        doc(db, "bons", bonId);
 
     const snapshot =
-        await getDoc(
-            reference
-        );
-
+        await getDoc(reference);
 
     if (!snapshot.exists()) {
-
-        throw new Error(
-            "BON_NOT_FOUND"
-        );
+        throw new Error("BON_NOT_FOUND");
     }
 
-
-    const bon =
-        snapshot.data();
-
-
-    // =================================================
-    // FINALISÉ / ARCHIVÉ / SUPPRIMÉ
-    // =================================================
+    const bon = {
+        id: snapshot.id,
+        ...snapshot.data()
+    };
 
     if (
         bon.statut ===
@@ -976,33 +628,23 @@ export async function envoyerRappelBon(
         bon.archive === true ||
         bon.supprime === true
     ) {
-
-        return;
+        return false;
     }
-
-
-    // =================================================
-    // ÉVITER LES DOUBLES RAPPELS
-    // =================================================
 
     if (
         bon.rappelEnvoye === true
     ) {
-
-        return;
+        return false;
     }
-
 
     await createNotificationAtelier({
 
-        site:
-            bon.site,
+        site: bon.site,
 
-         anneeAcademique:
+        anneeAcademique:
             bon.anneeAcademique,
 
-        type:
-            "rappel_bon",
+        type: "rappel_bon",
 
         titre:
             "Bon en attente de finalisation",
@@ -1013,24 +655,22 @@ export async function envoyerRappelBon(
         bonId
     });
 
-
     await updateDoc(
-
         reference,
-
         {
-            rappelEnvoye:
-                true,
+            rappelEnvoye: true,
 
             rappelAt:
                 serverTimestamp()
         }
     );
+
+    return true;
 }
 
 
 // =====================================================
-// MARQUER UN BON COMME NÉGLIGÉ
+// MARQUER NÉGLIGÉ
 // =====================================================
 
 export async function marquerBonNeglige(
@@ -1038,22 +678,11 @@ export async function marquerBonNeglige(
 ) {
 
     if (!bonId) {
-
-        throw new Error(
-            "BON_ID_MANQUANT"
-        );
+        throw new Error("BON_ID_MANQUANT");
     }
 
-
     const bon =
-        await getBon(
-            bonId
-        );
-
-
-    // =================================================
-    // SI DÉJÀ FINALISÉ
-    // =================================================
+        await getBon(bonId);
 
     if (
         bon.statut ===
@@ -1063,41 +692,18 @@ export async function marquerBonNeglige(
         bon.archive === true ||
         bon.supprime === true
     ) {
-
         return;
     }
 
-
     await archiverBon(
-
         bonId,
-
         CAUSE_NEGLIGE
     );
 }
 
 
 // =====================================================
-// CONTRÔLE QUOTIDIEN DES BONS
-// =====================================================
-//
-// RÈGLE MÉTIER
-//
-// J = date du bon
-//
-// J + 0
-// → le bon reste actif
-//
-// J + 1
-// → si terminé / non terminé : archivage immédiat
-// → si encore en cours : rappel
-//
-// J + 2
-// → si toujours actif :
-//      statut = non_termine
-//      cause = Négligé
-//      archivage automatique
-//
+// CONTRÔLE AUTOMATIQUE DES BONS
 // =====================================================
 
 export async function controlerDelaisBons({
@@ -1106,9 +712,7 @@ export async function controlerDelaisBons({
 
     const contraintes = [];
 
-
     if (site) {
-
         contraintes.push(
             where(
                 "site",
@@ -1118,68 +722,26 @@ export async function controlerDelaisBons({
         );
     }
 
-
-    let requete;
-
-
-    if (
+    const requete =
         contraintes.length > 0
-    ) {
-
-        requete =
-            query(
-                collection(
-                    db,
-                    "bons"
-                ),
+            ? query(
+                collection(db, "bons"),
                 ...contraintes
+            )
+            : query(
+                collection(db, "bons")
             );
-
-    } else {
-
-        requete =
-            query(
-                collection(
-                    db,
-                    "bons"
-                )
-            );
-    }
-
 
     const snapshot =
-        await getDocs(
-            requete
-        );
-
+        await getDocs(requete);
 
     const maintenant =
         new Date();
 
-
-    const debutJour =
-        new Date(
-            maintenant
-        );
-
-    debutJour.setHours(
-        0,
-        0,
-        0,
-        0
-    );
-
-
     const resultats = {
-
-        rappels:
-            0,
-
-        archives:
-            0,
-
-        negliges:
-            0
+        rappels: 0,
+        archives: 0,
+        negliges: 0
     };
 
 
@@ -1197,14 +759,68 @@ export async function controlerDelaisBons({
         };
 
 
-        // =================================================
-        // IGNORER SUPPRIMÉS / DÉJÀ ARCHIVÉS
-        // =================================================
-
         if (
             bon.archive === true ||
             bon.supprime === true
         ) {
+            continue;
+        }
+
+
+        // =================================================
+        // TERMINÉ / NON TERMINÉ
+        // → 24 H APRÈS LE CHANGEMENT DE STATUT
+        // =================================================
+
+        if (
+            bon.statut ===
+                STATUTS_BON.TERMINE ||
+            bon.statut ===
+                STATUTS_BON.NON_TERMINE
+        ) {
+
+            const dateFinalisation =
+                bon.statut ===
+                STATUTS_BON.TERMINE
+                    ? bon.atelierTermineAt
+                    : bon.atelierNonTermineAt;
+
+            if (!dateFinalisation) {
+                continue;
+            }
+
+            const dateFinalisationJS =
+                convertirEnDate(
+                    dateFinalisation
+                );
+
+            if (!dateFinalisationJS) {
+                continue;
+            }
+
+            const age =
+                maintenant.getTime() -
+                dateFinalisationJS.getTime();
+
+            if (
+                age >=
+                24 * 60 * 60 * 1000
+            ) {
+
+                await db
+                    .collection("bons")
+                    .doc(bon.id)
+                    .update({
+
+                        archive: true,
+
+                        archivedAt:
+                            FieldValue.serverTimestamp()
+
+                    });
+
+                resultats.archives++;
+            }
 
             continue;
         }
@@ -1215,24 +831,22 @@ export async function controlerDelaisBons({
         // =================================================
 
         const dateBon =
-            obtenirDateDuBon(
-                bon
-            );
-
+            obtenirDateDuBon(bon);
 
         if (!dateBon) {
-
             continue;
         }
 
-
         dateBon.setHours(
-            0,
-            0,
-            0,
-            0
+            0, 0, 0, 0
         );
 
+        const debutJour =
+            new Date(maintenant);
+
+        debutJour.setHours(
+            0, 0, 0, 0
+        );
 
         const differenceJours =
             Math.floor(
@@ -1249,36 +863,28 @@ export async function controlerDelaisBons({
             );
 
 
+        if (
+            differenceJours <= 0
+        ) {
+            continue;
+        }
+
+
         // =================================================
-        // BON FINALISÉ
-        // =================================================
-        //
-        // Exemple :
-        // Bon du lundi terminé mardi.
-        //
-        // Mardi :
-        // différence = 1
-        //
-        // → archivage immédiat.
-        //
+        // J + 1
         // =================================================
 
         if (
-            bon.statut ===
-                STATUTS_BON.TERMINE ||
-            bon.statut ===
-                STATUTS_BON.NON_TERMINE
+            differenceJours === 1
         ) {
 
-            if (
-                differenceJours >= 1
-            ) {
-
-                await archiverBon(
+            const rappel =
+                await envoyerRappelBon(
                     bon.id
                 );
 
-                resultats.archives++;
+            if (rappel) {
+                resultats.rappels++;
             }
 
             continue;
@@ -1286,87 +892,83 @@ export async function controlerDelaisBons({
 
 
         // =================================================
-        // JOUR DU BON
-        // =================================================
-
-        if (
-            differenceJours <= 0
-        ) {
-
-            continue;
-        }
-
-
-        // =================================================
-        // PREMIER JOUR APRÈS LE BON
-        // → RAPPEL
-        // =================================================
-
-        if (
-            differenceJours === 1
-        ) {
-
-            await envoyerRappelBon(
-                bon.id
-            );
-
-            resultats.rappels++;
-
-            continue;
-        }
-
-
-        // =================================================
-        // DEUXIÈME JOUR APRÈS LE BON
-        // → NÉGLIGÉ
+        // J + 2
         // =================================================
 
         if (
             differenceJours >= 2
         ) {
 
-            await marquerBonNeglige(
-                bon.id
-            );
+            const neglige =
+                await marquerBonNeglige(
+                    bon.id
+                );
 
-            resultats.negliges++;
+            if (neglige) {
+                resultats.negliges++;
+            }
         }
     }
-
 
     return resultats;
 }
 
 
 // =====================================================
-// OBTENIR LA DATE DU BON
-// =====================================================
-//
-// La fonction accepte :
-//
-// obtenirDateDuBon(bon)
-//
-// ou
-//
-// obtenirDateDuBon({ date })
-//
+// CONVERTIR DATE
 // =====================================================
 
-function obtenirDateDuBon(
-    bon
-) {
+function convertirEnDate(value) {
 
-    if (
-        !bon?.date
-    ) {
-
+    if (!value) {
         return null;
     }
 
+    if (
+        typeof value.toDate ===
+        "function"
+    ) {
 
-    // =================================================
-    // DATE YYYY-MM-DD
-    // =================================================
+        const date =
+            value.toDate();
+
+        return Number.isNaN(
+            date.getTime()
+        )
+            ? null
+            : date;
+    }
+
+    if (
+        value instanceof Date
+    ) {
+        return Number.isNaN(
+            value.getTime()
+        )
+            ? null
+            : value;
+    }
+
+    const date =
+        new Date(value);
+
+    return Number.isNaN(
+        date.getTime()
+    )
+        ? null
+        : date;
+}
+
+
+// =====================================================
+// OBTENIR DATE DU BON
+// =====================================================
+
+function obtenirDateDuBon(bon) {
+
+    if (!bon?.date) {
+        return null;
+    }
 
     if (
         typeof bon.date ===
@@ -1378,90 +980,26 @@ function obtenirDateDuBon(
                 /^(\d{4})-(\d{2})-(\d{2})$/
             );
 
-
-        if (
-            correspondance
-        ) {
+        if (correspondance) {
 
             const date =
                 new Date(
-                    Number(
-                        correspondance[1]
-                    ),
-                    Number(
-                        correspondance[2]
-                    ) - 1,
-                    Number(
-                        correspondance[3]
-                    )
+                    Number(correspondance[1]),
+                    Number(correspondance[2]) - 1,
+                    Number(correspondance[3])
                 );
-
 
             if (
                 !Number.isNaN(
                     date.getTime()
                 )
             ) {
-
                 return date;
             }
         }
     }
 
-
-    // =================================================
-    // FIREBASE TIMESTAMP / AUTRE DATE
-    // =================================================
-
-    if (
-        typeof bon.date.toDate ===
-        "function"
-    ) {
-
-        const date =
-            bon.date.toDate();
-
-
-        if (
-            !Number.isNaN(
-                date.getTime()
-            )
-        ) {
-
-            date.setHours(
-                0,
-                0,
-                0,
-                0
-            );
-
-            return date;
-        }
-    }
-
-
-    const date =
-        new Date(
-            bon.date
-        );
-
-
-    if (
-        !Number.isNaN(
-            date.getTime()
-        )
-    ) {
-
-        date.setHours(
-            0,
-            0,
-            0,
-            0
-        );
-
-        return date;
-    }
-
-
-    return null;
+    return convertirEnDate(
+        bon.date
+    );
 }

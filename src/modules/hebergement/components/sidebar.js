@@ -167,6 +167,14 @@ export async function loadSidebar(profile) {
 <h4>GESTION</h4>
 
 <a
+    id="menu-notifications"
+    href="../notifications/index.html"
+>
+    <i data-lucide="bell"></i>
+    <span>Notifications</span>
+</a>
+
+<a
     id="menu-dashboard"
     href="../tableau-de-bord/index.html"
 >
@@ -294,19 +302,23 @@ export async function loadSidebar(profile) {
         window.location.pathname;
 
 
-    const pages = [
+const pages = [
 
-        ["/demandes/", "menu-demandes"],
+    ["/notifications/", "menu-notifications"],
 
-        ["/tableau-de-bord/", "menu-dashboard"],
+    ["/demandes/", "menu-demandes"],
 
-        ["/anciens-bons/", "menu-anciens"],
+    ["/tableau-de-bord/", "menu-dashboard"],
 
-        ["/historique-demandes/", "menu-historique"],
+    ["/anciens-bons/", "menu-anciens"],
 
-        ["/residents/", "menu-residents"]
+    ["/historique-demandes/", "menu-historique"],
 
-    ];
+    ["/residents/", "menu-residents"],
+
+    ["/recouvrement/", "menu-recouvrement"]
+
+];
 
 
     document
@@ -680,6 +692,21 @@ export async function loadSidebar(profile) {
                     notificationsQuery,
 
                     (snapshot) => {
+
+                            console.log(
+        "🔔 DEMANDES NON VUES :",
+        snapshot.size
+    );
+
+    snapshot.forEach((doc) => {
+
+        console.log(
+            "🔔 Notification :",
+            doc.id,
+            doc.data()
+        );
+
+    });
 
                         const nombre =
                             snapshot.size;

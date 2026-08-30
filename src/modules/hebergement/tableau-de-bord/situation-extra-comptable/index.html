@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Situation extra-comptable</title>
+
+    <!-- SIDEBAR -->
+    <link
+        rel="stylesheet"
+        href="../../components/sidebar.css"
+    >
+
+    <!-- CSS DE LA PAGE -->
+    <link
+        rel="stylesheet"
+        href="./situation-extra-comptable.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         HEADER MOBILE
+    ====================================================== -->
+
+    <header class="mobile-header">
+
+        <button
+            id="mobile-menu-btn"
+            type="button"
+            aria-label="Ouvrir le menu"
+        >
+            ☰
+        </button>
+
+        <h2 id="mobile-title">
+            Hébergement
+        </h2>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         LOADER
+    ====================================================== -->
+
+    <div id="app-loader">
+
+        <img
+            src="/src/assets/logo coud.png"
+            alt="Campus One"
+        >
+
+        <h2>
+            Campus One
+        </h2>
+
+        <p>
+            Chargement de la situation extra-comptable...
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <div id="sidebar-container"></div>
+
+
+
+    <!-- =====================================================
+         CONTENU PRINCIPAL
+    ====================================================== -->
+
+    <main id="content">
+
+
+        <!-- =================================================
+             EN-TÊTE DE LA PAGE
+        ================================================== -->
+
+        <section class="page-title">
+
+            <div>
+
+                <h1>
+                    Situation extra-comptable
+                </h1>
+
+                <p>
+                    État synthétique de la situation des loyers
+                    du pavillon
+                    <span id="pavillon-concerne">
+                        —
+                    </span>
+                    pour l'année académique
+                    <span id="annee-academique">
+                        —
+                    </span>
+                </p>
+
+            </div>
+
+            <div class="page-actions">
+
+                <button
+                    type="button"
+                    id="retour-recouvrement"
+                    class="secondary-btn"
+                >
+                    Retour au recouvrement
+                </button>
+
+                <button
+                    type="button"
+                    id="imprimer-situation"
+                    class="primary-btn"
+                >
+                    Imprimer
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             IDENTIFICATION DE LA SITUATION
+        ================================================== -->
+
+        <section class="card situation-identification">
+
+            <div class="card-header">
+
+                <div>
+
+                    <span class="section-kicker">
+                        ÉTAT ADMINISTRATIF
+                    </span>
+
+                    <h2>
+                        Identification de la situation
+                    </h2>
+
+                </div>
+
+                <span
+                    id="statut-situation"
+                    class="situation-status"
+                >
+                    En cours
+                </span>
+
+            </div>
+
+
+            <div class="identification-grid">
+
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Année académique
+                    </span>
+
+                    <strong id="info-annee">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Site
+                    </span>
+
+                    <strong id="info-site">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Pavillon
+                    </span>
+
+                    <strong id="info-pavillon">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Période
+                    </span>
+
+                    <strong id="info-periode">
+                        Novembre — Juillet
+                    </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Date de situation
+                    </span>
+
+                    <strong id="info-date">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <span class="info-label">
+                        Service
+                    </span>
+
+                    <strong>
+                        Service de l'Hébergement
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             SYNTHÈSE FINANCIÈRE
+        ================================================== -->
+
+        <section class="financial-summary">
+
+
+            <!-- MONTANT THÉORIQUE -->
+
+            <article class="summary-card">
+
+                <div class="summary-card-top">
+
+                    <span class="summary-label">
+                        Montant théorique
+                    </span>
+
+                    <span class="summary-icon">
+                        ₣
+                    </span>
+
+                </div>
+
+                <strong
+                    id="montant-theorique"
+                    class="summary-value"
+                >
+                    0 FCFA
+                </strong>
+
+                <span class="summary-description">
+                    Recettes attendues sur la période
+                </span>
+
+            </article>
+
+
+
+            <!-- MONTANT ENCAISSÉ -->
+
+            <article class="summary-card">
+
+                <div class="summary-card-top">
+
+                    <span class="summary-label">
+                        Montant encaissé
+                    </span>
+
+                    <span class="summary-icon">
+                        ✓
+                    </span>
+
+                </div>
+
+                <strong
+                    id="montant-encaisse"
+                    class="summary-value"
+                >
+                    0 FCFA
+                </strong>
+
+                <span class="summary-description">
+                    Paiements effectivement enregistrés
+                </span>
+
+            </article>
+
+
+
+            <!-- RESTE À RECOUVRER -->
+
+            <article class="summary-card">
+
+                <div class="summary-card-top">
+
+                    <span class="summary-label">
+                        Reste à recouvrer
+                    </span>
+
+                    <span class="summary-icon">
+                        !
+                    </span>
+
+                </div>
+
+                <strong
+                    id="reste-a-recouvrer"
+                    class="summary-value"
+                >
+                    0 FCFA
+                </strong>
+
+                <span class="summary-description">
+                    Solde restant dû
+                </span>
+
+            </article>
+
+
+
+            <!-- TAUX DE RECOUVREMENT -->
+
+            <article class="summary-card">
+
+                <div class="summary-card-top">
+
+                    <span class="summary-label">
+                        Taux de recouvrement
+                    </span>
+
+                    <span class="summary-icon">
+                        %
+                    </span>
+
+                </div>
+
+                <strong
+                    id="taux-recouvrement"
+                    class="summary-value"
+                >
+                    0 %
+                </strong>
+
+                <span class="summary-description">
+                    Niveau global de recouvrement
+                </span>
+
+            </article>
+
+
+        </section>
+
+
+
+        <!-- =================================================
+             SITUATION DES EFFECTIFS
+        ================================================== -->
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <span class="section-kicker">
+                        EFFECTIFS
+                    </span>
+
+                    <h2>
+                        Situation des occupants
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="occupancy-summary">
+
+
+                <div class="occupancy-item">
+
+                    <span>
+                        Effectif concerné
+                    </span>
+
+                    <strong id="effectif-concerne">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="occupancy-item">
+
+                    <span>
+                        Situations régularisées
+                    </span>
+
+                    <strong id="effectif-regulier">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="occupancy-item">
+
+                    <span>
+                        Situations présentant un solde
+                    </span>
+
+                    <strong id="effectif-dette">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="occupancy-item">
+
+                    <span>
+                        Taux de régularisation
+                    </span>
+
+                    <strong id="taux-regularisation">
+                        0 %
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+        <!-- =================================================
+     FILTRES PÉRIODIQUES
+================================================== -->
+
+<section class="card periodic-filters-card">
+
+    <div class="card-header">
+
+        <div>
+
+            <span class="section-kicker">
+                FILTRES
+            </span>
+
+            <h2>
+                Période de situation
+            </h2>
+
+            <p>
+                Sélectionnez la période à analyser
+                dans la situation extra-comptable.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="periodic-filters">
+
+
+        <!-- PÉRIODE -->
+
+        <div class="filter-group">
+
+            <label
+                for="filtre-periode"
+            >
+                Période
+            </label>
+
+            <select
+                id="filtre-periode"
+            >
+
+                <option value="toutes">
+                    Toutes les périodes
+                </option>
+
+                <option value="novembre">
+                    Novembre
+                </option>
+
+                <option value="decembre">
+                    Décembre
+                </option>
+
+                <option value="janvier">
+                    Janvier
+                </option>
+
+                <option value="fevrier">
+                    Février
+                </option>
+
+                <option value="mars">
+                    Mars
+                </option>
+
+                <option value="avril">
+                    Avril
+                </option>
+
+                <option value="mai">
+                    Mai
+                </option>
+
+                <option value="juin">
+                    Juin
+                </option>
+
+                <option value="juillet">
+                    Juillet
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ÉTAT DE LA PÉRIODE -->
+
+        <div class="filter-group">
+
+            <label
+                for="filtre-etat"
+            >
+                État de la période
+            </label>
+
+            <select
+                id="filtre-etat"
+            >
+
+                <option value="tous">
+                    Tous les états
+                </option>
+
+                <option value="regularisee">
+                    Régularisée
+                </option>
+
+                <option value="reste">
+                    Avec reste à recouvrer
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- RÉINITIALISATION -->
+
+        <div class="filter-actions">
+
+            <button
+                type="button"
+                id="reinitialiser-filtres"
+                class="secondary-btn"
+            >
+                Réinitialiser
+            </button>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+        <!-- =================================================
+             SITUATION MENSUELLE
+        ================================================== -->
+
+        <section class="card">
+
+
+            <div class="table-title-container">
+
+                <div>
+
+                    <span class="section-kicker">
+                        ÉTAT PÉRIODIQUE
+                    </span>
+
+                    <h2>
+                        Situation mensuelle des loyers
+                    </h2>
+
+                    <p>
+                        Synthèse des montants théoriques,
+                        encaissés et restant à recouvrer
+                        pour chaque période.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table class="table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Période
+                            </th>
+
+                            <th>
+                                Effectif concerné
+                            </th>
+
+                            <th>
+                                Montant théorique
+                            </th>
+
+                            <th>
+                                Montant encaissé
+                            </th>
+
+                            <th>
+                                Reste à recouvrer
+                            </th>
+
+                            <th>
+                                Taux
+                            </th>
+
+                            <th>
+                                Situation
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="situation-mensuelle-body">
+
+                        <tr class="empty-row">
+
+                            <td colspan="7">
+                                Chargement...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+
+                    <tfoot id="situation-mensuelle-footer">
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    TOTAL
+                                </strong>
+                            </td>
+
+                            <td>
+                                <strong id="total-effectif-mensuel">
+                                    0
+                                </strong>
+                            </td>
+
+                            <td>
+                                <strong id="total-theorique-mensuel">
+                                    0 FCFA
+                                </strong>
+                            </td>
+
+                            <td>
+                                <strong id="total-encaisse-mensuel">
+                                    0 FCFA
+                                </strong>
+                            </td>
+
+                            <td>
+                                <strong id="total-reste-mensuel">
+                                    0 FCFA
+                                </strong>
+                            </td>
+
+                            <td>
+                                <strong id="total-taux-mensuel">
+                                    0 %
+                                </strong>
+                            </td>
+
+                            <td>
+                                —
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             SYNTHÈSE DU RECOUVREMENT
+        ================================================== -->
+
+        <section class="card">
+
+
+            <div class="card-header">
+
+                <div>
+
+                    <span class="section-kicker">
+                        SYNTHÈSE
+                    </span>
+
+                    <h2>
+                        État du recouvrement
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="recouvrement-overview">
+
+
+                <div class="overview-block">
+
+                    <span>
+                        Périodes entièrement régularisées
+                    </span>
+
+                    <strong id="periodes-regulieres">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-block">
+
+                    <span>
+                        Périodes avec reste à recouvrer
+                    </span>
+
+                    <strong id="periodes-avec-reste">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-block">
+
+                    <span>
+                        Meilleur taux mensuel
+                    </span>
+
+                    <strong id="meilleur-taux">
+                        0 %
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-block">
+
+                    <span>
+                        Dernière période traitée
+                    </span>
+
+                    <strong id="derniere-periode">
+                        —
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             OBSERVATIONS
+        ================================================== -->
+
+        <section class="card observations-card">
+
+            <div class="card-header">
+
+                <div>
+
+                    <span class="section-kicker">
+                        OBSERVATIONS
+                    </span>
+
+                    <h2>
+                        Observations administratives
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="observations-container"
+                class="observations-container"
+            >
+
+                <p class="observation-empty">
+                    Aucune observation particulière.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             VISA / CONTRÔLE
+        ================================================== -->
+
+        <section class="card validation-card">
+
+            <div class="validation-grid">
+
+
+                <div>
+
+                    <span class="validation-label">
+                        Établi par
+                    </span>
+
+                    <strong id="etabli-par">
+                        Service de l'Hébergement
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span class="validation-label">
+                        Date d'établissement
+                    </span>
+
+                    <strong id="date-etablissement">
+                        —
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span class="validation-label">
+                        État
+                    </span>
+
+                    <strong id="etat-document">
+                        Situation en cours
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script
+        type="module"
+        src="./situation-extra-comptable.js"
+    ></script>
+
+
+</body>
+
+</html>

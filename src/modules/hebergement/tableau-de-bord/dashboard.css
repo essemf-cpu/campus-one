@@ -359,3 +359,87 @@ table{
     }
 
 }
+
+/* ==========================
+   ACTIONS TABLEAU DE BORD
+========================== */
+
+.page-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+}
+
+
+.dashboard-actions{
+
+    flex-shrink:0;
+
+}
+
+
+.btn-situation-extra{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px 18px;
+
+    background:#2563eb;
+
+    color:#fff;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+
+.btn-situation-extra:hover{
+
+    opacity:.9;
+
+}
+
+
+@media (max-width:768px){
+
+    .page-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .dashboard-actions{
+
+        width:100%;
+
+    }
+
+    .btn-situation-extra{
+
+        width:100%;
+
+        justify-content:center;
+
+    }
+
+}
